@@ -1,0 +1,6 @@
+1 instalar appserver
+2 crear db abraxas
+3 importar sql
+4 setear nombre y pass del db user en Servidor.ini
+5 setear ip y puerto en Servidor.ini y en las variables globales del cliente
+5 run!

@@ -1,0 +1,37 @@
+[INIT]
+NumPlataformas=7
+
+[Plataforma1] 'Newbie Dunjeon
+Mapa=168
+X=50
+Y=57
+
+[Plataforma2] 'Nix
+Mapa=34
+X=44
+Y=88
+
+[Plataforma3] 'Ullathorpe
+Mapa=1
+X=58
+Y=45
+
+[Plataforma4] 'Banderbill
+Mapa=59
+X=50
+Y=50
+
+[Plataforma5] 'Lindos
+Mapa=62
+X=72
+Y=41
+
+[Plataforma6] 'Arghal
+Mapa=196
+X=52
+Y=75
+
+[Plataforma7] 'Arkhein
+Mapa=151
+X=40
+Y=48

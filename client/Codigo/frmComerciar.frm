@@ -1,0 +1,592 @@
+VERSION 5.00
+Begin VB.Form frmComerciar 
+   Appearance      =   0  'Flat
+   BackColor       =   &H00000000&
+   BorderStyle     =   0  'None
+   ClientHeight    =   3795
+   ClientLeft      =   5325
+   ClientTop       =   2505
+   ClientWidth     =   3345
+   ClipControls    =   0   'False
+   ControlBox      =   0   'False
+   DrawMode        =   1  'Blackness
+   FillStyle       =   0  'Solid
+   ForeColor       =   &H00FFFFFF&
+   MaxButton       =   0   'False
+   MinButton       =   0   'False
+   ScaleHeight     =   253
+   ScaleMode       =   3  'Pixel
+   ScaleWidth      =   223
+   ShowInTaskbar   =   0   'False
+   StartUpPosition =   1  'CenterOwner
+   WhatsThisHelp   =   -1  'True
+   Begin VB.TextBox Cantidad 
+      Alignment       =   2  'Center
+      BackColor       =   &H00000000&
+      BorderStyle     =   0  'None
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00C0FFFF&
+      Height          =   210
+      Left            =   1200
+      MaxLength       =   6
+      TabIndex        =   14
+      Text            =   "1"
+      Top             =   3405
+      Width           =   780
+   End
+   Begin VB.PictureBox PicComercianteInv 
+      Appearance      =   0  'Flat
+      BackColor       =   &H00000000&
+      BorderStyle     =   0  'None
+      ForeColor       =   &H00FFFFFF&
+      Height          =   1440
+      Left            =   240
+      Picture         =   "frmComerciar.frx":0000
+      ScaleHeight     =   96
+      ScaleMode       =   3  'Pixel
+      ScaleWidth      =   192
+      TabIndex        =   0
+      Tag             =   "4"
+      Top             =   1680
+      Width           =   2880
+   End
+   Begin VB.Shape CantidadBorder 
+      BorderColor     =   &H0080FFFF&
+      Height          =   270
+      Left            =   2400
+      Shape           =   4  'Rounded Rectangle
+      Top             =   3405
+      Visible         =   0   'False
+      Width           =   690
+   End
+   Begin VB.Label lblPuedeUsar 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "No lo podés usar."
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H000000C0&
+      Height          =   225
+      Left            =   240
+      TabIndex        =   3
+      Top             =   1080
+      Visible         =   0   'False
+      Width           =   1590
+   End
+   Begin VB.Label lblItemPrice 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "1455314"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H0000C0C0&
+      Height          =   270
+      Left            =   810
+      TabIndex        =   2
+      Top             =   465
+      Visible         =   0   'False
+      Width           =   945
+   End
+   Begin VB.Label lblValor 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "Valor:"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H0080FFFF&
+      Height          =   225
+      Left            =   240
+      TabIndex        =   6
+      Top             =   495
+      Visible         =   0   'False
+      Width           =   510
+   End
+   Begin VB.Label lblItemName 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "Nombre de Item"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H0080C0FF&
+      Height          =   270
+      Left            =   240
+      TabIndex        =   1
+      Top             =   210
+      Visible         =   0   'False
+      Width           =   2850
+   End
+   Begin VB.Label lblMaxDef 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "23"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00C0C0FF&
+      Height          =   225
+      Left            =   1440
+      TabIndex        =   10
+      Top             =   735
+      Visible         =   0   'False
+      Width           =   240
+   End
+   Begin VB.Label lblDefense 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "Defensa:"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H008080FF&
+      Height          =   225
+      Left            =   240
+      TabIndex        =   8
+      Top             =   750
+      UseMnemonic     =   0   'False
+      Visible         =   0   'False
+      Width           =   765
+   End
+   Begin VB.Label lblNpcName 
+      Alignment       =   2  'Center
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "Nombre de Npc"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   12
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00FFFFFF&
+      Height          =   285
+      Left            =   720
+      TabIndex        =   13
+      Top             =   555
+      UseMnemonic     =   0   'False
+      Width           =   1785
+   End
+   Begin VB.Label lblGuion 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "-"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H008080FF&
+      Height          =   225
+      Left            =   1080
+      TabIndex        =   11
+      Top             =   735
+      UseMnemonic     =   0   'False
+      Visible         =   0   'False
+      Width           =   75
+   End
+   Begin VB.Label lblMinDef 
+      Alignment       =   1  'Right Justify
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "12"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00C0C0FF&
+      Height          =   225
+      Left            =   1080
+      TabIndex        =   9
+      Top             =   735
+      Visible         =   0   'False
+      Width           =   240
+   End
+   Begin VB.Label lblDamage 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "Daño:"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H008080FF&
+      Height          =   225
+      Left            =   240
+      TabIndex        =   5
+      Top             =   750
+      UseMnemonic     =   0   'False
+      Visible         =   0   'False
+      Width           =   525
+   End
+   Begin VB.Label lblMaxHit 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "23"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00C0C0FF&
+      Height          =   225
+      Left            =   1200
+      TabIndex        =   7
+      Top             =   735
+      Visible         =   0   'False
+      Width           =   240
+   End
+   Begin VB.Label lblMinHit 
+      Alignment       =   1  'Right Justify
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "12"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00C0C0FF&
+      Height          =   225
+      Left            =   840
+      TabIndex        =   4
+      Top             =   735
+      Visible         =   0   'False
+      Width           =   240
+   End
+   Begin VB.Label lblGuion2 
+      Appearance      =   0  'Flat
+      AutoSize        =   -1  'True
+      BackColor       =   &H80000005&
+      BackStyle       =   0  'Transparent
+      Caption         =   "-"
+      BeginProperty Font 
+         Name            =   "Arial"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H008080FF&
+      Height          =   225
+      Left            =   1335
+      TabIndex        =   12
+      Top             =   735
+      UseMnemonic     =   0   'False
+      Visible         =   0   'False
+      Width           =   75
+   End
+End
+Attribute VB_Name = "frmComerciar"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Option Explicit
+
+Private Sub Cantidad_GotFocus()
+    CantidadBorder.BorderColor = &H80FFFF
+End Sub
+
+Private Sub Cantidad_LostFocus()
+    CantidadBorder.BorderColor = &H80FFFF
+End Sub
+
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Button = vbLeftButton Then
+        Call Auto_Drag(hwnd)
+    End If
+End Sub
+
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+'If DragType = None Then
+    lblItemName.Visible = False
+    lblValor.Visible = False
+    lblItemPrice.Visible = False
+    lblPuedeUsar.Visible = False
+    
+    lblDamage.Visible = False
+    lblMinHit.Visible = False
+    lblMaxHit.Visible = False
+                            
+    lblDefense.Visible = False
+    lblMinDef.Visible = False
+    lblMaxDef.Visible = False
+    
+    lblGuion.Visible = False
+    lblGuion2.Visible = False
+    
+    lblNpcName.Visible = True
+'End If
+
+    If NpcTempSlot > 0 Then
+        Dim Prev As Byte
+        
+        Prev = NpcTempSlot
+        
+        NpcTempSlot = 0
+        
+        If NpcInv(Prev).ObjIndex > 0 Then
+            Call InvNpc.DrawSlot(Prev)
+        End If
+    End If
+End Sub
+
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Button = vbRightButton Then
+        Unload Me
+        Comerciando = False
+        Call WriteCommerceEnd
+    End If
+End Sub
+
+Private Sub Cantidad_Change()
+On Error GoTo ErrHandler
+
+    If LenB(Cantidad.text) < 1 Then
+        Exit Sub
+    End If
+    
+    'Make sure only valid chars are inserted (with Shift + Insert they can paste illegal chars)
+    Dim i As Long
+    Dim tempstr As String
+    Dim CharAscii As Integer
+    
+    For i = 1 To Len(Cantidad.text)
+        CharAscii = Asc(mid$(Cantidad.text, i, 1))
+        
+        If CharAscii > 47 And CharAscii < 58 Then
+            tempstr = tempstr & Chr$(CharAscii)
+        End If
+    Next i
+
+    If Val(tempstr) > MaxInvObjs Then
+        tempstr = MaxInvObjs
+    ElseIf Val(tempstr) < 1 Then
+        tempstr = "1"
+    End If
+
+    tempstr = PonerPuntos(Val(tempstr))
+    
+    If tempstr <> Cantidad.text Then
+        Cantidad.text = tempstr
+        Cantidad.SelStart = Len(Cantidad.text)
+    End If
+    
+    If NpcInvSelSlot > 0 Then
+        lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(Cantidad.text)))
+    End If
+        
+    Exit Sub
+    
+ErrHandler:
+    'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
+    Cantidad.text = "1"
+    Cantidad.SelStart = Len(Cantidad.text)
+End Sub
+
+Private Sub Form_Load()
+
+    'Dim x As Long
+    'Dim y As Long
+    'Dim n As Long
+    
+    'x = Width / Screen.TwipsPerPixelX
+    'y = Height / Screen.TwipsPerPixelY
+    
+    'set the corner angle by changing the value of 'n'
+    'n = 40
+    
+    'SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
+    
+    Call Make_Transparent_Form(hwnd, 225)
+    
+    NpcInvSelSlot = 0
+    
+    Picture = LoadPicture(GrhPath & "Comerciar.jpg")
+    
+End Sub
+
+Private Sub PicComercianteInv_DblClick()
+
+    If Not MainTimer.Check(TimersIndex.BuySell) Then
+        Exit Sub
+    End If
+    
+    If LenB(Cantidad.text) < 1 Then
+        Exit Sub
+    End If
+    
+    Dim Cuanto As Integer
+    
+    Cuanto = Val(Replace(Cantidad.text, ".", vbNullString))
+    
+    'If DragType = None Then
+        If NpcInvSelSlot > 0 Then
+            If Cuanto > 0 And Cuanto <= MaxInvObjs Then
+            
+                If Cuanto > NpcInv(NpcInvSelSlot).Amount Then
+                    Cuanto = NpcInv(NpcInvSelSlot).Amount
+                End If
+                
+                If UserGld >= CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Cuanto) Then
+                    Call WriteCommerceBuy(NpcInvSelSlot, Cuanto)
+                    Call Audio.mSound_PlayWav(SND_CLICK)
+                    PicComercianteInv.MousePointer = vbDefault
+                Else
+                    ShowConsoleMsg "No tenés suficiente oro.", 2, 51, 223, 1, 1
+                End If
+            End If
+        End If
+    'End If
+
+End Sub
+
+Private Sub PicComercianteInv_KeyUp(KeyCode As Integer, Shift As Integer)
+    If KeyCode = vbKeyEscape Then
+        Unload Me
+        Comerciando = False
+        Call WriteCommerceEnd
+    End If
+End Sub
+
+Private Sub PicComercianteInv_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    
+    'If DragType = InventarioNpc Then
+    'MOUSEPOINTER = vbDefault
+    'DragType = None
+    'ElseIf DragType = MiInventario Then
+    'If NpcInvSelSlot > 0 Then
+    'If IsNumeric(Cantidad.Text) Then
+    'If Cantidad.Text > 0 Then
+    'Call WriteCommerceSell(InvSelSlot, 1)
+    'call Audio.mSound_PlayWav(SND_CLICK)
+    'DragType = None
+    'frmMain.PicInv.MOUSEPOINTER = vbDefault
+    'End If
+    'End If
+    'End If
+    'End If
+    
+End Sub
+
+Private Sub PicComercianteInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+
+    If Button = vbRightButton Then
+        Unload Me
+        Comerciando = False
+        Call WriteCommerceEnd
+    End If
+    
+    'If Button = vbRightButton Then
+    'If IsNumeric(frmComerciar.Cantidad.Text) Then
+    'If frmComerciar.Cantidad.Text > 0 Then
+    'Call WriteCommerceSell(InvSelSlot, 1)
+    'call Audio.mSound_PlayWav(SND_CLICK)
+    'End If
+    'End If
+    'EXIT SUB
+    'End If
+    
+    'If DragType = InventarioNpc Then
+    'MOUSEPOINTER = vbDefault
+    'DragType = None
+    'End If
+End Sub

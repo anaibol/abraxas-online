@@ -1,0 +1,415 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "clsAudio"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'Controls all audio using DirectSound and DirectMusic 7.
+Option Explicit
+
+
+Private LastPlayMP3 As Boolean
+
+'Used By MP3 Playing
+Dim IMC   As IMediaControl
+Dim IBA   As IBasicAudio
+Dim IME   As IMediaEvent
+Dim IMPos As IMediaPosition
+
+'Direct Music
+Dim DMP As DirectMusicPerformance8
+Dim DML As DirectMusicLoader8
+Dim DMS As DirectMusicSegment8
+
+Dim mPlaying As Boolean ' Para ver si hay alguno reproduciendo
+
+'Direct Sound
+Dim DS As DirectSound8
+Dim DSE As DirectSoundEnum8
+
+Private Type mSound
+    file As Integer
+    lup As Byte 'Lup es Loop xD
+    buffer As DirectSoundSecondaryBuffer8
+End Type
+
+Dim init As Boolean
+
+Private Const mMaxSoundCount As Byte = 100
+Dim mSList(1 To mMaxSoundCount) As mSound
+
+Public acSound As Boolean 'Sonido activado ?
+Public acMusic As Boolean 'Musica activada ?
+Public vlSound As Integer 'Volumen  del  sonido
+Public vlMusic As Integer 'Volumen de la musica
+Dim avlSound As Integer 'Volumen  del  sonido
+Dim avlMusic As Integer 'Volumen de la musica
+Dim currentMidi As Integer
+
+'Hecho por mannakia, respetar derechos del autor
+Public Function mSound_InitDirect(dX As DirectX8, ByVal hwnd As Long) As Boolean
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Inicia el direct sound y setea el array          '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+On Error GoTo err
+    Set DSE = dX.GetDSEnum
+    Set DS = dX.DirectSoundCreate(DSE.GetGuid(1)) 'use the default device
+    DS.SetCooperativeLevel hwnd, DSSCL_NORMAL
+    
+    Dim i As Long
+    For i = 1 To mMaxSoundCount
+        Set mSList(i).buffer = Nothing
+    Next i
+    
+    Dim dmParams As DMUS_AUDIOPARAMS
+    
+    Set DMP = dX.DirectMusicPerformanceCreate
+    Set DML = dX.DirectMusicLoaderCreate
+    
+    DMP.InitAudio hwnd, DMUS_AUDIOF_ALL, dmParams, Nothing, DMUS_APATH_DYNAMIC_STEREO, 128
+    DMP.SetMasterAutoDownload True
+
+    'DML.SetSearchDirectory dirMidi
+
+    DMP.SetMasterVolume 100
+    
+    mSound_InitDirect = True
+    
+    init = True
+    Exit Function
+err:
+    mSound_InitDirect = False
+    
+End Function
+Public Function mSound_Refresh()
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Actualiza el volumen y la des/activacion         '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+    If init = False Then Exit Function
+    
+    If Not acSound Then mSound_StopWav -1
+    
+    If acMusic Then
+        If currentMidi <> 0 And Not mPlaying Then mMusic_PlayMid currentMidi
+    Else
+        mMusic_StopMid
+    End If
+    
+    If avlSound <> vlSound Then 'Actualizamos
+        avlSound = vlSound
+        
+        Dim i As Long
+        For i = 1 To mMaxSoundCount
+            If Not mSList(i).buffer Is Nothing Then
+                mSList(i).buffer.SetVolume vlSound
+            End If
+        Next i
+    End If
+    
+    If avlMusic <> vlMusic Then 'Actualizamos
+        avlMusic = vlMusic
+        
+        DMP.SetMasterVolume vlMusic
+    End If
+End Function
+Public Function mSound_StopWav(ByVal file As Integer)
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Frena los/el wav/s que este/n reproduciendo      '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+    Dim i As Long
+
+    For i = 1 To mMaxSoundCount
+        If mSList(i).file = file Or file = -1 Then
+            If Not mSList(i).buffer Is Nothing Then
+                mSList(i).buffer.Stop
+                
+                Set mSList(i).buffer = Nothing
+    
+                mSList(i).lup = 0
+                mSList(i).file = 0
+            End If
+        End If
+    Next i
+End Function
+Public Function mMusic_StopMid()
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Frena el midi actualmente reproduciendo          '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+    If mPlaying = True Then
+        DMP.StopEx DMS, 0, DMUS_SEGF_DEFAULT
+        Set DMS = Nothing
+    End If
+    
+    mPlaying = False
+End Function
+Public Function mMusic_PlayMid(ByVal file As Integer, Optional ByVal lup As Boolean)
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Carga y reproduce un midi                        '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+    If acMusic = False Or Not init Then Exit Function
+    
+    If mPlaying = True Then
+        DMP.StopEx DMS, 0, DMUS_SEGF_DEFAULT
+        Set DMS = Nothing
+    End If
+        
+    Set DMS = DML.LoadSegment(App.path & "\Music\" & file & ".mid")
+    DMS.SetStandardMidiFile
+    
+    If lup Then
+        DMS.SetRepeats -1
+    Else
+        DMS.SetRepeats 0
+    End If
+    
+    DMP.PlaySegmentEx DMS, DMUS_SEGF_DEFAULT, 0
+    
+    mPlaying = True
+End Function
+Public Function mSound_PlayWav(ByVal file As String, Optional ByVal lup As Byte = 0) As Byte
+'*******************************************************'
+'Author: Leandro Mendoza(Mannakia)                      '
+'Desc: Carga y reproduce un wav                         '
+'Last Modify: 10-03-10                                  '
+'*******************************************************'
+    Dim i As Long
+    
+    If acSound = False Or Not init Then Exit Function
+    If Not FileExist(App.path & "\Sfx\" & file, vbNormal) Then Exit Function
+'
+'    For i = 1 To mMaxSoundCount
+'        If mSList(i).file = file Then
+'            If Not (mSList(i).buffer.GetStatus() = DSBSTATUS_BUFFERLOST Or mSList(i).buffer.GetStatus() = 0) Then
+'                Exit Function
+'            End If
+'        End If
+'    Next i
+'
+    For i = 1 To mMaxSoundCount
+        If mSList(i).buffer Is Nothing Then
+            Exit For
+        End If
+    Next i
+   
+    If i > mMaxSoundCount Then
+        For i = 1 To mMaxSoundCount
+            If mSList(i).buffer.GetStatus() = DSBSTATUS_BUFFERLOST Or mSList(i).buffer.GetStatus() = 0 Then
+                Exit For
+            End If
+        Next i
+    End If
+    
+    'No hay buffers
+    If i > mMaxSoundCount Then Exit Function
+    
+    mSList(i).file = file
+    mSList(i).lup = lup
+    
+    'Limpiamos la memoria xD
+    Set mSList(i).buffer = Nothing
+
+    Dim BufferDesc As DSBUFFERDESC
+    BufferDesc.lFlags = DSBCAPS_CTRLVOLUME
+    
+    Set mSList(i).buffer = DS.CreateSoundBufferFromFile(App.path & "\Sfx\" & file & ".wav", BufferDesc)
+
+    mSList(i).buffer.SetVolume vlSound
+
+    If mSList(i).lup = 1 Then
+        mSList(i).buffer.Play DSBPLAY_LOOPING
+    Else
+        mSList(i).buffer.Play DSBPLAY_DEFAULT
+    End If
+
+    mSound_PlayWav = CByte(i)
+End Function
+
+Private Sub Class_Terminate()
+    Dim i As Long
+    For i = 1 To mMaxSoundCount
+        Set mSList(i).buffer = Nothing
+    Next i
+    
+    Set DMP = Nothing
+    Set DML = Nothing
+    Set DMS = Nothing
+    
+    Set DS = Nothing
+    Set DSE = Nothing
+End Sub
+Public Function MusicMP3Empty() As Boolean
+'Destroy the MP3 objects.
+
+On Error GoTo ErrorHandl
+    
+    Call MusicMP3Stop
+    
+    Set IBA = Nothing
+    Set IME = Nothing
+    Set IMPos = Nothing
+    Set IMC = Nothing
+    
+    MusicMP3Empty = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3Empty = False
+    End
+End Function
+
+Public Function MusicMP3Load(ByVal FilePath As String, Optional ByVal Volume As Long = 0, Optional ByVal Balance As Long = 0) As Boolean 'Loads a MP3 *
+    
+    On Error GoTo ErrorHandl
+    
+    If Not FileExist(FilePath, vbArchive) Then
+        Exit Function
+    End If
+    
+    If Not MusicMP3Empty() Then
+        GoTo ErrorHandl
+    End If
+    
+    Set IMC = New FilgraphManager
+    Call IMC.RenderFile(FilePath)
+    
+    Set IBA = IMC
+    
+    If Volume > 0 Then
+        Volume = 0
+    End If
+    
+    If Volume < -4000 Then
+        Volume = -4000
+    End If
+    
+    IBA.Volume = Volume
+    
+    If Balance > 5000 Then
+        Balance = 5000
+    End If
+    
+    If Balance < -5000 Then
+        Balance = -5000
+    End If
+    
+    IBA.Balance = Balance
+    
+    Set IME = IMC
+    
+    Set IMPos = IMC
+    
+    If ObjPtr(IMPos) Then
+        IMPos.Rate = 1#
+    End If
+    
+    IMPos.CurrentPosition = 0
+    
+    MusicMP3Load = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3Load = False
+End Function
+
+Public Function MusicMP3Play(ByVal MusicFile As Byte) As Boolean
+
+On Error GoTo ErrorHandl
+    
+    If Not MusicActivated Then
+        Exit Function
+    End If
+    
+    
+    If Not MusicMP3Load(MusicPath & MusicFile & ".mp3") Then
+        Exit Function
+    End If
+    
+    Call IMC.Run
+    
+    MusicMP3Play = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3Play = False
+End Function
+
+Public Sub MusicMP3GetLoop()
+'Check if the song need looping.
+    On Error GoTo ErrorHandl
+    
+    If IMPos.StopTime = IMPos.CurrentPosition Then
+        MusicMP3Stop
+        'MusicMP3Play
+    End If
+ErrorHandl:
+End Sub
+
+Public Function MusicMP3Stop() As Boolean
+
+On Error GoTo ErrorHandl
+    
+    If ObjPtr(IMC) > 0 Then
+        IMC.Stop
+        IMPos.CurrentPosition = 0
+    End If
+    
+    MusicMP3Stop = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3Stop = False
+End Function
+
+Public Function MusicMP3Pause() As Boolean
+'Pause a the current MP3 file.
+
+    On Error GoTo ErrorHandl
+    
+    Call IMC.Pause
+    
+    MusicMP3Pause = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3Pause = False
+End Function
+
+Public Function MusicMP3VolumeSet(ByVal Volume As Long) As Boolean
+'Set the volume to the current MP3.
+
+    On Error GoTo ErrorHandl
+    
+    If Volume > 0 Then
+        Volume = 0
+    End If
+    
+    If Volume < -4000 Then
+        Volume = -4000
+    End If
+    
+    IBA.Volume = Volume
+
+    MusicMP3VolumeSet = True
+    Exit Function
+
+ErrorHandl:
+    MusicMP3VolumeSet = False
+End Function
+
