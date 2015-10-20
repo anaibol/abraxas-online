@@ -27,7 +27,7 @@ On Error GoTo ErrOut
     DB_Port = Val(GetVar(ServidorIni, "MYSQL", "Port"))
     
     'Create the connection
-    DB_Conn.ConnectionString = "DRIVER={MySQL ODBC 3.51 Driver};SERVER=" & z & _
+    DB_Conn.ConnectionString = "DRIVER={MySQL ODBC 3.51 Driver};SERVER=" & DB_Host & _
         ";DATABASE=" & DB_Name & ";PORT=" & DB_Port & ";UID=" & DB_User & ";PWD=" & DB_Pass & ";OPTION=3"
     DB_Conn.CursorLocation = adUseClient
     
