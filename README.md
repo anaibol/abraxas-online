@@ -1,4 +1,3 @@
-# abraxas-old
-Old Abraxas, MMORPG game made in VB6 based on Argentum Online
+# Abraxas Online
 
 ![](http://i.imm.io/8w4c.png)
