@@ -72,10 +72,10 @@ Private Sub ButtonHolder_Click()
         Exit Sub
     End If
     
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
 End Sub
 
-Private Sub ButtonHolder_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub ButtonHolder_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 'Implements the mouse down event of the image button.
 'Toggle to Click image button.
     If Disabled Then
@@ -84,7 +84,7 @@ Private Sub ButtonHolder_MouseDown(Button As Integer, Shift As Integer, X As Sin
     ButtonHolder.Picture = ClickButtonImage
 End Sub
 
-Private Sub ButtonHolder_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub ButtonHolder_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 'Implements the mouse move event of the image button.
 'Toggle to pressed image button.
 
@@ -119,7 +119,7 @@ Public Sub ToggleToNormal()
     OverButton = False
 End Sub
 
-Private Sub ButtonHolder_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub ButtonHolder_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 'Implements the mouse up event of the image button.
 'Toggle to RollOver image button.
 

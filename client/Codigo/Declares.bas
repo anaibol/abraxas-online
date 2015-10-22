@@ -3,12 +3,12 @@ Option Explicit
 
 Public Declare Sub mouse_event Lib "user32" _
 (ByVal dwFlags As Long, ByVal dX As Long, _
-ByVal dY As Long, ByVal cButtons As Long, _
+ByVal dy As Long, ByVal cButtons As Long, _
 ByVal dwExtraInfo As Long)
 Public Const MOUSEEVENTF_LEFTDOWN = &H2
 Public Const MOUSEEVENTF_LEFTUP = &H4
 
-Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, Y, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
+Public Declare Function SetWindowPos Lib "user32" (ByVal hWnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, y, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
 Public Const HWND_TOPMOST = -1
 Public Const HWND_NOTOPMOST = -2
 Public Const SWP_NOMOVE = &H2
@@ -58,6 +58,7 @@ Public Const MAX_LIST_Items As Byte = 4
 Public InvLingosHerreria(1 To MAX_LIST_Items) As New clsGrapchicalInventory
 Public InvMaderasCarpinteria(1 To MAX_LIST_Items) As New clsGrapchicalInventory
 
+Public SurfaceDB As clsSurfaceManager   'No va new porque es una interfaz, el new se pone al decidir que clase de objeto es
 Public CustomKeys As New clsCustomKeys
 Public CustomMessages As New clsCustomMessages
 
@@ -351,10 +352,10 @@ Public Enum eObjType
 End Enum
 
 'Tamaño del mapa
-Public Const XMaxMapSize As Byte = 100
-Public Const XMinMapSize As Byte = 1
-Public Const YMaxMapSize As Byte = 100
-Public Const YMinMapSize As Byte = 1
+Public Const XMaxMapSize As Integer = 500
+Public Const XMinMapSize As Integer = 1
+Public Const YMaxMapSize As Integer = 500
+Public Const YMinMapSize As Integer = 1
 
 'Mensajes
 Public Const MENSAJE_CRIATURA_FALLA_GOLPE As String = "¡La criatura falló el golpe!"
@@ -670,6 +671,10 @@ Public Const Elf_Wood_Grh As Integer = 1999
 
 Public picMouseIcon As Picture
 
+'MINIMAPA
+Public SupBMiniMap As DirectDrawSurface7
+Public SupMiniMap As DirectDrawSurface7
+
 Public Enum EstadoTiempo
     Amanecer = 1
     Mañana = 2
@@ -712,6 +717,8 @@ Public Consola As ConsolaLoqui
 'End Enum
 
 'Public DragType As BeginDrag
+
+Public HDSerialOK As Boolean
 
 Public PicInvDragging As Boolean
 

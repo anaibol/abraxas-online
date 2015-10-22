@@ -78,8 +78,8 @@ Public Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRg
 Public Declare Function HideCaret Lib "user32" (ByVal hWnd As Long) As Long
 
 Private Type POINTAPI
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
 Property Get TitleBarHeight() As Long
@@ -115,7 +115,13 @@ On Error Resume Next
 End Sub
 
 Public Sub CargarMiniMapa()
-
+    Dim DDm As DDSURFACEDESC2
+    DDm.lHeight = 2000
+    DDm.lWidth = 2000
+    DDm.ddsCaps.lCaps = DDSCAPS_SYSTEMMEMORY
+    DDm.lFlags = DDSD_CAPS Or DDSD_HEIGHT Or DDSD_WIDTH
+    Set SupMiniMap = DirectDraw.CreateSurface(DDm)
+    Set SupBMiniMap = DirectDraw.CreateSurface(DDm)
 End Sub
 
 Public Sub CargarAnimEscudos()
@@ -342,7 +348,7 @@ Private Sub CheckKeys()
         Meditando = False
         Charlist(UserCharIndex).FxIndex = 0
         
-        Call Audio.mSound_StopWav(PortalBufferIndex)
+        Call Audio.StopWave(PortalBufferIndex)
         PortalBufferIndex = 0
     End If
 
@@ -400,6 +406,108 @@ Private Sub CheckKeys()
     End If
 
 End Sub
+
+Public Sub CargarMapa(ByVal map As Integer)
+
+
+    On Error Resume Next
+    
+    Dim x As Integer
+    Dim y As Integer
+    Dim TempInt As Integer
+    Dim ByFlags As Byte
+    
+    Dim HandleMap As Integer
+    Dim HandleInf As Integer
+    
+    'map
+    HandleMap = FreeFile()
+    Open MapPath & "Mapa" & map & ".map" For Binary As HandleMap
+    Seek HandleMap, 1
+    
+    'inf
+    HandleInf = FreeFile()
+    Open MapPath & "Mapa" & map & ".inf" For Binary As HandleInf
+    Seek HandleInf, 1
+    
+    'map Header
+    Get HandleMap, , MapInfo(map).Version
+    Get HandleMap, , MiCabecera
+    Get HandleMap, , TempInt
+    Get HandleMap, , TempInt
+    Get HandleMap, , TempInt
+    Get HandleMap, , TempInt
+    
+    'Load arrays
+    For y = YMinMapSize To YMaxMapSize
+        For x = XMinMapSize To XMaxMapSize
+            With MapData(x, y)
+                Get HandleMap, , ByFlags
+                
+                .Blocked = False 'ByFlags And 1
+                                     
+                Get HandleMap, , .Graphic(1).GrhIndex
+                InitGrh .Graphic(1), .Graphic(1).GrhIndex
+                
+                'Layer 2 used?
+                If ByFlags And 2 Then
+                    Get HandleMap, , .Graphic(2).GrhIndex
+                    InitGrh .Graphic(2), .Graphic(2).GrhIndex
+                Else
+                    .Graphic(2).GrhIndex = 0
+                End If
+                    
+                'Layer 3 used?
+                If ByFlags And 4 Then
+                    Get HandleMap, , .Graphic(3).GrhIndex
+                    InitGrh .Graphic(3), .Graphic(3).GrhIndex
+                Else
+                    .Graphic(3).GrhIndex = 0
+                End If
+                    
+                'Layer 4 used?
+                If ByFlags And 8 Then
+                    Get HandleMap, , .Graphic(4).GrhIndex
+                    InitGrh .Graphic(4), .Graphic(4).GrhIndex
+                Else
+                    .Graphic(4).GrhIndex = 0
+                End If
+                
+                'Trigger used?
+                If ByFlags And 16 Then
+                    Get HandleMap, , .Trigger
+                Else
+                    .Trigger = 0
+                End If
+                
+                Get HandleInf, , ByFlags
+                
+                'TileExit
+                If ByFlags And 1 Then
+                    Get HandleInf, , .TileExit.map
+                    Get HandleInf, , .TileExit.x
+                    Get HandleInf, , .TileExit.y
+                End If
+                                                      
+                'Erase NPCs
+                If .CharIndex > 0 Then
+                    Call EraseChar(.CharIndex)
+                End If
+                
+                'Erase OBJs
+                .Obj.Grh.GrhIndex = 0
+                .Obj.Name = vbNullString
+                .Obj.Amount = 0
+                .FxIndex = 0
+            End With
+        Next x
+    Next y
+       
+    Close HandleMap
+    Close HandleInf
+           
+End Sub
+
 Function ReadField(ByVal Pos As Integer, ByRef Text As String, ByVal SepASCII As Byte) As String
 'Gets a field from a delimited string
 
@@ -502,7 +610,7 @@ On Error Resume Next
     PacketName(ServerPacketID.ObjectDelete) = "ObjectDelete"
     PacketName(ServerPacketID.BlockPosition) = "BlockPosition"
     PacketName(ServerPacketID.PlayMP3) = "PlayMP3"
-    PacketName(ServerPacketID.PlayWav) = "PlayWav"
+    PacketName(ServerPacketID.SoundFX) = "SoundFX"
     PacketName(ServerPacketID.GuildList) = "GuildList"
     PacketName(ServerPacketID.AreaChanged) = "AreaChanged"
     PacketName(ServerPacketID.PauseToggle) = "PauseToggle"
@@ -653,7 +761,9 @@ On Error Resume Next
     
     'Initialize FONTTYPES
     Call modFonts.InitFonts
-
+         
+    Set SurfaceDB = New clsSurfaceManDyn
+    
     Call modResolution.SetResolution
                          
     'Set resolution BEFORE the loading form is displayed, therefore it will be centeRed.
@@ -671,22 +781,30 @@ On Error Resume Next
     Call CargarAnimArmas
     Call CargarAnimEscudos
     Call CargarMiniMapa
+    
+    UserMap = 1
+    Call GenerarMiniMapa
+        
+    CargarMapa UserMap
 
     'Inicializamos el inventario gráfico
-    Call Inventario.Initialize(frmMain.PicInv, MaxInvSlots)
+    Call Inventario.Initialize(DirectDraw, frmMain.PicInv, MaxInvSlots)
     
-    Call Cinturon.Initialize(frmMain.PicBelt, MaxBeltSlots)
+    Call Cinturon.Initialize(DirectDraw, frmMain.PicBelt, MaxBeltSlots)
     
-    Call Hechizos.Initialize(frmMain.PicSpellInv, MaxSpellSlots)
+    Call Hechizos.Initialize(DirectDraw, frmMain.PicSpellInv, MaxSpellSlots)
     
     'Call InvCompanieros.Initialize(DirectDraw, frmMain.PicCompaInv, MaxCompaSlots)
     
+    'Inicializamos el sonido
+    Call Audio.Initialize(DirectX, frmMain.hWnd, SfxPath, MusicPath)
+        
     'If Not ChangeResolution And Not ResolucionActual Then
     'frmConnect.BorderStyle = 3
     'frmConnect.Caption = frmConnect.Caption
     'End If
     
-    Call Audio.mSound_PlayWav(SND_INTRO)
+    Call Audio.Play(SND_INTRO)
 
     'Lo.pongo.antes
     frmConnect.Visible = True
@@ -760,7 +878,7 @@ Public Sub DoMeditar()
         Call InitGrh(.fX, FxData(.FxIndex).Animacion)
         
         If PortalBufferIndex = 0 Then
-            PortalBufferIndex = Audio.mSound_PlayWav(SND_PORTAL, 1)
+            PortalBufferIndex = Audio.Play(SND_PORTAL, .Pos.x, .Pos.y, LoopStyle.Enabled)
         End If
     End With
 
@@ -823,11 +941,11 @@ Private Function CMSValidateChar_(ByVal iAsc As Integer) As Boolean
 End Function
 
 'TODO : como todo lo relativo a mapas, no tiene nada que hacer acá....
-Public Function HayAgua(ByVal X As Integer, ByVal Y As Integer) As Boolean
-    HayAgua = ((MapData(X, Y).Graphic(1).GrhIndex >= 1505 And MapData(X, Y).Graphic(1).GrhIndex <= 1520) Or _
-            (MapData(X, Y).Graphic(1).GrhIndex >= 5665 And MapData(X, Y).Graphic(1).GrhIndex <= 5680) Or _
-            (MapData(X, Y).Graphic(1).GrhIndex >= 13547 And MapData(X, Y).Graphic(1).GrhIndex <= 13562)) And _
-                MapData(X, Y).Graphic(2).GrhIndex = 0
+Public Function HayAgua(ByVal x As Integer, ByVal y As Integer) As Boolean
+    HayAgua = ((MapData(x, y).Graphic(1).GrhIndex >= 1505 And MapData(x, y).Graphic(1).GrhIndex <= 1520) Or _
+            (MapData(x, y).Graphic(1).GrhIndex >= 5665 And MapData(x, y).Graphic(1).GrhIndex <= 5680) Or _
+            (MapData(x, y).Graphic(1).GrhIndex >= 13547 And MapData(x, y).Graphic(1).GrhIndex <= 13562)) And _
+                MapData(x, y).Graphic(2).GrhIndex = 0
                 
 End Function
 
@@ -912,6 +1030,9 @@ End Sub
 
 Public Sub CloseClient()
 'Frees all used resources, cleans up and leaves
+
+    'Allow new instances of the client to be opened
+    Call ReleaseInstance
     
     EngineRun = False
 
@@ -923,6 +1044,7 @@ Public Sub CloseClient()
     'Destruimos los objetos públicos creados
     Set CustomMessages = Nothing
     Set CustomKeys = Nothing
+    Set SurfaceDB = Nothing
     Set Dialogos = Nothing
     Set Audio = Nothing
     Set Inventario = Nothing
@@ -1237,10 +1359,10 @@ Public Sub Equipar()
         Dim DR As RECT
     
         SR.Right = 32
-        SR.bottom = 32
+        SR.Bottom = 32
      
         DR.Right = 32
-        DR.bottom = 32
+        DR.Bottom = 32
                 
         Select Case .ObjType
         

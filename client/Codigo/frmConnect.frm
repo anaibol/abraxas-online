@@ -88,6 +88,7 @@ Begin VB.Form frmConnect
       _Version        =   393217
       BackColor       =   16576
       BorderStyle     =   0
+      Enabled         =   -1  'True
       MultiLine       =   0   'False
       MousePointer    =   1
       DisableNoScroll =   -1  'True
@@ -97,7 +98,7 @@ Begin VB.Form frmConnect
       OLEDropMode     =   0
       TextRTF         =   $"frmConnect.frx":000C
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -117,15 +118,16 @@ Begin VB.Form frmConnect
       _Version        =   393217
       BackColor       =   16576
       BorderStyle     =   0
+      Enabled         =   -1  'True
       MultiLine       =   0   'False
       MousePointer    =   1
       DisableNoScroll =   -1  'True
       Appearance      =   0
       OLEDragMode     =   0
       OLEDropMode     =   0
-      TextRTF         =   $"frmConnect.frx":0090
+      TextRTF         =   $"frmConnect.frx":009A
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   21.75
          Charset         =   0
          Weight          =   400
@@ -141,7 +143,7 @@ Begin VB.Form frmConnect
       BackStyle       =   0  'Transparent
       Caption         =   "Entrar"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -163,7 +165,7 @@ Begin VB.Form frmConnect
       BackStyle       =   0  'Transparent
       Caption         =   "Empezar"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -185,7 +187,7 @@ Begin VB.Form frmConnect
       BackStyle       =   0  'Transparent
       Caption         =   "X"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   15.75
          Charset         =   0
          Weight          =   700
@@ -208,7 +210,7 @@ Begin VB.Form frmConnect
       BackStyle       =   0  'Transparent
       Caption         =   "X"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   15.75
          Charset         =   0
          Weight          =   700
@@ -244,7 +246,7 @@ Begin VB.Form frmConnect
       Appearance      =   0  'Flat
       Height          =   180
       Left            =   4320
-      Picture         =   "frmConnect.frx":0114
+      Picture         =   "frmConnect.frx":0128
       Top             =   5880
       Width           =   180
    End
@@ -283,7 +285,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Private ret As Long
+Private Ret As Long
 
 Private arrValues() As String
 
@@ -331,7 +333,7 @@ Private Sub Empezar_Click()
     
     'frmMain.Socket1.Connect
     
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     frmCrearPersonaje.Show vbModal
 End Sub
@@ -342,9 +344,9 @@ On Error Resume Next
 
     Visible = False
     
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
-    If LenB(PasswordTxt.text) < 1 Then
+    If LenB(PasswordTxt.Text) < 1 Then
         PasswordTxtBorder.BorderColor = &H80&
         PasswordTxtBorder.Visible = True
         PsNo.Visible = True
@@ -352,7 +354,7 @@ On Error Resume Next
         Exit Sub
     End If
        
-    If LenB(NameTxt.text) < 3 Or Len(NameTxt.text) > 15 Then
+    If LenB(NameTxt.Text) < 3 Or Len(NameTxt.Text) > 15 Then
         NameTxtBorder.BorderColor = &H80&
         NameTxtBorder.Visible = True
         NmNo.Visible = True
@@ -360,7 +362,7 @@ On Error Resume Next
         Exit Sub
     End If
     
-    If Len(PasswordTxt.text) < 6 Then
+    If Len(PasswordTxt.Text) < 6 Then
         PasswordTxtBorder.BorderColor = &H80&
         PasswordTxtBorder.Visible = True
         PsNo.Visible = True
@@ -375,9 +377,9 @@ On Error Resume Next
     MousePointer = 11
             
     'Update user info
-    UserName = NameTxt.text
+    UserName = NameTxt.Text
 
-    UserPassword = PasswordTxt.text
+    UserPassword = PasswordTxt.Text
         
     EstadoLogin = Normal
     
@@ -397,14 +399,14 @@ End Sub
 
 Private Sub Form_Activate()
     If Not ChangeResolution Then
-        ret = GetWindowLong(hwnd, -20)
-        ret = ret Or &H80000
-        SetWindowLong hwnd, -20, ret
+        Ret = GetWindowLong(hWnd, -20)
+        Ret = Ret Or &H80000
+        SetWindowLong hWnd, -20, Ret
         Timer1.Interval = 5
         Timer1.Enabled = True
     End If
     
-    Call SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS)
+    Call SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS)
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
@@ -421,33 +423,33 @@ On Error Resume Next
      
     Icon = frmMain.Icon
     
-    Call Make_Transparent_Richtext(NameTxt.hwnd)
-    Call Make_Transparent_Richtext(PasswordTxt.hwnd)
+    Call Make_Transparent_Richtext(NameTxt.hWnd)
+    Call Make_Transparent_Richtext(PasswordTxt.hWnd)
     
     'Get the username/password
     eName = (GetVar(DataPath & "Game.ini", "INIT", "Name"))
     
     If LenB(eName) > 0 Then
-        NameTxt.text = eName
+        NameTxt.Text = eName
         
         ePass = (GetVar(DataPath & "Game.ini", "INIT", "Pass"))
             
         If LenB(ePass) > 0 Then
-            PasswordTxt.text = ePass
+            PasswordTxt.Text = ePass
             SavePassImg.Visible = True
-            Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+            Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
         Else
-            Call SendMessage(PasswordTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+            Call SendMessage(PasswordTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
             'PasswordTxtBorder.Visible = True
         End If
         
     Else
-        NameTxt.SelLength = Len(NameTxt.text)
+        NameTxt.SelLength = Len(NameTxt.Text)
         NameTxt.SelColor = RGB(255, 255, 255)
                
-        PasswordTxt.SelLength = Len(PasswordTxt.text)
+        PasswordTxt.SelLength = Len(PasswordTxt.Text)
         PasswordTxt.SelColor = RGB(255, 255, 255)
-        Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0)
+        Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0)
     End If
     
     'Redim arrValues(0)
@@ -456,9 +458,9 @@ On Error Resume Next
 End Sub
 
 Private Sub imgConectar_Click()
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
-    If LenB(PasswordTxt.text) < 1 Then
+    If LenB(PasswordTxt.Text) < 1 Then
         PasswordTxtBorder.BorderColor = &H80&
         PasswordTxtBorder.Visible = True
         PsNo.Visible = True
@@ -466,7 +468,7 @@ Private Sub imgConectar_Click()
         Exit Sub
     End If
        
-    If LenB(NameTxt.text) < 3 Or Len(NameTxt.text) > 15 Then
+    If LenB(NameTxt.Text) < 3 Or Len(NameTxt.Text) > 15 Then
         NameTxtBorder.BorderColor = &H80&
         NameTxtBorder.Visible = True
         NmNo.Visible = True
@@ -474,7 +476,7 @@ Private Sub imgConectar_Click()
         Exit Sub
     End If
     
-    If Len(PasswordTxt.text) < 6 Then
+    If Len(PasswordTxt.Text) < 6 Then
         PasswordTxtBorder.BorderColor = &H80&
         PasswordTxtBorder.Visible = True
         PsNo.Visible = True
@@ -489,9 +491,9 @@ Private Sub imgConectar_Click()
     MousePointer = 11
             
     'Update user info
-    UserName = NameTxt.text
+    UserName = NameTxt.Text
 
-    UserPassword = PasswordTxt.text
+    UserPassword = PasswordTxt.Text
         
     EstadoLogin = Normal
     
@@ -525,7 +527,7 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y A
 End Sub
 
 Private Sub imgCrearPJ_Click()
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     frmCrearPersonaje.Show vbModal
 End Sub
@@ -536,10 +538,16 @@ Private Sub NameTxt_Change()
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    If LenB(NameTxt.text) > 0 Then
-    
-        For i = 1 To Len(NameTxt.text)
-            CharAscii = Asc(mid$(NameTxt.text, i, 1))
+    If LenB(NameTxt.Text) > 0 Then
+        
+        NameTxt.Text = LTrim$(NameTxt.Text)
+        
+        If LenB(NameTxt.Text) < 1 Then
+            Exit Sub
+        End If
+        
+        For i = 1 To Len(NameTxt.Text)
+            CharAscii = Asc(mid$(NameTxt.Text, i, 1))
             
             If (CharAscii > 64 And CharAscii < 91) Or (CharAscii > 96 And CharAscii < 123) Or CharAscii = 32 Then
                 tempstr = tempstr & Chr$(CharAscii)
@@ -549,40 +557,40 @@ Private Sub NameTxt_Change()
         tempstr = StrConv(tempstr, vbProperCase)
         
         If LenB(tempstr) < 1 Then
-            NameTxt.text = vbNullString
+            NameTxt.Text = vbNullString
             Exit Sub
         End If
         
-        If tempstr <> NameTxt.text Then
+        If tempstr <> NameTxt.Text Then
             'We only set it if it's different, otherwise the event will be raised
             'constantly and the client will crush
-            NameTxt.text = tempstr
+            NameTxt.Text = tempstr
             PasswordTxtBorder.BorderColor = &HC0FFFF
         End If
 
         If LenB(eName) > 0 Then
             If LenB(ePass) > 0 Then
-                If NameTxt.text = eName Then
-                    PasswordTxt.text = ePass
+                If NameTxt.Text = eName Then
+                    PasswordTxt.Text = ePass
                     SavePassImg.Visible = True
                 Else
-                    PasswordTxt.text = vbNullString
+                    PasswordTxt.Text = vbNullString
                     PasswordTxt.SelColor = RGB(255, 255, 255)
                     SavePassImg.Visible = False
                 End If
             Else
-                PasswordTxt.text = vbNullString
+                PasswordTxt.Text = vbNullString
                 PasswordTxt.SelColor = RGB(255, 255, 255)
                 SavePassImg.Visible = False
             End If
         Else
             SavePassImg.Visible = False
-            PasswordTxt.text = vbNullString
+            PasswordTxt.Text = vbNullString
             PasswordTxt.SelColor = RGB(255, 255, 255)
         End If
     Else
         SavePassImg.Visible = False
-        PasswordTxt.text = vbNullString
+        PasswordTxt.Text = vbNullString
         PasswordTxt.SelColor = RGB(255, 255, 255)
     End If
         
@@ -590,11 +598,11 @@ Private Sub NameTxt_Change()
     'Call AutoCompletar_TextBox
     'End If
     
-    NameTxt.SelLength = Len(NameTxt.text)
+    NameTxt.SelLength = Len(NameTxt.Text)
         
     NameTxt.SelColor = RGB(255, 255, 255)
     
-    NameTxt.SelStart = Len(NameTxt.text)
+    NameTxt.SelStart = Len(NameTxt.Text)
     
     NmNo.Visible = False
     NameTxtBorder.BorderColor = &HC0FFFF
@@ -611,19 +619,19 @@ Private Sub PasswordTxt_Change()
     
     PasswordTxt.SelStart = 0
 
-    PasswordTxt.SelLength = Len(PasswordTxt.text)
+    PasswordTxt.SelLength = Len(PasswordTxt.Text)
         
     PasswordTxt.SelColor = RGB(255, 255, 255)
     
-    PasswordTxt.SelStart = Len(PasswordTxt.text)
+    PasswordTxt.SelStart = Len(PasswordTxt.Text)
     
     PsNo.Visible = False
     
     PasswordTxtBorder.BorderColor = &HC0FFFF
     
-    Call SendMessage(PasswordTxt.hwnd, &HCC, Asc("*"), 0)
+    Call SendMessage(PasswordTxt.hWnd, &HCC, Asc("*"), 0)
     
-    HideCaret PasswordTxt.hwnd
+    HideCaret PasswordTxt.hWnd
 End Sub
 
 Private Sub NameTxt_GotFocus()
@@ -635,12 +643,12 @@ Private Sub NameTxt_GotFocus()
     End If
         
     NameTxt.SelStart = 0
-    NameTxt.SelLength = Len(NameTxt.text)
+    NameTxt.SelLength = Len(NameTxt.Text)
 End Sub
 
 Private Sub PasswordTxt_GotFocus()
 
-    If LenB(NameTxt.text) < 1 Then
+    If LenB(NameTxt.Text) < 1 Then
         NameTxtBorder.BorderColor = &H80&
         NameTxtBorder.Visible = True
         NmNo.Visible = True
@@ -648,7 +656,7 @@ Private Sub PasswordTxt_GotFocus()
     End If
     
     PasswordTxtBorder.Visible = True
-    HideCaret PasswordTxt.hwnd
+    HideCaret PasswordTxt.hWnd
 
     If PasswordTxtBorder.BorderColor = &H80& Then
         PsNo.Visible = True
@@ -656,6 +664,14 @@ Private Sub PasswordTxt_GotFocus()
 End Sub
 
 Private Sub NameTxt_LostFocus()
+    NameTxt.Text = RTrim$(NameTxt.Text)
+        
+    If LenB(NameTxt.Text) < 1 Then
+        NameTxtBorder.BorderColor = &H80&
+        NameTxt.SetFocus
+        Exit Sub
+    End If
+    
     NameTxtBorder.Visible = False
     NmNo.Visible = False
     PsNo.Visible = False
@@ -663,7 +679,7 @@ Private Sub NameTxt_LostFocus()
 End Sub
 
 Private Sub PasswordTxt_KeyUp(KeyCode As Integer, Shift As Integer)
-    HideCaret PasswordTxt.hwnd
+    HideCaret PasswordTxt.hWnd
 End Sub
 
 Private Sub PasswordTxt_LostFocus()
@@ -674,6 +690,15 @@ End Sub
 Private Sub NameTxt_KeyDown(KeyCode As Integer, Shift As Integer)
     If KeyCode = vbKeyReturn Then
         Call imgConectar_Click
+    ElseIf KeyCode = vbKeyI And Shift > 0 Then
+        If ServerIpe.Visible = False Then
+            'ServerIP = "127.0.0.1"
+            'ServerIpe.Visible = True
+        Else
+            ServerIP = "abraxas-online.no-ip.org"
+            ServerIpe.Visible = False
+        End If
+        KeyCode = 0
     End If
 End Sub
 
@@ -681,14 +706,23 @@ Private Sub PasswordTxt_KeyDown(KeyCode As Integer, Shift As Integer)
     If KeyCode = vbKeyReturn Then
         Call imgConectar_Click
     ElseIf KeyCode = vbKeyBack Then
-        PasswordTxt.text = vbNullString
+        PasswordTxt.Text = vbNullString
+    ElseIf KeyCode = vbKeyI And Shift > 0 Then
+        If ServerIpe.Visible = False Then
+            ServerIP = "127.0.0.1"
+            ServerIpe.Visible = True
+        Else
+            ServerIP = "abraxas-online.no-ip.org"
+            ServerIpe.Visible = False
+        End If
+        KeyCode = 0
     End If
     
-    HideCaret PasswordTxt.hwnd
+    HideCaret PasswordTxt.hWnd
 End Sub
 
 Private Sub PasswordTxt_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
-    HideCaret PasswordTxt.hwnd
+    HideCaret PasswordTxt.hWnd
 End Sub
 
 Private Sub SavePassImg_Click()
@@ -727,7 +761,7 @@ Private Sub AutoCompletar_TextBox()
     Dim i As Integer
     Dim posSelect As Integer
  
-    Select Case (bKeyBack Or Len(NameTxt.text) = 0)
+    Select Case (bKeyBack Or Len(NameTxt.Text) = 0)
         Case True
             bKeyBack = False
             Exit Sub
@@ -737,14 +771,14 @@ Private Sub AutoCompletar_TextBox()
         'Recorremos todos los elementos del array
         For i = 0 To UBound(arrValues)
             'Buscamos coincidencias
-            If InStr(1, arrValues(i), .text, vbTextCompare) = 1 Then
+            If InStr(1, arrValues(i), .Text, vbTextCompare) = 1 Then
                 posSelect = .SelStart
                 'Asignar el texto de array al textbox
-                .text = arrValues(i)
+                .Text = arrValues(i)
            
                 'seleccionar el texto
                 .SelStart = posSelect
-                .SelLength = Len(.text) - posSelect
+                .SelLength = Len(.Text) - posSelect
                 Exit For 'salimos del bucle
             End If
         Next i
@@ -789,10 +823,14 @@ Private Sub DeleteValues()
     
     'Esto es para ponerlo en un boton o checkboxz para borrar con este PUBLIC SUB
     Call DeleteValues
-    NameTxt.text = vbNullString
+    NameTxt.Text = vbNullString
     ReDim arrValues(0)
     Call LoadValues(arrValues)
 
+End Sub
+
+Private Sub ServerIpe_Change()
+    ServerIP = ServerIpe.Text
 End Sub
 
 Private Sub Timer1_Timer()
@@ -804,9 +842,9 @@ Private Sub Timer1_Timer()
         Timer1.Enabled = False
     Else
         If Cont + 80 > 255 Then
-            SetLayeredWindowAttributes hwnd, 0, 255, &H2
+            SetLayeredWindowAttributes hWnd, 0, 255, &H2
         Else
-            SetLayeredWindowAttributes hwnd, 0, Cont + 80, &H2
+            SetLayeredWindowAttributes hWnd, 0, Cont + 80, &H2
         End If
     End If
 End Sub
@@ -814,43 +852,43 @@ End Sub
 Private Sub Timer2_Timer()
     If Not Screen.ActiveControl Is Nothing Then
         If Screen.ActiveControl = NameTxt Then
-              HideCaret NameTxt.hwnd
+              HideCaret NameTxt.hWnd
         ElseIf Screen.ActiveControl = PasswordTxt Then
-            HideCaret PasswordTxt.hwnd
+            HideCaret PasswordTxt.hWnd
         Else
-            If LenB(NameTxt.text) > 0 Then
-                NameTxt.text = eName
+            If LenB(NameTxt.Text) > 0 Then
+                NameTxt.Text = eName
         
-                If LenB(PasswordTxt.text) > 0 Then
+                If LenB(PasswordTxt.Text) > 0 Then
                     NameTxt.SelStart = 0
-                    NameTxt.SelLength = Len(NameTxt.text)
-                    Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+                    NameTxt.SelLength = Len(NameTxt.Text)
+                    Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
                 Else
                     PasswordTxt.SelStart = 0
-                    PasswordTxt.SelLength = Len(PasswordTxt.text)
-                    Call SendMessage(PasswordTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+                    PasswordTxt.SelLength = Len(PasswordTxt.Text)
+                    Call SendMessage(PasswordTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
                 End If
                 
             Else
-                Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0)
+                Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0)
             End If
         End If
     Else
-        If LenB(NameTxt.text) > 0 Then
-            NameTxt.text = eName
+        If LenB(NameTxt.Text) > 0 Then
+            NameTxt.Text = eName
     
-            If LenB(PasswordTxt.text) > 0 Then
+            If LenB(PasswordTxt.Text) > 0 Then
                 NameTxt.SelStart = 0
-                NameTxt.SelLength = Len(NameTxt.text)
-                Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+                NameTxt.SelLength = Len(NameTxt.Text)
+                Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
             Else
                 PasswordTxt.SelStart = 0
-                PasswordTxt.SelLength = Len(PasswordTxt.text)
-                Call SendMessage(PasswordTxt.hwnd, &H7, ByVal 0&, ByVal 0&)
+                PasswordTxt.SelLength = Len(PasswordTxt.Text)
+                Call SendMessage(PasswordTxt.hWnd, &H7, ByVal 0&, ByVal 0&)
             End If
             
         Else
-            Call SendMessage(NameTxt.hwnd, &H7, ByVal 0&, ByVal 0)
+            Call SendMessage(NameTxt.hWnd, &H7, ByVal 0&, ByVal 0)
         End If
     End If
     

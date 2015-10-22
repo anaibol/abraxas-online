@@ -103,7 +103,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -123,7 +123,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12
          Charset         =   0
          Weight          =   400
@@ -143,7 +143,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -165,7 +165,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -187,7 +187,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -243,7 +243,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -264,7 +264,7 @@ Begin VB.Form frmCrearPersonaje
       Appearance      =   0  'Flat
       BackColor       =   &H00000000&
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -363,7 +363,7 @@ Begin VB.Form frmCrearPersonaje
       BackColor       =   &H80000005&
       BackStyle       =   0  'Transparent
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -384,7 +384,7 @@ Begin VB.Form frmCrearPersonaje
       BackColor       =   &H80000005&
       BackStyle       =   0  'Transparent
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -405,7 +405,7 @@ Begin VB.Form frmCrearPersonaje
       BackColor       =   &H80000005&
       BackStyle       =   0  'Transparent
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -426,7 +426,7 @@ Begin VB.Form frmCrearPersonaje
       BackColor       =   &H80000005&
       BackStyle       =   0  'Transparent
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -447,7 +447,7 @@ Begin VB.Form frmCrearPersonaje
       BackColor       =   &H80000005&
       BackStyle       =   0  'Transparent
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -569,7 +569,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "36"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -611,7 +611,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "8"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -634,7 +634,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "8"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -657,7 +657,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "8"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -680,7 +680,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "8"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -703,7 +703,7 @@ Begin VB.Form frmCrearPersonaje
       BackStyle       =   0  'Transparent
       Caption         =   "8"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -776,19 +776,19 @@ Private Const GNOMO_M_CUERPO_DESNUDO As Integer = 260
 Public SkillPoints As Byte
 
 Private Sub boton_Click(Index As Integer)
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     Select Case Index
     
         Case 0
-            If LenB(NameTxt.text) < 1 Then
+            If LenB(NameTxt.Text) < 1 Then
                 MsgBox "No elegiste tu nuevo nombre."
                 NameTxtBorder.BorderColor = &H80&
                 NameTxt.SetFocus
                 Exit Sub
             End If
             
-            If Len(NameTxt.text) < 3 Or Len(NameTxt.text) > 15 Then
+            If Len(NameTxt.Text) < 3 Or Len(NameTxt.Text) > 15 Then
                 MsgBox "Tu nombre debe debe contener 3 o más carácteres."
                 NameTxtBorder.BorderColor = &H80&
                 NameTxt.SetFocus
@@ -799,8 +799,8 @@ Private Sub boton_Click(Index As Integer)
             Dim loopc As Byte
             Dim CharAscii As Integer
             
-            For loopc = 1 To Len(NameTxt.text)
-                CharAscii = Asc(mid$(NameTxt.text, loopc, 1))
+            For loopc = 1 To Len(NameTxt.Text)
+                CharAscii = Asc(mid$(NameTxt.Text, loopc, 1))
                 If Not LegalChar(CharAscii) Then
                     MsgBox "El nombre que elegiste es inválido porque contiene el carácter " & Chr(34) & Chr$(CharAscii) & Chr(34) & ", que no está permitido."
                     NameTxtBorder.BorderColor = &H80&
@@ -809,8 +809,8 @@ Private Sub boton_Click(Index As Integer)
                 End If
             Next loopc
             
-            If Right$(NameTxt.text, 1) = " " Then
-                UserName = RTrim$(NameTxt.text)
+            If Right$(NameTxt.Text, 1) = " " Then
+                UserName = RTrim$(NameTxt.Text)
                 MsgBox "Fueron removidos los espacios al final del nombre."
             End If
             
@@ -841,22 +841,22 @@ Private Sub boton_Click(Index As Integer)
                 Exit Sub
             End If
             
-            If LenB(txtMail.text) < 1 Then
+            If LenB(txtMail.Text) < 1 Then
                 MsgBox "No has introducido tu dirección de correo electrónico."
                 txtMailBorder.BorderColor = &H80&
                 txtMail.SetFocus
                 Exit Sub
             End If
             
-            If Not CheckMailString(txtMail.text) Then
+            If Not CheckMailString(txtMail.Text) Then
                 MsgBox "La dirección de correo electrónico es inválida."
                 txtMailBorder.BorderColor = &H80&
                 txtMail.SetFocus
                 Exit Sub
             End If
                             
-            If Len(txtPasswd.text) < 6 Then
-                If LenB(txtPasswd.text) < 1 Then
+            If Len(txtPasswd.Text) < 6 Then
+                If LenB(txtPasswd.Text) < 1 Then
                     MsgBox "No elegiste tu clave."
                 Else
                     MsgBox "El largo de tu clave debe ser de al menos 6 carácteres."
@@ -868,8 +868,8 @@ Private Sub boton_Click(Index As Integer)
             End If
             
             
-            If Len(txtConfirmPasswd.text) < 6 Then
-                If LenB(txtConfirmPasswd.text) < 1 Then
+            If Len(txtConfirmPasswd.Text) < 6 Then
+                If LenB(txtConfirmPasswd.Text) < 1 Then
                     MsgBox "Repite tu clave para confirmarla."
                 Else
                     MsgBox "Las claves no coinciden."
@@ -880,7 +880,7 @@ Private Sub boton_Click(Index As Integer)
                 Exit Sub
             End If
             
-            If txtConfirmPasswd.text <> txtPasswd.text Then
+            If txtConfirmPasswd.Text <> txtPasswd.Text Then
                 MsgBox "Las claves no coinciden. Debes repetir tu clave elegida para confirmarla."
                 
                 txtConfirmPasswdBorder.BorderColor = &H80&
@@ -890,9 +890,9 @@ Private Sub boton_Click(Index As Integer)
     
             MousePointer = 11
     
-            UserName = NameTxt.text
-            UserPassword = txtPasswd.text
-            UserEmail = txtMail.text
+            UserName = NameTxt.Text
+            UserPassword = txtPasswd.Text
+            UserEmail = txtMail.Text
             UserRaza = lstRaza.ListIndex + 1
             UserSexo = lstGenero.ListIndex + 1
             UserClase = lstClase.ListIndex + 1
@@ -946,18 +946,18 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
 End Sub
 
 Private Sub lstClase_Click()
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
 End Sub
 
 Private Sub lstGenero_Click()
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     UserSexo = lstGenero.ListIndex + 1
     Call DarCuerpoYCabeza
 End Sub
 
 Private Sub lstRaza_Click()
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
 
     UserRaza = lstRaza.ListIndex + 1
     Call DarCuerpoYCabeza
@@ -1083,7 +1083,7 @@ Private Sub HeadPJ_Click(Index As Integer)
 End Sub
 
 Private Sub lblRestaAtributos_Click(Index As Integer)
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
 
     If lblAtributos(Index).Caption > 8 Then
         lblAtributos(Index).Caption = Val(lblAtributos(Index).Caption) - 1
@@ -1092,7 +1092,7 @@ Private Sub lblRestaAtributos_Click(Index As Integer)
 End Sub
 
 Private Sub lblSumaAtributos_Click(Index As Integer)
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     If AtributosLibres.Caption > 0 And lblAtributos(Index).Caption < 18 Then
         lblAtributos(Index).Caption = Val(lblAtributos(Index).Caption) + 1
@@ -1106,8 +1106,8 @@ Private Sub NameTxt_Change()
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    For i = 1 To Len(NameTxt.text)
-        CharAscii = Asc(mid$(NameTxt.text, i, 1))
+    For i = 1 To Len(NameTxt.Text)
+        CharAscii = Asc(mid$(NameTxt.Text, i, 1))
         
         If (CharAscii > 64 And CharAscii < 91) Or (CharAscii > 96 And CharAscii < 123) Or CharAscii = 32 Then
             tempstr = tempstr & Chr$(CharAscii)
@@ -1116,18 +1116,18 @@ Private Sub NameTxt_Change()
     
     tempstr = StrConv(tempstr, vbProperCase)
 
-    If tempstr <> NameTxt.text Then
+    If tempstr <> NameTxt.Text Then
         'We only set it if it's different, otherwise the event will be raised
         'constantly and the client will crush
-        NameTxt.text = tempstr
+        NameTxt.Text = tempstr
     End If
 
-    If LenB(NameTxt.text) > 0 Then
+    If LenB(NameTxt.Text) > 0 Then
         'If LTrim$(UCase$(Left$(NameTxt.Text, 1)) & LCase$(Right$(NameTxt.Text, Len(NameTxt.Text) - 1))) <> NameTxt.Text Then
         'NameTxt.Text = LTrim$(UCase$(Left$(NameTxt.Text, 1)) & LCase$(Right$(NameTxt.Text, Len(NameTxt.Text) - 1)))
         'End If
         
-        NameTxt.SelStart = Len(NameTxt.text)
+        NameTxt.SelStart = Len(NameTxt.Text)
     End If
 End Sub
 
@@ -1425,8 +1425,8 @@ End Sub
 Private Sub tAnimacion_Timer()
     Dim SR As RECT
     Dim Grh As Long
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Static Frame As Byte
     
     If currentGrh = 0 Then
@@ -1449,13 +1449,13 @@ Private Sub tAnimacion_Timer()
         SR.Left = .sX
         SR.Top = .sY
         SR.Right = SR.Left + .PixelWidth
-        SR.bottom = SR.Top + .PixelHeight
+        SR.Bottom = SR.Top + .PixelHeight
         
-        X = picPJ.Width * 0.5 - .PixelWidth * 0.5 + 4
-        Y = picPJ.Height - .PixelHeight + 10
+        x = picPJ.Width * 0.5 - .PixelWidth * 0.5 + 4
+        y = picPJ.Height - .PixelHeight + 10
         
-        Call DrawTransparentGrhtoHdc(picPJ.hdc, X, Y, Grh, SR)
-        Y = Y + .PixelHeight
+        Call DrawTransparentGrhtoHdc(picPJ.hdc, x, y, Grh, SR)
+        y = y + .PixelHeight
     End With
     
     Grh = HeadData(UserHead).Head(Dir).GrhIndex
@@ -1464,12 +1464,12 @@ Private Sub tAnimacion_Timer()
         SR.Left = .sX
         SR.Top = .sY
         SR.Right = SR.Left + .PixelWidth
-        SR.bottom = SR.Top + .PixelHeight
+        SR.Bottom = SR.Top + .PixelHeight
         
-        X = picPJ.Width * 0.5 - .PixelWidth * 0.5 + 4
-        Y = Y + BodyData(UserBody).HeadOffset.Y - .PixelHeight
+        x = picPJ.Width * 0.5 - .PixelWidth * 0.5 + 4
+        y = y + BodyData(UserBody).HeadOffset.y - .PixelHeight
         
-        Call DrawTransparentGrhtoHdc(picPJ.hdc, X, Y, Grh, SR)
+        Call DrawTransparentGrhtoHdc(picPJ.hdc, x, y, Grh, SR)
     End With
 End Sub
 
@@ -1477,8 +1477,8 @@ Private Sub DrawHead(ByVal Head As Integer, ByVal PicIndex As Integer)
 
     Dim SR As RECT
     Dim Grh As Long
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     
     Call DrawImageInPicture(picHead(PicIndex), Picture, 0, 0, , , picHead(PicIndex).Left, picHead(PicIndex).Top)
     
@@ -1488,12 +1488,12 @@ Private Sub DrawHead(ByVal Head As Integer, ByVal PicIndex As Integer)
         SR.Left = .sX
         SR.Top = .sY
         SR.Right = SR.Left + .PixelWidth
-        SR.bottom = SR.Top + .PixelHeight
+        SR.Bottom = SR.Top + .PixelHeight
         
-        X = picHead(PicIndex).Width * 0.5 - .PixelWidth * 0.5 + 2.5
-        Y = 1
+        x = picHead(PicIndex).Width * 0.5 - .PixelWidth * 0.5 + 2.5
+        y = 1
         
-        Call DrawTransparentGrhtoHdc(picHead(PicIndex).hdc, X, Y, Grh, SR)
+        Call DrawTransparentGrhtoHdc(picHead(PicIndex).hdc, x, y, Grh, SR)
     End With
     
 End Sub

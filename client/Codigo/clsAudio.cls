@@ -14,6 +14,70 @@ Attribute VB_Exposed = False
 'Controls all audio using DirectSound and DirectMusic 7.
 Option Explicit
 
+'Maximum number of sound buffers to hold in memory at any time.
+Private Const NumSoundBuffers As Byte = 30
+
+'The distance at which the sound is inaudible.
+Private Const MAX_DISTANCE_TO_SOURCE As Integer = 150
+
+'The frequency variation coefficient for Doppler effect simulation.
+Private Const DELTA_FQ As Integer = 75
+
+'Custom sound buffer structure.
+Private Type SoundBuffer
+    FileName As String
+    looping As Boolean
+    x As Integer
+    y As Integer
+    normalFq As Long
+    Buffer As DirectSoundBuffer
+End Type
+
+'States how to set a sound's looping state.
+Public Enum LoopStyle
+    Default = 0
+    Disabled = 1
+    Enabled = 2
+End Enum
+
+'Set to true once the object is created to prevent multiple initializations of the same object.
+Dim inited As Boolean
+
+'The one and only DirectSound object
+Dim DirectSound As DirectSound
+
+'Array of all existing sound buffers
+Dim DSBuffers(1 To NumSoundBuffers) As SoundBuffer
+
+'Directory from which to load sound files by default
+Dim SoundPath As String
+
+'The volume for sounds (FXs)
+Dim SndVolume As Long
+
+'DirectMusic's Performance object
+Dim Performance As DirectMusicPerformance
+
+'Currently loaded segment
+Dim Segment As DirectMusicSegment
+
+'The one and only DirectMusic Loader
+Dim Loader As DirectMusicLoader
+
+'State of the currently loaded segment
+Dim SegState As DirectMusicSegmentState
+
+'States wether music is supported by hardware or not
+Dim Music As Boolean
+
+'Last loaded music file. Used to be able to load it when music gets activated
+Dim CurrentMusicFile As String
+
+'States the last position where the listener was in the X axis
+Dim lastPosX As Integer
+
+'States the last position where the listener was in the Y axis
+Dim lastPosY As Integer
 
 Private LastPlayMP3 As Boolean
 
@@ -23,237 +87,554 @@ Dim IBA   As IBasicAudio
 Dim IME   As IMediaEvent
 Dim IMPos As IMediaPosition
 
-'Direct Music
-Dim DMP As DirectMusicPerformance8
-Dim DML As DirectMusicLoader8
-Dim DMS As DirectMusicSegment8
+'Constructor. Performs no action at all.
+Private Sub Class_Initialize()
+End Sub
 
-Dim mPlaying As Boolean ' Para ver si hay alguno reproduciendo
+'Destructor. Releases all created objects assuring no memory-leaks.
+Private Sub Class_Terminate()
+'Destroy's all DirectMusic and DirectSound objects
 
-'Direct Sound
-Dim DS As DirectSound8
-Dim DSE As DirectSoundEnum8
-
-Private Type mSound
-    file As Integer
-    lup As Byte 'Lup es Loop xD
-    buffer As DirectSoundSecondaryBuffer8
-End Type
-
-Dim init As Boolean
-
-Private Const mMaxSoundCount As Byte = 100
-Dim mSList(1 To mMaxSoundCount) As mSound
-
-Public acSound As Boolean 'Sonido activado ?
-Public acMusic As Boolean 'Musica activada ?
-Public vlSound As Integer 'Volumen  del  sonido
-Public vlMusic As Integer 'Volumen de la musica
-Dim avlSound As Integer 'Volumen  del  sonido
-Dim avlMusic As Integer 'Volumen de la musica
-Dim currentMidi As Integer
-
-'Hecho por mannakia, respetar derechos del autor
-Public Function mSound_InitDirect(dX As DirectX8, ByVal hwnd As Long) As Boolean
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Inicia el direct sound y setea el array          '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
-On Error GoTo err
-    Set DSE = dX.GetDSEnum
-    Set DS = dX.DirectSoundCreate(DSE.GetGuid(1)) 'use the default device
-    DS.SetCooperativeLevel hwnd, DSSCL_NORMAL
+On Error Resume Next
+    'Stop every channel being used and destroy the buffer
+    Call StopWave
     
+    'Stop music
+    Call Performance.Stop(Segment, SegState, 0, 0)
+    
+    Call Performance.CloseDown
+    
+    Set DirectSound = Nothing
+    
+    Set Segment = Nothing
+    Set Performance = Nothing
+    Set Loader = Nothing
+    
+    inited = False
+End Sub
+
+Public Function Initialize(ByRef dX As DirectX7, ByVal hWnd As Long, ByVal sound_path As String, ByVal music_path As String) As Boolean
+'Initializes the clsAudio object.
+'Creates all DS and DM objects
+
+On Error GoTo ErrHandler
+    
+    'Prevent multiple creations
+    If inited Then
+        Exit Function
+    End If
+    
+    'Validate DX object
+    If dX Is Nothing Then
+        GoTo ErrHandler
+    End If
+    
+    'Initialize DirectSound
+    Set DirectSound = dX.DirectSoundCreate(vbNullString)
+    
+    Call DirectSound.SetCooperativeLevel(hWnd, DSSCL_PRIORITY)
+    
+    'Set sound path
+    SoundPath = sound_path
+    
+    'Set default volume
+    SndVolume = 0
+    
+    'Initialize DirectMusic
+    Music = InitializedirectMusic(dX, hWnd)
+    
+    CurrentMusicFile = vbNullString
+    
+    'Set tempo to 0 and volume of music
+    MusicTempo = 0
+    Call Performance.SetMasterVolume(200)
+    
+    inited = True
+    
+    Initialize = True
+Exit Function
+
+ErrHandler:
+End Function
+
+Private Function InitializedirectMusic(ByRef dX As DirectX7, ByVal hWnd As Long) As Boolean
+'Creates and configures all DirectMusic objects.
+'Initialize DM. Returns false if music isn't supported by HW
+
+On Error GoTo ErrHandler
+    Set Loader = DirectX.DirectMusicLoaderCreate()
+    
+    Set Performance = dX.DirectMusicPerformanceCreate()
+    Call Performance.Init(DirectSound, hWnd)
+    Call Performance.SetMasterAutoDownload(True)        'Enable auto download of instruments
+    
+    'Set to port default, 1 channel group is enough for MIDIs
+    Call Performance.SetPort(-1, 1)
+    
+    InitializedirectMusic = True
+Exit Function
+
+ErrHandler:
+End Function
+
+Public Function Play(ByVal FileName As String, Optional ByVal srcX As Integer = 0, Optional ByVal srcY As Integer = 0, Optional ByVal LoopSound As LoopStyle = LoopStyle.Default) As Long
+'Plays a new WAVE file.
+
+On Error GoTo ErrHandler
+    Dim bufferIndex As Long
+    
+    If Not SoundEffectsActivated Then
+        Exit Function
+    End If
+    
+    'Get the buffer index were wave was loaded
+    bufferIndex = LoadWave(FileName, LoopSound)
+    
+    If bufferIndex = 0 Then
+        Exit Function   'If an Error ocurRed abort
+    End If
+    
+    With DSBuffers(bufferIndex)
+        If .looping Then
+            .Buffer.Play DSBPLAY_LOOPING
+        Else
+            .Buffer.Play DSBPLAY_DEFAULT
+        End If
+        
+        'Apply volume
+        Call .Buffer.SetVolume(SndVolume)
+        
+        'Store position
+        .x = srcX
+        .y = srcY
+        
+        'Get standard frequency
+        .normalFq = .Buffer.GetFrequency()
+    End With
+    
+   Play = bufferIndex
+    
+    If SoundEffectsActivated Then
+        If srcX > 0 And srcY > 0 Then
+            Call Update3DSound(bufferIndex, 0, 0)
+        End If
+    End If
+Exit Function
+
+ErrHandler:
+End Function
+
+Private Sub ResetSoundValues()
+'Reset the frequency, volume and pan.
+
     Dim i As Long
-    For i = 1 To mMaxSoundCount
-        Set mSList(i).buffer = Nothing
+    
+    For i = 1 To NumSoundBuffers
+        If Not DSBuffers(i).Buffer Is Nothing Then
+            With DSBuffers(i)
+                Call .Buffer.SetFrequency(.normalFq)
+                Call .Buffer.SetVolume(SndVolume)
+                Call .Buffer.SetPan(0)
+            End With
+        End If
     Next i
-    
-    Dim dmParams As DMUS_AUDIOPARAMS
-    
-    Set DMP = dX.DirectMusicPerformanceCreate
-    Set DML = dX.DirectMusicLoaderCreate
-    
-    DMP.InitAudio hwnd, DMUS_AUDIOF_ALL, dmParams, Nothing, DMUS_APATH_DYNAMIC_STEREO, 128
-    DMP.SetMasterAutoDownload True
+End Sub
 
-    'DML.SetSearchDirectory dirMidi
+Private Sub Update3DSound(ByVal bufferIndex As Long, ByVal deltaX As Integer, ByVal deltaY As Integer)
+'Refreshes the sound's arguments.
 
-    DMP.SetMasterVolume 100
+    Dim linearDistanceOld As Single
+    Dim linearDistanceNew As Single
+    Dim deltaDistance As Single
+    Dim distanceXOld As Long
+    Dim distanceYOld As Long
+    Dim distanceXNew As Long
+    Dim distanceYNew As Long
+    Dim perceivedFq As Long
     
-    mSound_InitDirect = True
-    
-    init = True
-    Exit Function
-err:
-    mSound_InitDirect = False
-    
-End Function
-Public Function mSound_Refresh()
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Actualiza el volumen y la des/activacion         '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
-    If init = False Then Exit Function
-    
-    If Not acSound Then mSound_StopWav -1
-    
-    If acMusic Then
-        If currentMidi <> 0 And Not mPlaying Then mMusic_PlayMid currentMidi
-    Else
-        mMusic_StopMid
-    End If
-    
-    If avlSound <> vlSound Then 'Actualizamos
-        avlSound = vlSound
+    With DSBuffers(bufferIndex)
+        distanceXOld = .x - lastPosX
+        distanceYOld = .y - lastPosY
         
-        Dim i As Long
-        For i = 1 To mMaxSoundCount
-            If Not mSList(i).buffer Is Nothing Then
-                mSList(i).buffer.SetVolume vlSound
+        distanceXNew = distanceXOld + deltaX
+        distanceYNew = distanceYOld + deltaY
+        
+        linearDistanceOld = Sqr(distanceXOld * distanceXOld + distanceYOld * distanceYOld)
+        linearDistanceNew = Sqr(distanceXNew * distanceXNew + distanceYNew * distanceYNew)
+        
+        deltaDistance = linearDistanceNew - linearDistanceOld
+        
+        'Update frequency emulating Doppler effect
+        perceivedFq = .normalFq * (1 - deltaDistance / DELTA_FQ)
+        
+        If perceivedFq < DSBFREQUENCY_MIN Then
+            perceivedFq = DSBFREQUENCY_MIN
+        End If
+        
+        Call .Buffer.SetFrequency(perceivedFq)
+        
+        'Set volumen amortiguation according to distance
+        If linearDistanceNew > MAX_DISTANCE_TO_SOURCE Then
+            Call .Buffer.SetVolume(SndVolume + (DSBVOLUME_MIN - SndVolume))
+        Else
+            If UserMoving Then
+                Call .Buffer.SetVolume(SndVolume + (linearDistanceNew / MAX_DISTANCE_TO_SOURCE) * (DSBVOLUME_MIN - SndVolume))
+            Else
+                Call .Buffer.SetVolume(SndVolume + (linearDistanceNew / MAX_DISTANCE_TO_SOURCE) * (DSBVOLUME_MIN - SndVolume))
             End If
-        Next i
-    End If
-    
-    If avlMusic <> vlMusic Then 'Actualizamos
-        avlMusic = vlMusic
-        
-        DMP.SetMasterVolume vlMusic
-    End If
-End Function
-Public Function mSound_StopWav(ByVal file As Integer)
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Frena los/el wav/s que este/n reproduciendo      '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
-    Dim i As Long
+        End If
 
-    For i = 1 To mMaxSoundCount
-        If mSList(i).file = file Or file = -1 Then
-            If Not mSList(i).buffer Is Nothing Then
-                mSList(i).buffer.Stop
-                
-                Set mSList(i).buffer = Nothing
+        'Prevent division by zero
+        If linearDistanceNew = 0 Then
+            linearDistanceNew = 1
+        End If
+        
+        'Set panning according to relative position of the source to the listener
+        Call .Buffer.SetPan((distanceXNew / linearDistanceNew) * DSBPAN_RIGHT)
+    End With
+End Sub
+
+Public Sub MoveListener(ByVal x As Integer, ByVal y As Integer)
+'Updates 3D sounds based on the movement of the listener.
     
-                mSList(i).lup = 0
-                mSList(i).file = 0
+    Dim i As Byte
+    Dim deltaX As Integer
+    Dim deltaY As Integer
+    
+    If Not SoundEffectsActivated Then
+        Exit Sub
+    End If
+    
+    deltaX = x - lastPosX
+    
+    deltaY = y - lastPosY
+    
+    For i = 1 To NumSoundBuffers
+        If Not DSBuffers(i).Buffer Is Nothing Then
+            If DSBuffers(i).Buffer.GetStatus And DSBSTATUS_PLAYING Then
+                If DSBuffers(i).x > 0 And DSBuffers(i).y > 0 Then
+                    Call Update3DSound(i, deltaX, deltaY)
+                End If
             End If
         End If
     Next i
-End Function
-Public Function mMusic_StopMid()
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Frena el midi actualmente reproduciendo          '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
-    If mPlaying = True Then
-        DMP.StopEx DMS, 0, DMUS_SEGF_DEFAULT
-        Set DMS = Nothing
-    End If
     
-    mPlaying = False
-End Function
-Public Function mMusic_PlayMid(ByVal file As Integer, Optional ByVal lup As Boolean)
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Carga y reproduce un midi                        '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
-    If acMusic = False Or Not init Then Exit Function
-    
-    If mPlaying = True Then
-        DMP.StopEx DMS, 0, DMUS_SEGF_DEFAULT
-        Set DMS = Nothing
-    End If
-        
-    Set DMS = DML.LoadSegment(App.path & "\Music\" & file & ".mid")
-    DMS.SetStandardMidiFile
-    
-    If lup Then
-        DMS.SetRepeats -1
-    Else
-        DMS.SetRepeats 0
-    End If
-    
-    DMP.PlaySegmentEx DMS, DMUS_SEGF_DEFAULT, 0
-    
-    mPlaying = True
-End Function
-Public Function mSound_PlayWav(ByVal file As String, Optional ByVal lup As Byte = 0) As Byte
-'*******************************************************'
-'Author: Leandro Mendoza(Mannakia)                      '
-'Desc: Carga y reproduce un wav                         '
-'Last Modify: 10-03-10                                  '
-'*******************************************************'
+    lastPosX = x
+    lastPosY = y
+End Sub
+
+Private Function LoadWave(ByVal FileName As String, ByVal looping As LoopStyle) As Long
+'Loads a new wave into memory (if it's not already loaded) and returns
+'the buffer index
+
+On Error GoTo ErrHandler
+    Dim bufferDesc As DSBUFFERDESC
+    Dim waveFormat As WAVEFORMATEX
     Dim i As Long
     
-    If acSound = False Or Not init Then Exit Function
-    If Not FileExist(App.path & "\Sfx\" & file, vbNormal) Then Exit Function
-'
-'    For i = 1 To mMaxSoundCount
-'        If mSList(i).file = file Then
-'            If Not (mSList(i).buffer.GetStatus() = DSBSTATUS_BUFFERLOST Or mSList(i).buffer.GetStatus() = 0) Then
-'                Exit Function
-'            End If
-'        End If
-'    Next i
-'
-    For i = 1 To mMaxSoundCount
-        If mSList(i).buffer Is Nothing Then
+    FileName = UCase$(FileName)
+    
+    If Not FileExist(SoundPath & FileName, vbArchive) Then
+        Exit Function
+    End If
+    
+    'Check if the buffer is in memory and not playing
+    For i = 1 To NumSoundBuffers
+        If DSBuffers(i).FileName = FileName Then
+            If DSBuffers(i).Buffer.GetStatus = 0 Or DSBuffers(i).Buffer.GetStatus() = DSBSTATUS_BUFFERLOST Then
+                'Found it! We just play this one :)
+                LoadWave = i
+                
+                'Set looping if needed
+                If looping <> LoopStyle.Default Then
+                    DSBuffers(i).looping = (looping = LoopStyle.Enabled)
+                End If
+                
+                'Reset default sound frecuency to avoid issues.
+                Call DSBuffers(i).Buffer.SetFrequency(DSBuffers(i).normalFq)
+                
+                Exit Function
+            End If
+        End If
+    Next i
+    
+    'Not in memory, search for an empty buffer
+    For i = 1 To NumSoundBuffers
+        If DSBuffers(i).Buffer Is Nothing Then
             Exit For
         End If
     Next i
-   
-    If i > mMaxSoundCount Then
-        For i = 1 To mMaxSoundCount
-            If mSList(i).buffer.GetStatus() = DSBSTATUS_BUFFERLOST Or mSList(i).buffer.GetStatus() = 0 Then
+    
+    'No empty buffers?? Search for one not being played and use that Slot
+    If i > NumSoundBuffers Then
+        For i = 1 To NumSoundBuffers
+            If DSBuffers(i).Buffer.GetStatus() = DSBSTATUS_BUFFERLOST Or DSBuffers(i).Buffer.GetStatus() = 0 Then
                 Exit For
             End If
         Next i
     End If
     
-    'No hay buffers
-    If i > mMaxSoundCount Then Exit Function
-    
-    mSList(i).file = file
-    mSList(i).lup = lup
-    
-    'Limpiamos la memoria xD
-    Set mSList(i).buffer = Nothing
-
-    Dim BufferDesc As DSBUFFERDESC
-    BufferDesc.lFlags = DSBCAPS_CTRLVOLUME
-    
-    Set mSList(i).buffer = DS.CreateSoundBufferFromFile(App.path & "\Sfx\" & file & ".wav", BufferDesc)
-
-    mSList(i).buffer.SetVolume vlSound
-
-    If mSList(i).lup = 1 Then
-        mSList(i).buffer.Play DSBPLAY_LOOPING
-    Else
-        mSList(i).buffer.Play DSBPLAY_DEFAULT
+    'Still no free buffers?? Get the first non-looping sound
+    If i > NumSoundBuffers Then
+        For i = 1 To NumSoundBuffers
+            If Not (DSBuffers(i).Buffer.GetStatus() And DSBSTATUS_LOOPING) Then
+                Call DSBuffers(i).Buffer.Stop
+                Exit For
+            End If
+        Next i
     End If
+    
+    'If every sound is looping, just ignore new sound unless it's looping too (in which case we set it at the first Slot by default)
+    If i > NumSoundBuffers Then
+        If Not looping Then
+            Exit Function
+        End If
+        i = 1
+    End If
+    
+    'Create new sound
+    bufferDesc.lFlags = DSBCAPS_CTRLFREQUENCY Or DSBCAPS_CTRLPAN Or DSBCAPS_CTRLVOLUME Or DSBCAPS_STATIC
+    
+    waveFormat.nFormatTag = WAVE_FORMAT_PCM
+    waveFormat.nChannels = 2
+    waveFormat.lSamplesPerSec = 22050
+    waveFormat.nBitsPerSample = 16
+    waveFormat.nBlockAlign = waveFormat.nBitsPerSample / 8 * waveFormat.nChannels
+    waveFormat.lAvgBytesPerSec = waveFormat.lSamplesPerSec * waveFormat.nBlockAlign
+    
+    With DSBuffers(i)
+        Set .Buffer = Nothing   'Get rid of any previous data
+        
+        .FileName = FileName
+        .looping = (looping = LoopStyle.Enabled)
+        
+        Set .Buffer = DirectSound.CreateSoundBufferFromFile(SoundPath & FileName, bufferDesc, waveFormat)
+    End With
+    
+    LoadWave = i
+Exit Function
 
-    mSound_PlayWav = CByte(i)
+ErrHandler:
 End Function
 
-Private Sub Class_Terminate()
-    Dim i As Long
-    For i = 1 To mMaxSoundCount
-        Set mSList(i).buffer = Nothing
-    Next i
-    
-    Set DMP = Nothing
-    Set DML = Nothing
-    Set DMS = Nothing
-    
-    Set DS = Nothing
-    Set DSE = Nothing
+Public Sub StopWave(Optional ByVal bufferIndex As Long = 0)
+'Stops the sound in the given buffer index, or every sound if
+'index is 0
+
+    If bufferIndex > 0 And bufferIndex <= NumSoundBuffers Then
+        If DSBuffers(bufferIndex).Buffer.GetStatus() And DSBSTATUS_PLAYING Then
+            Call DSBuffers(bufferIndex).Buffer.Stop
+        End If
+    ElseIf bufferIndex = 0 Then
+        Dim i As Long
+        For i = 1 To NumSoundBuffers
+            If Not DSBuffers(i).Buffer Is Nothing Then
+                If DSBuffers(i).Buffer.GetStatus() > 0 And DSBuffers(i).Buffer.GetStatus() <> DSBSTATUS_BUFFERLOST Then
+                    Call DSBuffers(i).Buffer.Stop
+                End If
+            End If
+        Next i
+    End If
 End Sub
+
+Public Property Get PlayingSound() As Boolean
+'Returns true if there is at least one sound playing
+
+    Dim i As Long
+    
+    For i = 1 To NumSoundBuffers
+        If Not DSBuffers(i).Buffer Is Nothing Then
+            If DSBuffers(i).Buffer.GetStatus() And DSBSTATUS_PLAYING Then
+                PlayingSound = True
+                Exit Property
+            End If
+        End If
+    Next i
+End Property
+
+Public Property Let SoundVolume(ByVal Volume As Byte)
+'Sets the sound's volume as a percentage
+
+    Dim i As Long
+    
+    If Volume > 100 Then
+        Exit Property
+    End If
+    
+    'Take percentage to actual value
+    SndVolume = Volume * (DSBVOLUME_MAX - DSBVOLUME_MIN) * 0.01 + DSBVOLUME_MIN
+    
+    For i = 1 To NumSoundBuffers
+        If Not DSBuffers(i).Buffer Is Nothing Then
+            If DSBuffers(i).Buffer.GetStatus And DSBSTATUS_PLAYING Then
+                Call DSBuffers(i).Buffer.SetVolume(SndVolume)
+            End If
+        End If
+    Next i
+End Property
+
+Public Property Get SoundVolume() As Byte
+'Sets the music's volume as a percentage
+
+    SoundVolume = CByte((SndVolume - DSBVOLUME_MIN) * 100 / (DSBVOLUME_MAX - DSBVOLUME_MIN))
+End Property
+
+Public Function PlayMIDI(Optional ByVal FileNumber As Byte = 0, Optional ByVal Loops As Long = -1) As Boolean
+'Loads a midi and start to play it
+
+On Error GoTo ErrHandler
+    
+    If Not MusicActivated Then
+        Exit Function
+    End If
+    
+    If Not Music Then
+        Exit Function
+    End If
+    
+    If PlayingMusic Then
+        Call StopMidi
+    End If
+    
+    If FileNumber < 1 Then
+        Exit Function
+    End If
+        
+    CurrentMusicFile = FileNumber
+
+    LastPlayMP3 = False
+    
+    If FileNumber > 0 Then
+        If Not LoadMidi(FileNumber) Then
+            Exit Function
+        End If
+    Else
+        'Make sure we have a loaded segment
+        If Segment Is Nothing Then
+            Exit Function
+        End If
+    End If
+    
+    Call MusicMP3Stop
+    
+    'Play it
+    Call Segment.SetRepeats(Loops)
+    
+    Set SegState = Performance.PlaySegment(Segment, 0, 0)
+    
+    PlayMIDI = True
+Exit Function
+
+ErrHandler:
+End Function
+
+Private Function LoadMidi(ByVal FileNumber As Byte) As Boolean
+'Loads a midi to memory
+
+On Error GoTo ErrHandler
+    If Not FileExist(MusicPath & FileNumber & ".mid", vbArchive) Then
+        Exit Function
+    End If
+    
+    Call StopMidi
+    
+    'Destroy old object
+    Set Segment = Nothing
+    
+    Set Segment = Loader.LoadSegment(MusicPath & FileNumber & ".mid")
+    
+    If Segment Is Nothing Then
+        Exit Function
+    End If
+    
+    Call Segment.SetStandardMidiFile
+    
+    LoadMidi = True
+Exit Function
+
+ErrHandler:
+End Function
+
+Public Sub StopMidi()
+'Stops playing a midi
+On Error GoTo ErrHandler
+    If PlayingMusic Then
+        Call Performance.Stop(Segment, SegState, 0, 0)
+    End If
+Exit Sub
+
+ErrHandler:
+End Sub
+
+Public Property Let MusicTempo(ByVal Tempo As Single)
+'Sets the music's tempo
+
+    If Not Music Then
+        Exit Property
+    End If
+    
+    If Tempo < 0.25 Or Tempo > 2# Then
+        Exit Property
+    End If
+    
+    Call Performance.SetMasterTempo(Tempo)
+End Property
+
+Public Property Let MusicVolume(ByVal Volume As Long)
+'Sets the music's volume as a percentage
+
+    If Not Music Then
+        Exit Property
+    End If
+    
+    If Volume < 0 Or Volume > 100 Then
+        Exit Property
+    End If
+    
+    'Volume ranges from -10000 to 10000
+    Call Performance.SetMasterVolume(Volume * 200 - 10000)
+End Property
+
+Public Property Get MusicTempo() As Single
+'Returns the music's tempo
+
+    If Not Music Then
+        Exit Property
+    End If
+    
+    MusicTempo = Performance.GetMasterTempo()
+End Property
+
+Public Property Get MusicVolume() As Long
+'Returns the music's volume as a percentage
+    
+    If Not Music Then
+        Exit Property
+    End If
+    
+    MusicVolume = (Performance.GetMasterVolume() + 10000) / 200
+End Property
+
+Public Property Get PlayingMusic() As Boolean
+'Returns True if a midi is being played
+    
+    If Not Music Or Segment Is Nothing Then
+        Exit Property
+    End If
+    
+    PlayingMusic = Performance.IsPlaying(Segment, SegState)
+End Property
+
+Public Property Get MusicLenght() As Long
+'Returns the lenght of the current midi
+    
+    If Not Music Then
+        Exit Property
+    End If
+    
+    MusicLenght = Segment.GetLength()
+End Property
+
 Public Function MusicMP3Empty() As Boolean
 'Destroy the MP3 objects.
 
@@ -336,6 +717,9 @@ On Error GoTo ErrorHandl
         Exit Function
     End If
     
+    If Not Music Then
+        Exit Function
+    End If
     
     If Not MusicMP3Load(MusicPath & MusicFile & ".mp3") Then
         Exit Function

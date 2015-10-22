@@ -81,8 +81,8 @@ On Error Resume Next
             
             Case "/SUBASTAR"
             
-                If MapData(UserPos.X, UserPos.Y).Obj.Amount > 0 Then
-                    If MapData(UserPos.X, UserPos.Y).Obj.ObjType = otGuita Then
+                If MapData(UserPos.x, UserPos.y).Obj.Amount > 0 Then
+                    If MapData(UserPos.x, UserPos.y).Obj.ObjType = otGuita Then
                         Call ShowConsoleMsg("No podés subastar monedas de oro.")
                     Else
                         Call WriteAuctionCreate

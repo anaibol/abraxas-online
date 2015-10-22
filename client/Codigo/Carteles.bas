@@ -55,17 +55,16 @@ Public Sub DibujarCartel()
         Exit Sub
     End If
     
-    Dim X As Integer, Y As Integer
+    Dim x As Integer, y As Integer
     
-    X = XPosCartel + 20
-    Y = YPosCartel + 60
+    x = XPosCartel + 20
     
     Call DDrawTransGrhIndextoSurface(textura, XPosCartel, YPosCartel, 0)
     
     Dim j As Integer, desp As Integer
     
     For j = 0 To UBound(LeyendaFormateada)
-        RenderText X, Y + desp, LeyendaFormateada(j), &HC0FFFF
+        RenderText x, y + desp, LeyendaFormateada(j), &HC0FFFF, frmCharge.font
         desp = desp + (frmCharge.font.size) + 5
     Next
 End Sub

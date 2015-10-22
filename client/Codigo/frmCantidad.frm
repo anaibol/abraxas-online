@@ -38,7 +38,7 @@ Begin VB.Form frmCantidad
       BackColor       =   &H00000000&
       BorderStyle     =   0  'None
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -71,7 +71,7 @@ Begin VB.Form frmCantidad
       BackStyle       =   0  'Transparent
       Caption         =   "Todo"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -93,7 +93,7 @@ Begin VB.Form frmCantidad
       BackStyle       =   0  'Transparent
       Caption         =   "Tirar"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -122,21 +122,21 @@ Private Declare Function LockWindowUpdate Lib "user32" (ByVal hwndLock As Long) 
 
 Private Sub Aceptar_Click()
 
-    If LenB(Cantidad.text) > 0 Then
+    If LenB(Cantidad.Text) > 0 Then
         Dim Cuanto As Integer
         
-        Cuanto = Val(Replace(Cantidad.text, ".", vbNullString))
+        Cuanto = Val(Replace(Cantidad.Text, ".", vbNullString))
         
         If Cuanto > 0 And Cuanto <= Inv(InvSelSlot).Amount Then
             Call WriteDrop(InvSelSlot, Cuanto)
-            Call Audio.mSound_PlayWav(SND_DROP)
+            Call Audio.Play(SND_DROP)
         End If
     End If
     
     Unload Me
 End Sub
 
-Private Sub Aceptar_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Aceptar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Aceptar.ForeColor = &H80FFFF
     Todo.ForeColor = &HC0FFFF
 End Sub
@@ -144,16 +144,16 @@ End Sub
 Private Sub Cantidad_KeyUp(KeyCode As Integer, Shift As Integer)
     If Not ValorCambiado Then
         ValorCambiado = True
-        Cantidad.text = Right$(Cantidad.text, 1)
+        Cantidad.Text = Right$(Cantidad.Text, 1)
     End If
 
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.SelStart = Len(Cantidad.Text)
 End Sub
 
-Private Sub Cantidad_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Cantidad_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbRightButton Then
         
-        LockWindowUpdate Cantidad.hwnd
+        LockWindowUpdate Cantidad.hWnd
         
         Cantidad.Enabled = False
         
@@ -161,27 +161,27 @@ Private Sub Cantidad_MouseDown(Button As Integer, Shift As Integer, X As Single,
     End If
 End Sub
 
-Private Sub Cantidad_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Cantidad_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Aceptar.ForeColor = &HC0FFFF
 End Sub
 
 Private Sub Timer1_Timer()
-    HideCaret Cantidad.hwnd
+    HideCaret Cantidad.hWnd
 End Sub
 
-Private Sub Todo_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Todo_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Todo.ForeColor = &H80FFFF
     Aceptar.ForeColor = &HC0FFFF
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Aceptar.ForeColor = &HC0FFFF
     Todo.ForeColor = &HC0FFFF
 End Sub
 
 Private Sub Todo_Click()
     Call WriteDrop(InvSelSlot, Inv(InvSelSlot).Amount)
-    Call Audio.mSound_PlayWav(SND_DROP)
+    Call Audio.Play(SND_DROP)
     Unload Me
 End Sub
 
@@ -198,11 +198,11 @@ Private Sub Form_Load()
     
     'SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
     
-    Call Make_Transparent_Form(hwnd, 210)
+    Call Make_Transparent_Form(hWnd, 210)
 
-    Cantidad.text = "1"
+    Cantidad.Text = "1"
     
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.SelStart = Len(Cantidad.Text)
     
     Picture = LoadPicture(GrhPath & "Cantidad.jpg")
     
@@ -214,14 +214,14 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
         Unload Me
         
     ElseIf KeyCode = vbKeyReturn Then
-        If LenB(Cantidad.text) > 0 Then
+        If LenB(Cantidad.Text) > 0 Then
             Dim Cuanto As Integer
             
-            Cuanto = Val(Replace(Cantidad.text, ".", vbNullString))
+            Cuanto = Val(Replace(Cantidad.Text, ".", vbNullString))
             
             If Cuanto > 0 And Cuanto <= Inv(InvSelSlot).Amount Then
                 Call WriteDrop(InvSelSlot, Cuanto)
-                Call Audio.mSound_PlayWav(SND_DROP)
+                Call Audio.Play(SND_DROP)
             End If
         End If
     
@@ -229,17 +229,17 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        Call Auto_Drag(hwnd)
+        Call Auto_Drag(hWnd)
     Else
         Unload Me
     End If
 End Sub
 
-Private Sub Label1_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Label1_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        Call Auto_Drag(hwnd)
+        Call Auto_Drag(hWnd)
     Else
         Unload Me
     End If
@@ -249,7 +249,7 @@ Private Sub Cantidad_Change()
 
 On Error GoTo ErrHandler
     
-    If LenB(Cantidad.text) < 1 Then
+    If LenB(Cantidad.Text) < 1 Then
         Exit Sub
     End If
     
@@ -258,36 +258,36 @@ On Error GoTo ErrHandler
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    For i = 1 To Len(Cantidad.text)
-        CharAscii = Asc(mid$(Cantidad.text, i, 1))
+    For i = 1 To Len(Cantidad.Text)
+        CharAscii = Asc(mid$(Cantidad.Text, i, 1))
         
         If (CharAscii > 47 And CharAscii < 58) Or CharAscii = 46 Then
             tempstr = tempstr & Chr$(CharAscii)
         End If
     Next i
     
-    If tempstr <> Cantidad.text Then
+    If tempstr <> Cantidad.Text Then
         'We only set it if it's different, otherwise the event will be raised
         'constantly and the client will crush
-        Cantidad.text = tempstr
+        Cantidad.Text = tempstr
     End If
     
-    If Val(Replace(Cantidad.text, ".", vbNullString)) > Inv(InvSelSlot).Amount Then
-        Cantidad.text = Inv(InvSelSlot).Amount
-    ElseIf Val(Replace(Cantidad.text, ".", vbNullString)) > MaxInvObjs Then
-        Cantidad.text = Inv(InvSelSlot).Amount
-    ElseIf Val(Replace(Cantidad.text, ".", vbNullString)) < 1 Then
-        Cantidad.text = "1"
+    If Val(Replace(Cantidad.Text, ".", vbNullString)) > Inv(InvSelSlot).Amount Then
+        Cantidad.Text = Inv(InvSelSlot).Amount
+    ElseIf Val(Replace(Cantidad.Text, ".", vbNullString)) > MaxInvObjs Then
+        Cantidad.Text = Inv(InvSelSlot).Amount
+    ElseIf Val(Replace(Cantidad.Text, ".", vbNullString)) < 1 Then
+        Cantidad.Text = "1"
     End If
     
-    Cantidad.text = PonerPuntos(Val(Replace(Cantidad.text, ".", vbNullString)))
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.Text = PonerPuntos(Val(Replace(Cantidad.Text, ".", vbNullString)))
+    Cantidad.SelStart = Len(Cantidad.Text)
     
     Exit Sub
     
 ErrHandler:
     'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
-    Cantidad.text = "1"
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.Text = "1"
+    Cantidad.SelStart = Len(Cantidad.Text)
 End Sub
 

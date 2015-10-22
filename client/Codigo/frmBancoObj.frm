@@ -23,7 +23,7 @@ Begin VB.Form frmBanco
       BackColor       =   &H00000000&
       BorderStyle     =   0  'None
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -61,7 +61,7 @@ Begin VB.Form frmBanco
       BackColor       =   &H00000000&
       BorderStyle     =   0  'None
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -123,7 +123,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "Nombre de Item"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -146,7 +146,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "No lo podés usar."
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -169,7 +169,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "Valor:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -191,7 +191,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -227,7 +227,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "1455314"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -250,7 +250,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "-"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -274,7 +274,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "Defensa:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -298,7 +298,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "-"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -323,7 +323,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "12"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -346,7 +346,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "23"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -369,7 +369,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "23"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -392,7 +392,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "Daño:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -417,7 +417,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "Bóveda"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12
          Charset         =   0
          Weight          =   400
@@ -441,7 +441,7 @@ Begin VB.Form frmBanco
       BackStyle       =   0  'Transparent
       Caption         =   "12"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -468,7 +468,7 @@ Option Explicit
 Private Sub Cantidad_Change()
 On Error GoTo ErrHandler
 
-    If LenB(Cantidad.text) < 1 Then
+    If LenB(Cantidad.Text) < 1 Then
         Exit Sub
     End If
     
@@ -477,8 +477,8 @@ On Error GoTo ErrHandler
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    For i = 1 To Len(Cantidad.text)
-        CharAscii = Asc(mid$(Cantidad.text, i, 1))
+    For i = 1 To Len(Cantidad.Text)
+        CharAscii = Asc(mid$(Cantidad.Text, i, 1))
         
         If CharAscii > 47 And CharAscii < 58 Then
             tempstr = tempstr & Chr$(CharAscii)
@@ -499,22 +499,22 @@ On Error GoTo ErrHandler
     
     tempstr = PonerPuntos(Val(tempstr))
     
-    If tempstr <> Cantidad.text Then
-        Cantidad.text = tempstr
-        Cantidad.SelStart = Len(Cantidad.text)
+    If tempstr <> Cantidad.Text Then
+        Cantidad.Text = tempstr
+        Cantidad.SelStart = Len(Cantidad.Text)
     End If
     
     If NpcInvSelSlot > 0 Then
         'El precio, cuando nos venden algo, lo tenemos que Redondear para arriba.
-        lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(Cantidad.text)))
+        lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(Cantidad.Text)))
     End If
     
     Exit Sub
     
 ErrHandler:
     'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
-    Cantidad.text = "1"
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.Text = "1"
+    Cantidad.SelStart = Len(Cantidad.Text)
 End Sub
 
 Private Sub Cantidad_GotFocus()
@@ -541,25 +541,25 @@ On Error GoTo ErrHandler
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    For i = 1 To Len(Cantidad2.text)
-        CharAscii = Asc(mid$(Cantidad2.text, i, 1))
+    For i = 1 To Len(Cantidad2.Text)
+        CharAscii = Asc(mid$(Cantidad2.Text, i, 1))
         
         If CharAscii >= 48 And CharAscii <= 57 Then
             tempstr = tempstr & Chr$(CharAscii)
         End If
     Next i
     
-    If tempstr <> Cantidad2.text Then
+    If tempstr <> Cantidad2.Text Then
         'We only set it if it's different, otherwise the event will be raised
         'constantly and the client will crush
-        Cantidad2.text = tempstr
+        Cantidad2.Text = tempstr
     End If
     
     Exit Sub
     
 ErrHandler:
     'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
-    Cantidad2.text = "1"
+    Cantidad2.Text = "1"
 End Sub
 
 Private Sub CmdMoverBov_Click(Index As Integer)
@@ -593,22 +593,22 @@ Private Sub Depositar_Click()
         Exit Sub
     End If
     
-    If Val(Cantidad2.text) <= 0 Or Val(Cantidad2.text) > UserGld Or Not IsNumeric(Cantidad2.text) Then
+    If Val(Cantidad2.Text) <= 0 Or Val(Cantidad2.Text) > UserGld Or Not IsNumeric(Cantidad2.Text) Then
         Cantidad2.ForeColor = vbRed
         Exit Sub
     End If
 
     Cantidad2.ForeColor = &HC0FFFF
 
-    Call WriteBankDepositGold(Val(Cantidad2.text))
+    Call WriteBankDepositGold(Val(Cantidad2.Text))
     
-    UserBankGold = UserBankGold + Val(Cantidad2.text)
+    UserBankGold = UserBankGold + Val(Cantidad2.Text)
     lblUserBankGold.Caption = PonerPuntos(UserBankGold)
     
-    UserGld = UserGld - Val(Cantidad2.text)
+    UserGld = UserGld - Val(Cantidad2.Text)
     frmMain.GldLbl.Caption = PonerPuntos(UserGld)
     
-    Call InitGld(-Val(Cantidad2.text))
+    Call InitGld(-Val(Cantidad2.Text))
 End Sub
 
 Private Sub Form_Load()
@@ -623,20 +623,20 @@ Private Sub Form_Load()
     
     'SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
     
-    Call Make_Transparent_Form(hwnd, 225)
+    Call Make_Transparent_Form(hWnd, 225)
     
     NpcInvSelSlot = 0
     
     Picture = LoadPicture(GrhPath & "Bóveda.jpg")
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        Call Auto_Drag(hwnd)
+        Call Auto_Drag(hWnd)
     End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     'If DragType = None Then
         lblItemName.Visible = False
         lblValor.Visible = False
@@ -670,7 +670,7 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y A
     End If
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbRightButton Then
         Unload Me
         Comerciando = False
@@ -683,13 +683,13 @@ Private Sub PicBancoInv_DblClick()
         Exit Sub
     End If
     
-    If LenB(Cantidad.text) < 1 Then
+    If LenB(Cantidad.Text) < 1 Then
         Exit Sub
     End If
     
     Dim Cuanto As Integer
     
-    Cuanto = Val(Replace(Cantidad.text, ".", vbNullString))
+    Cuanto = Val(Replace(Cantidad.Text, ".", vbNullString))
                 
     If NpcInvSelSlot > 0 Then
         If Cuanto > 0 And Cuanto <= MaxInvObjs Then
@@ -699,7 +699,7 @@ Private Sub PicBancoInv_DblClick()
             
             MousePointer = vbDefault
             Call WriteBankExtractItem(NpcInvSelSlot, Cuanto)
-            Call Audio.mSound_PlayWav(SND_CLICK)
+            Call Audio.Play(SND_CLICK)
         End If
     End If
 End Sub
@@ -712,7 +712,7 @@ Private Sub PicBancoInv_KeyUp(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Private Sub PicBancoInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicBancoInv_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     If Button = vbRightButton Then
         Unload Me
@@ -727,7 +727,7 @@ Private Sub PicBancoInv_MouseUp(Button As Integer, Shift As Integer, X As Single
     'MOUSEPOINTER = vbDefault
 
     'Call WriteBankExtractItem(NpcInvSelSlot, Cantidad.Text)
-    'call Audio.mSound_PlayWav(SND_CLICK)
+    'call Audio.Play(SND_CLICK)
     'End If
     'End If
     'End If
@@ -740,7 +740,7 @@ Private Sub PicBancoInv_MouseUp(Button As Integer, Shift As Integer, X As Single
     'If Cantidad.Text > 0 Then
     'MOUSEPOINTER = vbDefault
     'Call WriteBankExtractItem(NpcInvSelSlot, Cantidad.Text)
-    'call Audio.mSound_PlayWav(SND_CLICK)
+    'call Audio.Play(SND_CLICK)
     'End If
     'End If
     'End If
@@ -755,20 +755,20 @@ Private Sub Retirar_Click()
         Exit Sub
     End If
     
-    If Val(Cantidad2.text) <= 0 Or Val(Cantidad2.text) > UserBankGold Or Not IsNumeric(Cantidad2.text) Then
+    If Val(Cantidad2.Text) <= 0 Or Val(Cantidad2.Text) > UserBankGold Or Not IsNumeric(Cantidad2.Text) Then
         Cantidad2.ForeColor = vbRed
         Exit Sub
     End If
                                                                     
     Cantidad2.ForeColor = &HC0FFFF
                                                             
-    Call WriteBankExtractGold(Val(Cantidad2.text))
+    Call WriteBankExtractGold(Val(Cantidad2.Text))
                                                                     
-    UserBankGold = UserBankGold - Val(Cantidad2.text)
+    UserBankGold = UserBankGold - Val(Cantidad2.Text)
     lblUserBankGold.Caption = PonerPuntos(UserBankGold)
 
-    UserGld = UserGld + Val(Cantidad2.text)
+    UserGld = UserGld + Val(Cantidad2.Text)
     frmMain.GldLbl.Caption = PonerPuntos(UserGld)
     
-    Call InitGld(Val(Cantidad2.text))
+    Call InitGld(Val(Cantidad2.Text))
 End Sub

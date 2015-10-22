@@ -7,8 +7,8 @@ Public MaxLimiteX As Integer
 Public MinLimiteY As Integer
 Public MaxLimiteY As Integer
 
-Public Sub CambioDeArea(ByVal X As Byte, ByVal Y As Byte)
-    Dim loopX As Byte, loopY As Byte
+Public Sub CambioDeArea(ByVal x As Integer, ByVal y As Integer)
+    Dim loopX As Integer, loopY As Integer
     
     MinLimiteX = (X \ 9 - 1) * 9
     MaxLimiteX = MinLimiteX + 26
@@ -16,9 +16,9 @@ Public Sub CambioDeArea(ByVal X As Byte, ByVal Y As Byte)
     MinLimiteY = (Y \ 9 - 1) * 9
     MaxLimiteY = MinLimiteY + 26
     
-    For loopX = 1 To 100
-        For loopY = 1 To 100
-            
+    For loopX = MinXBorder To MaxXBorder
+        For loopY = MinYBorder To MaxYBorder
+    
             If loopY < MinLimiteY Or loopY > MaxLimiteY Or loopX < MinLimiteX Or loopX > MaxLimiteX Then
                 'Erase NPCs
                 If MapData(loopX, loopY).CharIndex > 0 Then

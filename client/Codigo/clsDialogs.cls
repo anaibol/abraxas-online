@@ -32,12 +32,12 @@ Private Const MS_ADD_EXTRA As Integer = 5000
 
 Private Type dialog
     textLine()  As String
-    X           As Integer
-    Y           As Integer
+    x           As Integer
+    y           As Integer
     startTime   As Long
     lifeTime    As Long
     CharIndex   As Integer
-    color       As Long
+    Color       As Long
     renderable  As Boolean
     SUBe As Integer 'Efecto (INTEGER!)
 End Type
@@ -90,7 +90,7 @@ Private Function BinarySearch(ByVal CharIndex As Integer) As Integer
     BinarySearch = Not Min
 End Function
 
-Public Sub CreateDialog(ByRef Chat As String, ByVal CharIndex As Integer, ByVal color As Long)
+Public Sub CreateDialog(ByRef Chat As String, ByVal CharIndex As Integer, ByVal Color As Long)
 'Creates a new dialog. If the user already had a dialog, then it's replaced,
 'otherwise a new Slot is used.
     
@@ -116,7 +116,7 @@ Public Sub CreateDialog(ByRef Chat As String, ByVal CharIndex As Integer, ByVal 
     
     With dialogs(Slot)
         .CharIndex = CharIndex
-        .color = color
+        .Color = Color
         .renderable = False
         .startTime = GetTickCount()
         .textLine = FormatChat(Chat)
@@ -196,7 +196,7 @@ Private Function FormatChat(ByRef Chat As String) As String()
     FormatChat = ChatLines
 End Function
 
-Public Sub UpdateDialogPos(ByVal X As Integer, ByVal Y As Integer, ByVal CharIndex As Integer)
+Public Sub UpdateDialogPos(ByVal x As Integer, ByVal y As Integer, ByVal CharIndex As Integer)
 'Updates a dialog's position.
 
     Dim Slot As Integer
@@ -205,8 +205,8 @@ Public Sub UpdateDialogPos(ByVal X As Integer, ByVal Y As Integer, ByVal CharInd
     
     If Slot >= 0 Then
         With dialogs(Slot)
-            .X = X - (MAX_LENGTH * 0.5) * 3
-            .Y = Y - (UBound(.textLine()) * 3)
+            .x = x - (MAX_LENGTH * 0.5) * 3
+            .y = y - (UBound(.textLine()) * 3)
             .renderable = True
         End With
     End If
@@ -232,14 +232,14 @@ Public Sub Render()
                 If .lifeTime >= 292 Then
                     .SUBe = .SUBe - 1
                     If .SUBe > 0 Then
-                        .Y = .Y + .SUBe
+                        .y = .y + .SUBe
                     End If
                 End If
                 offset = -(usedFont.size + 2) * UBound(.textLine())
                 
                 'Render it
                 For j = 0 To UBound(.textLine())
-                    Call RenderText(.X, .Y + offset - 2, .textLine(j), .color)
+                    Call RenderText(.x, .y + offset - 2, .textLine(j), .Color, usedFont)
                     offset = offset + usedFont.size + 5
                 Next j
                 

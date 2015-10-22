@@ -25,7 +25,7 @@ Begin VB.Form frmComerciar
       BackColor       =   &H00000000&
       BorderStyle     =   0  'None
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -74,7 +74,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "No lo podés usar."
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -97,7 +97,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "1455314"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -120,7 +120,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "Valor:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -143,7 +143,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "Nombre de Item"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -166,7 +166,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "23"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -189,7 +189,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "Defensa:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -214,7 +214,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "Nombre de Npc"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12
          Charset         =   0
          Weight          =   400
@@ -237,7 +237,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "-"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -262,7 +262,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "12"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -285,7 +285,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "Daño:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -309,7 +309,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "23"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -333,7 +333,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "12"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -356,7 +356,7 @@ Begin VB.Form frmComerciar
       BackStyle       =   0  'Transparent
       Caption         =   "-"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   400
@@ -389,13 +389,13 @@ Private Sub Cantidad_LostFocus()
     CantidadBorder.BorderColor = &H80FFFF
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        Call Auto_Drag(hwnd)
+        Call Auto_Drag(hWnd)
     End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 'If DragType = None Then
     lblItemName.Visible = False
     lblValor.Visible = False
@@ -429,7 +429,7 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y A
     End If
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbRightButton Then
         Unload Me
         Comerciando = False
@@ -440,7 +440,7 @@ End Sub
 Private Sub Cantidad_Change()
 On Error GoTo ErrHandler
 
-    If LenB(Cantidad.text) < 1 Then
+    If LenB(Cantidad.Text) < 1 Then
         Exit Sub
     End If
     
@@ -449,8 +449,8 @@ On Error GoTo ErrHandler
     Dim tempstr As String
     Dim CharAscii As Integer
     
-    For i = 1 To Len(Cantidad.text)
-        CharAscii = Asc(mid$(Cantidad.text, i, 1))
+    For i = 1 To Len(Cantidad.Text)
+        CharAscii = Asc(mid$(Cantidad.Text, i, 1))
         
         If CharAscii > 47 And CharAscii < 58 Then
             tempstr = tempstr & Chr$(CharAscii)
@@ -465,21 +465,21 @@ On Error GoTo ErrHandler
 
     tempstr = PonerPuntos(Val(tempstr))
     
-    If tempstr <> Cantidad.text Then
-        Cantidad.text = tempstr
-        Cantidad.SelStart = Len(Cantidad.text)
+    If tempstr <> Cantidad.Text Then
+        Cantidad.Text = tempstr
+        Cantidad.SelStart = Len(Cantidad.Text)
     End If
     
     If NpcInvSelSlot > 0 Then
-        lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(Cantidad.text)))
+        lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Val(Cantidad.Text)))
     End If
         
     Exit Sub
     
 ErrHandler:
     'If we got here the user may have pasted (Shift + Insert) a REALLY large number, causing an overflow, so we set amount back to 1
-    Cantidad.text = "1"
-    Cantidad.SelStart = Len(Cantidad.text)
+    Cantidad.Text = "1"
+    Cantidad.SelStart = Len(Cantidad.Text)
 End Sub
 
 Private Sub Form_Load()
@@ -496,7 +496,7 @@ Private Sub Form_Load()
     
     'SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
     
-    Call Make_Transparent_Form(hwnd, 225)
+    Call Make_Transparent_Form(hWnd, 225)
     
     NpcInvSelSlot = 0
     
@@ -510,13 +510,13 @@ Private Sub PicComercianteInv_DblClick()
         Exit Sub
     End If
     
-    If LenB(Cantidad.text) < 1 Then
+    If LenB(Cantidad.Text) < 1 Then
         Exit Sub
     End If
     
     Dim Cuanto As Integer
     
-    Cuanto = Val(Replace(Cantidad.text, ".", vbNullString))
+    Cuanto = Val(Replace(Cantidad.Text, ".", vbNullString))
     
     'If DragType = None Then
         If NpcInvSelSlot > 0 Then
@@ -528,7 +528,7 @@ Private Sub PicComercianteInv_DblClick()
                 
                 If UserGld >= CalculateBuyPrice(NpcInv(NpcInvSelSlot).Valor, Cuanto) Then
                     Call WriteCommerceBuy(NpcInvSelSlot, Cuanto)
-                    Call Audio.mSound_PlayWav(SND_CLICK)
+                    Call Audio.Play(SND_CLICK)
                     PicComercianteInv.MousePointer = vbDefault
                 Else
                     ShowConsoleMsg "No tenés suficiente oro.", 2, 51, 223, 1, 1
@@ -547,7 +547,7 @@ Private Sub PicComercianteInv_KeyUp(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Private Sub PicComercianteInv_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicComercianteInv_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     'If DragType = InventarioNpc Then
     'MOUSEPOINTER = vbDefault
@@ -557,7 +557,7 @@ Private Sub PicComercianteInv_MouseMove(Button As Integer, Shift As Integer, X A
     'If IsNumeric(Cantidad.Text) Then
     'If Cantidad.Text > 0 Then
     'Call WriteCommerceSell(InvSelSlot, 1)
-    'call Audio.mSound_PlayWav(SND_CLICK)
+    'call Audio.Play(SND_CLICK)
     'DragType = None
     'frmMain.PicInv.MOUSEPOINTER = vbDefault
     'End If
@@ -567,7 +567,7 @@ Private Sub PicComercianteInv_MouseMove(Button As Integer, Shift As Integer, X A
     
 End Sub
 
-Private Sub PicComercianteInv_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub PicComercianteInv_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 
     If Button = vbRightButton Then
         Unload Me
@@ -579,7 +579,7 @@ Private Sub PicComercianteInv_MouseUp(Button As Integer, Shift As Integer, X As 
     'If IsNumeric(frmComerciar.Cantidad.Text) Then
     'If frmComerciar.Cantidad.Text > 0 Then
     'Call WriteCommerceSell(InvSelSlot, 1)
-    'call Audio.mSound_PlayWav(SND_CLICK)
+    'call Audio.Play(SND_CLICK)
     'End If
     'End If
     'EXIT SUB

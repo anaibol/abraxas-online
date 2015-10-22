@@ -29,7 +29,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "Guardar"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -49,7 +49,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "Salir"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -70,7 +70,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "Puntos restantes:"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   700
@@ -91,7 +91,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "Habilidades"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   15
          Charset         =   0
          Weight          =   400
@@ -112,7 +112,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -134,7 +134,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -156,7 +156,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -178,7 +178,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -200,7 +200,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -222,7 +222,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -244,7 +244,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -266,7 +266,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -288,7 +288,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -310,7 +310,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -332,7 +332,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -354,7 +354,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -377,7 +377,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -400,7 +400,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -423,7 +423,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -446,7 +446,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -469,7 +469,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -492,7 +492,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -515,7 +515,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -538,7 +538,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -561,7 +561,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -584,7 +584,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -607,7 +607,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -630,7 +630,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -853,7 +853,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -875,7 +875,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -914,7 +914,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -936,7 +936,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -975,7 +975,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -997,7 +997,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -1036,7 +1036,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -1058,7 +1058,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -1097,7 +1097,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -1119,7 +1119,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -1158,7 +1158,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -1180,7 +1180,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -1210,7 +1210,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "skill1"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -1233,7 +1233,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12.75
          Charset         =   0
          Weight          =   400
@@ -1272,7 +1272,7 @@ Begin VB.Form frmSkills
       BackStyle       =   0  'Transparent
       Caption         =   "x"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   14.25
          Charset         =   0
          Weight          =   400
@@ -1297,7 +1297,7 @@ Option Explicit
 
 Private Sub Command1_Click(Index As Integer)
 
-    Call Audio.mSound_PlayWav(SND_CLICK)
+    Call Audio.Play(SND_CLICK)
     
     Dim indice
     If (Index And &H1) = 0 Then
@@ -1326,17 +1326,17 @@ End Sub
 
 Private Sub Form_Load()
 
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Dim n As Long
     
-    X = Width / Screen.TwipsPerPixelX
-    Y = Height / Screen.TwipsPerPixelY
+    x = Width / Screen.TwipsPerPixelX
+    y = Height / Screen.TwipsPerPixelY
     
     'set the corner angle by changing the value of 'n'
     n = 90
     
-    SetWindowRgn hwnd, CreateRoundRectRgn(0, 0, X, Y, n, n), True
+    SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
     
     'Nombres de los skills
     
@@ -1362,12 +1362,12 @@ Private Sub Form_Load()
         End If
     Next
     
-    Call Make_Transparent_Form(hwnd, 230)
+    Call Make_Transparent_Form(hWnd, 230)
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        Call Auto_Drag(hwnd)
+        Call Auto_Drag(hWnd)
     Else
         Unload Me
     End If
@@ -1406,17 +1406,17 @@ Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
     End If
 End Sub
 
-Private Sub Salir_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Salir_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Salir.ForeColor = &H80FFFF
     Guardar.ForeColor = &H80FFFF
 End Sub
 
-Private Sub Guardar_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Guardar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Guardar.ForeColor = &H80FFFF
     Salir.ForeColor = &H80FFFF
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Guardar.ForeColor = &H80FFFF
     Salir.ForeColor = &H80FFFF
 End Sub

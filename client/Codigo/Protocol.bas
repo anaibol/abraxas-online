@@ -184,7 +184,7 @@ Public Enum ServerPacketID
     ObjectDelete
     BlockPosition
     PlayMP3
-    PlayWav
+    SoundFX
     GuildList
     AreaChanged
     PauseToggle
@@ -388,7 +388,7 @@ Private Enum ClientPacketID
 End Enum
 
 Public Sub HandleIncomingData()
-    
+
     Dim PacketID As Byte
     
     PacketID = incomingData.PeekByte()
@@ -532,8 +532,8 @@ Public Sub HandleIncomingData()
         Case ServerPacketID.PlayMP3
             Call HandlePlayMP3
         
-        Case ServerPacketID.PlayWav
-            Call HandlePlayWav
+        Case ServerPacketID.SoundFX
+            Call HandleSoundFX
         
         Case ServerPacketID.GuildList
             Call HandleGuildList
@@ -828,9 +828,9 @@ Private Sub HandleBlockedWithShield()
     Charlist(CharBlocked).Escudo.ShieldWalk(Charlist(CharBlocked).Heading).Started = 1
 
     If CharBlocked = UserCharIndex Then
-        Call Audio.mSound_PlayWav(SND_ESCUDO)
+        Call Audio.Play(SND_ESCUDO)
     Else
-        Call Audio.mSound_PlayWav(SND_ESCUDO)
+        Call Audio.Play(SND_ESCUDO, Charlist(CharBlocked).Pos.x, Charlist(CharBlocked).Pos.y)
     End If
 End Sub
 
@@ -848,9 +848,9 @@ Private Sub HandleUserSwing()
     DamageType = 1
     
     If RandomNumber(1, 2) = 1 Then
-        Call Audio.mSound_PlayWav(SND_SWING)
+        Call Audio.Play(SND_SWING)
     Else
-        Call Audio.mSound_PlayWav(SND_SWING2)
+        Call Audio.Play(SND_SWING2)
     End If
 End Sub
 
@@ -867,13 +867,7 @@ Private Sub HandleResuscitationSafeOn()
 End Sub
 
 Private Sub HandleUpdateSta()
-    
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
+
     Call incomingData.ReadByte
     
     'Get data and update form
@@ -898,12 +892,6 @@ Private Sub HandleUpdateSta()
 End Sub
 
 Private Sub HandleUpdateMana()
-    
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
     Call incomingData.ReadByte
     
@@ -936,12 +924,6 @@ Private Sub HandleUpdateMana()
 End Sub
 
 Private Sub HandleUpdateHP()
-    
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
 
     Call incomingData.ReadByte
     
@@ -959,7 +941,9 @@ Private Sub HandleUpdateHP()
     End If
     
     If UserMinHP < UserMaxHP * 0.2 Then
-        Call Audio.mSound_PlayWav(SND_HEARTBEAT)
+        If Not Audio.PlayingSound Then
+            Call Audio.Play(SND_HEARTBEAT)
+        End If
     End If
     
 End Sub
@@ -967,13 +951,7 @@ End Sub
 Private Sub HandleUpdateGold()
 
 On Error GoTo Error
-    
-    'Check packet is complete
-    If incomingData.length < 5 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
+        
     Dim Gld As Long
     
     Call incomingData.ReadByte
@@ -991,12 +969,6 @@ Error:
 End Sub
 
 Private Sub HandleUpdateExp()
-    'Check packet is complete
-    If incomingData.length < 5 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Dim Exp As Long
     
     Call incomingData.ReadByte
@@ -1011,13 +983,6 @@ Private Sub HandleUpdateExp()
 End Sub
 
 Private Sub HandleUpdateStrenghtAndDexterity()
-
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     'Get data and update form
@@ -1030,13 +995,6 @@ Private Sub HandleUpdateStrenghtAndDexterity()
 End Sub
 
 Private Sub HandleUpdateStrenght()
-
-    'Check packet is complete
-    If incomingData.length < 2 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     'Get data and update form
@@ -1046,13 +1004,6 @@ Private Sub HandleUpdateStrenght()
 End Sub
 
 Private Sub HandleUpdateDexterity()
-
-    'Check packet is complete
-    If incomingData.length < 2 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     'Get data and update form
@@ -1062,12 +1013,6 @@ Private Sub HandleUpdateDexterity()
 End Sub
 
 Private Sub HandlePopulation()
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     'Get data and update form
@@ -1075,12 +1020,6 @@ Private Sub HandlePopulation()
 End Sub
 
 Private Sub HandleAnimAttack()
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-
     Dim CharAttacking As Integer
     
     Call incomingData.ReadByte
@@ -1094,12 +1033,6 @@ Private Sub HandleAnimAttack()
 End Sub
 
 Private Sub HandleCharMeditate()
-    'Check packet is complete
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-
     Dim CharMeditating As Integer
     
     Call incomingData.ReadByte
@@ -1127,7 +1060,7 @@ Private Sub HandleCharMeditate()
         Call InitGrh(.fX, FxData(.FxIndex).Animacion)
             
         If PortalBufferIndex = 0 Then
-            PortalBufferIndex = Audio.mSound_PlayWav(SND_PORTAL, 1)
+            PortalBufferIndex = Audio.Play(SND_PORTAL, .Pos.x, .Pos.y, LoopStyle.Enabled)
         End If
             
     End With
@@ -1138,22 +1071,16 @@ Private Sub HandleChangeMap()
     
 On Error Resume Next
 
-    'If incomingData.length < 6 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
     Call incomingData.ReadByte
     
     UserMap = incomingData.ReadInteger
-    
 
     MapInfo(UserMap).Name = vbNullString
     MapInfo(UserMap).Music = 0
     
     If bLluvia(UserMap) = 0 Then
         If bRain Then
-            Call Audio.mSound_StopWav(RainBufferIndex)
+            Call Audio.StopWave(RainBufferIndex)
             RainBufferIndex = 0
             frmMain.IsPlaying = PlayLoop.plNone
         End If
@@ -1167,69 +1094,59 @@ On Error Resume Next
     End If
 
     MapInfo(UserMap).Zone = GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Zone")
-    MapInfo(UserMap).Music = Val(GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Music"))
-    MapInfo(UserMap).Top = Val(GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Top"))
-    MapInfo(UserMap).Left = Val(GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Left"))
+    MapInfo(UserMap).Music = GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Music")
+    MapInfo(UserMap).Top = GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Top")
+    MapInfo(UserMap).Left = GetVar(MapPath & "Maps.dat", "Mapa" & UserMap, "Left")
     
     If MusicActivated Then
         If MapInfo(UserMap).Music > 134 Then
             Call Audio.MusicMP3Play(MapInfo(UserMap).Music)
         Else
-            Call Audio.mMusic_PlayMid(MapInfo(UserMap).Music)
+            Call Audio.PlayMIDI(MapInfo(UserMap).Music)
         End If
     End If
 
-    Call GenerarMiniMapa
-    
-    Map_Load UserMap
-    
+    'Call GenerarMiniMapa
+        
+    'CargarMapa UserMap
+
 End Sub
 
 Private Sub HandlePosUpdate()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
 
     Call incomingData.ReadByte
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     
     'Set new pos
-    If UserPos.X <> X Or UserPos.Y <> Y Then
+    If UserPos.x <> x Or UserPos.y <> y Then
         'Set new pos
-        UserPos.X = X
-        UserPos.Y = Y
+        UserPos.x = x
+        UserPos.y = y
         
         'Remove char from old position
-        If MapData(UserPos.X, UserPos.Y).CharIndex = UserCharIndex Then
-            MapData(UserPos.X, UserPos.Y).CharIndex = 0
+        If MapData(UserPos.x, UserPos.y).CharIndex = UserCharIndex Then
+            MapData(UserPos.x, UserPos.y).CharIndex = 0
         End If
         
         'Set char
-        MapData(UserPos.X, UserPos.Y).CharIndex = UserCharIndex
+        MapData(UserPos.x, UserPos.y).CharIndex = UserCharIndex
         Charlist(UserCharIndex).Pos = UserPos
         
         'Are we under a roof?
-        bTecho = IIf(MapData(UserPos.X, UserPos.Y).Trigger = 1 Or _
-            MapData(UserPos.X, UserPos.Y).Trigger = 2 Or _
-            MapData(UserPos.X, UserPos.Y).Trigger = 4, True, False)
+        bTecho = IIf(MapData(UserPos.x, UserPos.y).Trigger = 1 Or _
+            MapData(UserPos.x, UserPos.y).Trigger = 2 Or _
+            MapData(UserPos.x, UserPos.y).Trigger = 4, True, False)
             
         Call DibujarMiniMapa
     End If
 End Sub
 
 Private Sub HandleDamage()
-
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
     Dim Damg As Integer
     
@@ -1258,11 +1175,6 @@ End Sub
 
 Private Sub HandleUserDamaged()
 
-    If incomingData.length < 5 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
             
     AttackerCharIndex = incomingData.ReadInteger
@@ -1307,18 +1219,13 @@ Private Sub HandleUserDamaged()
 End Sub
 
 Private Sub HandleChatOverHead()
-
-    If incomingData.length < 8 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim CharIndex As Integer
@@ -1326,12 +1233,12 @@ On Error GoTo ErrHandler
     Dim g As Byte
     Dim B As Byte
     
-    Chat = buffer.ReadASCIIString
-    CharIndex = buffer.ReadInteger
+    Chat = Buffer.ReadASCIIString
+    CharIndex = Buffer.ReadInteger
     
-    r = buffer.ReadByte
-    g = buffer.ReadByte
-    B = buffer.ReadByte
+    r = Buffer.ReadByte
+    g = Buffer.ReadByte
+    B = Buffer.ReadByte
     
     'Only add the Chat if the Char exists (a CharRemove may have been sent to the PC / NPC area before the buffer was flushed)
     'If Charlist(CharIndex).Active Then
@@ -1339,7 +1246,7 @@ On Error GoTo ErrHandler
     'End If
         
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 ErrHandler:
     Dim Error As Long
@@ -1347,7 +1254,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
     
     If Error > 0 Then
         'Err.Raise Error
@@ -1361,18 +1268,13 @@ End Sub
 Private Sub HandleConsoleMessage()
 
 On Error Resume Next
-
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim FontIndex As Integer
@@ -1381,8 +1283,8 @@ On Error GoTo ErrHandler
     Dim g As Byte
     Dim B As Byte
     
-    Chat = buffer.ReadASCIIString
-    FontIndex = buffer.ReadByte
+    Chat = Buffer.ReadASCIIString
+    FontIndex = Buffer.ReadByte
     
     If InStr(1, Chat, "~") Then
         str = ReadField(2, Chat, 126)
@@ -1427,7 +1329,7 @@ On Error GoTo ErrHandler
     
     'Call checkText(Chat)
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -1435,7 +1337,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -1447,16 +1349,16 @@ Private Sub HandleChatNormal()
 On Error Resume Next
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim CharIndex As Integer
             
-    Chat = buffer.ReadASCIIString
-    CharIndex = buffer.ReadInteger
+    Chat = Buffer.ReadASCIIString
+    CharIndex = Buffer.ReadInteger
     
     If Charlist(CharIndex).Priv < 2 Then
         With FontTypes(FontTypeNames.FONTTYPE_TALK)
@@ -1499,7 +1401,7 @@ On Error Resume Next
     End If
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 End Sub
 
@@ -1534,17 +1436,17 @@ Private Sub HandleChatGuild()
 On Error Resume Next
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim Nombre As String
     Dim i As Integer
             
-    Chat = buffer.ReadASCIIString
-    Nombre = buffer.ReadASCIIString
+    Chat = Buffer.ReadASCIIString
+    Nombre = Buffer.ReadASCIIString
     
     With FontTypes(FontTypeNames.FONTTYPE_GUILDMSG)
         Call ShowConsoleMsg(Nombre & ": ", .Red, .Green, .Blue, .Bold, .Italic, True, True)
@@ -1566,7 +1468,7 @@ On Error Resume Next
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 End Sub
 
@@ -1575,17 +1477,17 @@ Private Sub HandleChatCompa()
 On Error Resume Next
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim Nro As Byte
     Dim i As Integer
     
-    Chat = buffer.ReadASCIIString
-    Nro = buffer.ReadByte
+    Chat = Buffer.ReadASCIIString
+    Nro = Buffer.ReadByte
     
     With FontTypes(FontTypeNames.FONTTYPE_COMPAMESSAGE)
         Call ShowConsoleMsg(Compa(Nro).Nombre & ": ", .Red, .Green, .Blue, .Bold, .Italic, True, True)
@@ -1607,7 +1509,7 @@ On Error Resume Next
     End With
 
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 End Sub
 
@@ -1616,17 +1518,17 @@ Private Sub HandleChatPrivate()
 On Error Resume Next
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim Nombre As String
     Dim i As Integer
     
-    Chat = buffer.ReadASCIIString
-    Nombre = buffer.ReadASCIIString
+    Chat = Buffer.ReadASCIIString
+    Nombre = Buffer.ReadASCIIString
 
     With FontTypes(FontTypeNames.FONTTYPE_PRIVATEMESSAGE)
     
@@ -1650,7 +1552,7 @@ On Error Resume Next
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 End Sub
 
@@ -1659,16 +1561,16 @@ Private Sub HandleChatGlobal()
 On Error Resume Next
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim Nombre As String
     
-    Chat = buffer.ReadASCIIString
-    Nombre = buffer.ReadASCIIString
+    Chat = Buffer.ReadASCIIString
+    Nombre = Buffer.ReadASCIIString
 
     With FontTypes(FontTypeNames.FONTTYPE_PUBLICMESSAGE)
         Call ShowConsoleMsg(Nombre & ": ", .Red, .Green, .Blue, .Bold, .Italic, True, True)
@@ -1679,23 +1581,18 @@ On Error Resume Next
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
 End Sub
 
 Private Sub HandleCommerceChat()
 
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Chat As String
     Dim FontIndex As Integer
@@ -1704,8 +1601,8 @@ On Error GoTo ErrHandler
     Dim g As Byte
     Dim B As Byte
     
-    Chat = buffer.ReadASCIIString
-    FontIndex = buffer.ReadByte
+    Chat = Buffer.ReadASCIIString
+    FontIndex = Buffer.ReadByte
     
     If InStr(1, Chat, "~") Then
         str = ReadField(2, Chat, 126)
@@ -1737,7 +1634,7 @@ On Error GoTo ErrHandler
     End If
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -1745,7 +1642,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -1753,24 +1650,19 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleShowMessageBox()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
-    frmMensaje.msg.Caption = buffer.ReadASCIIString
+    frmMensaje.msg.Caption = Buffer.ReadASCIIString
     frmMensaje.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -1778,7 +1670,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -1786,46 +1678,41 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleCharCreate()
-
-    'If incomingData.length < 24 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim CharIndex As Integer
     Dim Body As Integer
     Dim Head As Integer
     Dim Heading As eHeading
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     Dim Weapon As Integer
     Dim Shield As Integer
     Dim Helmet As Integer
     Dim Privs As Integer
     
-    CharIndex = buffer.ReadInteger
-    Body = buffer.ReadInteger
-    Head = buffer.ReadInteger
-    Heading = buffer.ReadByte
-    X = buffer.ReadByte
-    Y = buffer.ReadByte
-    Weapon = buffer.ReadByte
-    Shield = buffer.ReadByte
-    Helmet = buffer.ReadByte
+    CharIndex = Buffer.ReadInteger
+    Body = Buffer.ReadInteger
+    Head = Buffer.ReadInteger
+    Heading = Buffer.ReadByte
+    x = Buffer.ReadInteger
+    y = Buffer.ReadInteger
+    Weapon = Buffer.ReadByte
+    Shield = Buffer.ReadByte
+    Helmet = Buffer.ReadByte
     
     With Charlist(CharIndex)
         .EsUser = True
-        .Nombre = buffer.ReadASCIIString
-        .Guilda = buffer.ReadASCIIString
-        Privs = buffer.ReadByte
-        .Lvl = buffer.ReadByte
+        .Nombre = Buffer.ReadASCIIString
+        .Guilda = Buffer.ReadASCIIString
+        Privs = Buffer.ReadByte
+        .Lvl = Buffer.ReadByte
         
         If Privs > 0 Then
             'If the player is a RM, ignore other flags
@@ -1843,10 +1730,10 @@ On Error GoTo ErrHandler
         
     End With
     
-    Call MakeChar(CharIndex, Body, Head, Heading, X, Y, Weapon, Shield, Helmet)
+    Call MakeChar(CharIndex, Body, Head, Heading, x, y, Weapon, Shield, Helmet)
         
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -1854,7 +1741,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -1865,50 +1752,50 @@ Private Sub HandleNpcCharCreate()
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim CharIndex As Integer
     Dim Body As Integer
     Dim Head As Integer
     Dim Heading As eHeading
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
-    CharIndex = buffer.ReadInteger
+    CharIndex = Buffer.ReadInteger
     
-    Body = buffer.ReadInteger
+    Body = Buffer.ReadInteger
 
     If Body > 4000 Then
-        Head = buffer.ReadInteger
+        Head = Buffer.ReadInteger
         Body = Body - 4000
     End If
     
-    Heading = buffer.ReadByte
+    Heading = Buffer.ReadByte
     
-    X = buffer.ReadByte
-    Y = buffer.ReadByte
+    x = Buffer.ReadInteger
+    y = Buffer.ReadInteger
     
-    Charlist(CharIndex).Nombre = buffer.ReadASCIIString
+    Charlist(CharIndex).Nombre = Buffer.ReadASCIIString
 
     If Body > 2000 Then
-        Charlist(CharIndex).Lvl = buffer.ReadByte
+        Charlist(CharIndex).Lvl = Buffer.ReadByte
         Body = Body - 2000
     Else
         Charlist(CharIndex).Lvl = 1
     End If
          
     If Body > 1000 Then
-        Charlist(CharIndex).MascoIndex = buffer.ReadByte
+        Charlist(CharIndex).MascoIndex = Buffer.ReadByte
         Body = Body - 1000
     End If
     
-    Call MakeChar(CharIndex, Body, Head, Heading, X, Y)
+    Call MakeChar(CharIndex, Body, Head, Heading, x, y)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -1916,7 +1803,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -1924,11 +1811,6 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleCharChangeNick()
-    If incomingData.length < 6 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     Dim CharIndex As Integer
     CharIndex = incomingData.ReadInteger
@@ -1936,11 +1818,6 @@ Private Sub HandleCharChangeNick()
 End Sub
 
 Private Sub HandleCharRemove()
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
@@ -1953,20 +1830,15 @@ Private Sub HandleCharRemove()
 End Sub
 
 Private Sub HandleCharMove()
-    If incomingData.length < 5 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
     CharIndex = incomingData.ReadInteger
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     
     If CharIndex < 1 Then
         Exit Sub
@@ -1982,16 +1854,10 @@ Private Sub HandleCharMove()
     
     Call DoPasosFx(CharIndex)
     
-    Call MoveCharbyPos(CharIndex, X, Y)
+    Call MoveCharbyPos(CharIndex, x, y)
 End Sub
 
 Private Sub HandleForceCharMove()
-    
-    If incomingData.length < 2 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim Direccion As Byte
@@ -2002,12 +1868,6 @@ Private Sub HandleForceCharMove()
 End Sub
 
 Private Sub HandleCharChange()
-    
-    'If incomingData.length < 18 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
@@ -2077,13 +1937,13 @@ Private Sub HandleObjCreate()
     
     Call incomingData.ReadByte
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     
-    With MapData(X, Y)
+    With MapData(x, y)
     
         .Obj.ObjType = incomingData.ReadByte
         
@@ -2151,9 +2011,9 @@ Private Sub HandleObjCreate()
                 End If
                 
                 'Call Morir
-                If UserPos.X <> X Or UserPos.Y <> Y Then
-                    UserPos.X = X
-                    UserPos.Y = Y
+                If UserPos.x <> x Or UserPos.y <> y Then
+                    UserPos.x = x
+                    UserPos.y = y
                 End If
             End If
         
@@ -2201,29 +2061,22 @@ Private Sub HandleObjCreate()
 End Sub
 
 Private Sub HandleObjectDelete()
-    
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
-    
     Call incomingData.ReadByte
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     
-    With MapData(X, Y)
-        If X = UserPos.X And Y = UserPos.Y Then
+    With MapData(x, y)
+        If x = UserPos.x And y = UserPos.y Then
             If .Obj.Amount > 0 Then
                 If LenB(.Obj.Name) > 0 Then
                     If .Obj.ObjType = otGuita Then
-                        Call Audio.mSound_PlayWav(SND_PICKUP_GOLD)
+                        Call Audio.Play(SND_PICKUP_GOLD)
                     Else
-                        Call Audio.mSound_PlayWav(SND_PICKUP)
+                        Call Audio.Play(SND_PICKUP)
                     End If
                 End If
             End If
@@ -2236,31 +2089,18 @@ Private Sub HandleObjectDelete()
 End Sub
 
 Private Sub HandleBlockPosition()
-
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
-    
     Call incomingData.ReadByte
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     
-    MapData(X, Y).Blocked = incomingData.ReadBoolean
+    MapData(x, y).Blocked = incomingData.ReadBoolean
 End Sub
 
 Private Sub HandlePlayMP3()
-    If incomingData.length < 2 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
-    
     Call incomingData.ReadByte
     
     Dim Number As Byte
@@ -2270,52 +2110,40 @@ Private Sub HandlePlayMP3()
     If Number > 134 Then
         Call Audio.MusicMP3Play(Number)
     Else
-        Call Audio.mMusic_PlayMid(Number)
+        Call Audio.PlayMIDI(Number)
     End If
 End Sub
 
-Private Sub HandlePlayWav()
-    'If incomingData.length < 3 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
-    
+Private Sub HandleSoundFX()
     Call incomingData.ReadByte
         
     Dim wave As Byte
-    Dim srcX As Byte
-    Dim srcY As Byte
+    Dim srcX As Integer
+    Dim srcY As Integer
     
     wave = incomingData.ReadByte
-    srcX = incomingData.ReadByte
+    srcX = incomingData.ReadInteger
     
     If srcX > 0 Then
-        srcY = incomingData.ReadByte
+        srcY = incomingData.ReadInteger
     End If
-    
-    Call Audio.mSound_PlayWav(CStr(wave) & ".wav")
+
+    Call Audio.Play(CStr(wave) & ".wav", srcX, srcY)
 End Sub
 
 Private Sub HandleGuildList()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     'Clear guild's list
     frmGuildAdm.GuildsList.Clear
     
     Dim guilds() As String
-    guilds = Split(buffer.ReadASCIIString, SEPARATOR)
+    guilds = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     Dim i As Long
     For i = 0 To UBound(guilds())
@@ -2323,7 +2151,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
     frmGuildAdm.Show vbModeless, frmMain
     
@@ -2333,7 +2161,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -2341,21 +2169,15 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleAreaChanged()
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
-    
     Call incomingData.ReadByte
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
         
-    Call CambioDeArea(X, Y)
+    Call CambioDeArea(x, y)
 End Sub
 
 Private Sub HandlePauseToggle()
@@ -2366,27 +2188,26 @@ Private Sub HandlePauseToggle()
 End Sub
 
 Private Sub HandleRainToggle()
-
     
     Call incomingData.ReadByte
     
-    If Not InMapBounds(UserPos.X, UserPos.Y) Then
+    If Not InMapBounds(UserPos.x, UserPos.y) Then
         Exit Sub
     End If
     
-    bTecho = IIf(MapData(UserPos.X, UserPos.Y).Trigger = 1 Or _
-        MapData(UserPos.X, UserPos.Y).Trigger = 2 Or _
-        MapData(UserPos.X, UserPos.Y).Trigger = 4, True, False)
+    bTecho = IIf(MapData(UserPos.x, UserPos.y).Trigger = 1 Or _
+        MapData(UserPos.x, UserPos.y).Trigger = 2 Or _
+        MapData(UserPos.x, UserPos.y).Trigger = 4, True, False)
             
     If bRain Then
         If bLluvia(UserMap) Then
             'Stop playing the rain sound
-            Call Audio.mSound_StopWav(RainBufferIndex)
+            Call Audio.StopWave(RainBufferIndex)
             RainBufferIndex = 0
             If bTecho Then
-                Call Audio.mSound_PlayWav("lluviainend.wav")
+                Call Audio.Play("lluviainend.wav", 0, 0, LoopStyle.Disabled)
             Else
-                Call Audio.mSound_PlayWav("lluviaoutend.wav")
+                Call Audio.Play("lluviaoutend.wav", 0, 0, LoopStyle.Disabled)
             End If
             frmMain.IsPlaying = PlayLoop.plNone
         End If
@@ -2406,44 +2227,38 @@ Private Sub HandleWeather()
     
     If PrevTiempo <> 0 Then
         If Tiempo = Amanecer Then
-            Call Audio.mSound_PlayWav(SND_AMANECER)
+            Call Audio.Play(SND_AMANECER)
         ElseIf Tiempo = Noche Then
-            Call Audio.mSound_PlayWav(SND_NOCHE)
+            Call Audio.Play(SND_NOCHE)
         End If
     End If
     
-    If Not InMapBounds(UserPos.X, UserPos.Y) Then
+    If Not InMapBounds(UserPos.x, UserPos.y) Then
         Exit Sub
     End If
 
-    'bTecho = IIf(MapData( UserPos.x, UserPos.y).Trigger = 1 Or _
-        MapData(UserPos.x, UserPos.y).Trigger = 2 Or _
-        MapData(UserPos.x, UserPos.y).Trigger = 4, True, False)
+    'bTecho = IIf(MapData(UserPos.x, UserPos.y).Trigger = 1 Or _
+        MapData(Usermap,UserPos.x, UserPos.y).Trigger = 2 Or _
+        MapData(Usermap,UserPos.x, UserPos.y).Trigger = 4, True, False)
 End Sub
 
 Private Sub HandleCreateFX()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
-    Dim X As Byte
-    Dim Y As Byte
+    Dim x As Integer
+    Dim y As Integer
     Dim fX As Integer
     Dim Loops As Byte
     
-    X = incomingData.ReadByte
-    Y = incomingData.ReadByte
+    x = incomingData.ReadInteger
+    y = incomingData.ReadInteger
     fX = incomingData.ReadInteger
     
     If fX > 0 Then
         Loops = incomingData.ReadByte
     End If
     
-    With MapData(X, Y)
+    With MapData(x, y)
         .FxIndex = fX
             
         If .FxIndex > 0 Then
@@ -2459,13 +2274,6 @@ Private Sub HandleCreateFX()
 End Sub
 
 Private Sub HandleCreateCharFX()
-
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
@@ -2503,11 +2311,6 @@ Private Sub HandleUpdateUserStats()
     
     Dim Privs As Integer
 
-    If incomingData.length < 26 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     UserMaxHP = incomingData.ReadInteger
@@ -2526,12 +2329,12 @@ Private Sub HandleUpdateUserStats()
     End If
     
     UserCharIndex = incomingData.ReadInteger
-    UserPos.X = incomingData.ReadByte
-    UserPos.Y = incomingData.ReadByte
+    UserPos.x = incomingData.ReadInteger
+    UserPos.y = incomingData.ReadInteger
     
     With Charlist(UserCharIndex)
-        If .Pos.X > 0 And .Pos.Y > 0 Then
-            MapData(.Pos.X, .Pos.Y).CharIndex = 0
+        If .Pos.x > 0 And .Pos.y > 0 Then
+            MapData(.Pos.x, .Pos.y).CharIndex = 0
         End If
         
         .Pos = UserPos
@@ -2565,7 +2368,7 @@ Private Sub HandleUpdateUserStats()
             .Priv = 0
         End If
            
-        Call MakeChar(UserCharIndex, Body, Head, .Heading, .Pos.X, .Pos.Y, Weapon, Shield, Helmet)
+        Call MakeChar(UserCharIndex, Body, Head, .Heading, .Pos.x, .Pos.y, Weapon, Shield, Helmet)
         
     End With
 
@@ -2583,9 +2386,9 @@ Private Sub HandleUpdateUserStats()
     End If
 
     'Are we under a roof?
-    bTecho = IIf(MapData(UserPos.X, UserPos.Y).Trigger = 1 Or _
-        MapData(UserPos.X, UserPos.Y).Trigger = 2 Or _
-        MapData(UserPos.X, UserPos.Y).Trigger = 4, True, False)
+    bTecho = IIf(MapData(UserPos.x, UserPos.y).Trigger = 1 Or _
+        MapData(UserPos.x, UserPos.y).Trigger = 2 Or _
+        MapData(UserPos.x, UserPos.y).Trigger = 4, True, False)
         
     Call DibujarMiniMapa
 End Sub
@@ -2607,7 +2410,7 @@ Private Sub HandleSlotMenosUno()
     
     If Tomando Then
         If Inv(Slot).ObjType = otBebida Or Inv(Slot).ObjType = otPocion Or Inv(Slot).ObjType = otBotellaLlena Then
-            Call Audio.mSound_PlayWav(SND_DRINK)
+            Call Audio.Play(SND_DRINK)
             Tomando = False
         End If
     End If
@@ -2618,8 +2421,8 @@ Private Sub HandleInventory()
 
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
     Dim i As Byte
         
@@ -2642,26 +2445,26 @@ On Error GoTo ErrHandler
     Dim DR As RECT
 
     SR.Right = 32
-    SR.bottom = 32
+    SR.Bottom = 32
  
     DR.Right = 32
-    DR.bottom = 32
+    DR.Bottom = 32
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     NroItems = 0
     
     With HeadEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
      
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
-            .MinDef = buffer.ReadByte
-            .MaxDef = buffer.ReadByte
+            .MinDef = Buffer.ReadByte
+            .MaxDef = Buffer.ReadByte
         
             .Amount = 1
             .PuedeUsar = True
@@ -2677,16 +2480,16 @@ On Error GoTo ErrHandler
     End With
     
     With BodyEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
         
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
-            .MinDef = buffer.ReadByte
-            .MaxDef = buffer.ReadByte
+            .MinDef = Buffer.ReadByte
+            .MaxDef = Buffer.ReadByte
             
             .Amount = 1
             .PuedeUsar = True
@@ -2701,25 +2504,25 @@ On Error GoTo ErrHandler
     End With
     
     With LeftHandEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
         
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
             If .ObjType = otArma Then
-                .MinHit = buffer.ReadByte
-                .MaxHit = buffer.ReadByte
+                .MinHit = Buffer.ReadByte
+                .MaxHit = Buffer.ReadByte
                 
                 .Proyectil = True
                     
                 frmMain.lblLeftHandEqp.Caption = .MinHit & "/" & .MaxHit
                 frmMain.picLeftHandEqp.Picture = frmMain.picLeftHandEqp.Picture
             Else
-                .MinDef = buffer.ReadByte
-                .MaxDef = buffer.ReadByte
+                .MinDef = Buffer.ReadByte
+                .MaxDef = Buffer.ReadByte
                 
                 frmMain.lblLeftHandEqp.Caption = .MinDef & "/" & .MaxDef
                 frmMain.picLeftHandEqp.Picture = frmMain.picLeftHandEqp.Picture
@@ -2735,20 +2538,20 @@ On Error GoTo ErrHandler
     End With
     
     With RightHandEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
         
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
-            .MinHit = buffer.ReadByte
-            .MaxHit = buffer.ReadByte
+            .MinHit = Buffer.ReadByte
+            .MaxHit = Buffer.ReadByte
             
             If .ObjIndex > 0 Then
                 If .ObjType = otFlecha Then
-                    .Amount = buffer.ReadInteger
+                    .Amount = Buffer.ReadInteger
                 End If
             End If
             
@@ -2769,13 +2572,13 @@ On Error GoTo ErrHandler
     End With
     
     With BeltEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
             
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
             .Amount = 1
             .PuedeUsar = True
@@ -2790,16 +2593,16 @@ On Error GoTo ErrHandler
     End With
     
     With RingEqp
-        .ObjIndex = buffer.ReadInteger
+        .ObjIndex = Buffer.ReadInteger
         
         If .ObjIndex > 0 Then
-            .GrhIndex = buffer.ReadInteger
-            .Name = buffer.ReadASCIIString
-            .Valor = buffer.ReadLong
-            .ObjType = buffer.ReadByte
+            .GrhIndex = Buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString
+            .Valor = Buffer.ReadLong
+            .ObjType = Buffer.ReadByte
             
-            .MinDef = buffer.ReadByte
-            .MaxDef = buffer.ReadByte
+            .MinDef = Buffer.ReadByte
+            .MaxDef = Buffer.ReadByte
             
             .Amount = 1
             .PuedeUsar = True
@@ -2838,18 +2641,18 @@ On Error GoTo ErrHandler
     
     For i = 1 To MaxInvSlots + 1
         
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
         
         If Slot < 1 Then
             Exit For
         End If
         
-        ObjIndex = buffer.ReadInteger
-        GrhIndex = buffer.ReadInteger
-        Name = buffer.ReadASCIIString
-        Amount = buffer.ReadInteger
-        Value = buffer.ReadLong
-        ObjType = buffer.ReadByte
+        ObjIndex = Buffer.ReadInteger
+        GrhIndex = Buffer.ReadInteger
+        Name = Buffer.ReadASCIIString
+        Amount = Buffer.ReadInteger
+        Value = Buffer.ReadLong
+        ObjType = Buffer.ReadByte
     
         MinHit = 0
         MaxHit = 0
@@ -2862,38 +2665,38 @@ On Error GoTo ErrHandler
             Case Is > 100
                 ObjType = ObjType - 100
                 
-                MinHit = buffer.ReadInteger
-                MaxHit = buffer.ReadInteger
+                MinHit = Buffer.ReadInteger
+                MaxHit = Buffer.ReadInteger
                 
                 If ObjType = otArma Then
-                    Proyectil = buffer.ReadBoolean
+                    Proyectil = Buffer.ReadBoolean
                 End If
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
             Case otArma
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
-                Proyectil = buffer.ReadBoolean
+                Proyectil = Buffer.ReadBoolean
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
             Case otFlecha
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
             Case otBarco
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
             Case otArmadura, otCasco, otEscudo, otAnillo
-                MinDef = buffer.ReadByte
-                MaxDef = buffer.ReadByte
+                MinDef = Buffer.ReadByte
+                MaxDef = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
         End Select
         
@@ -2903,7 +2706,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -2911,7 +2714,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -2919,18 +2722,13 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleInventorySlot()
-    
-    'If incomingData.length < 22 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
 
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
         
     Dim Slot As Byte
     Dim ObjIndex As Integer
@@ -2947,54 +2745,54 @@ On Error GoTo ErrHandler
     Dim PuedeUsar As Boolean
     Dim Proyectil As Boolean
     
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
-    ObjIndex = buffer.ReadInteger
-    GrhIndex = buffer.ReadInteger
-    Name = buffer.ReadASCIIString
-    Amount = buffer.ReadInteger
-    Value = buffer.ReadLong
-    ObjType = buffer.ReadByte
+    ObjIndex = Buffer.ReadInteger
+    GrhIndex = Buffer.ReadInteger
+    Name = Buffer.ReadASCIIString
+    Amount = Buffer.ReadInteger
+    Value = Buffer.ReadLong
+    ObjType = Buffer.ReadByte
 
     Select Case ObjType
                 
         Case Is > 100
             ObjType = ObjType - 100
             
-            MinHit = buffer.ReadInteger
-            MaxHit = buffer.ReadInteger
+            MinHit = Buffer.ReadInteger
+            MaxHit = Buffer.ReadInteger
             
             If ObjType = otArma Then
-                Proyectil = buffer.ReadBoolean
+                Proyectil = Buffer.ReadBoolean
             End If
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case otArma
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
-            Proyectil = buffer.ReadBoolean
+            Proyectil = Buffer.ReadBoolean
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case otFlecha
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case otBarco
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
             PuedeUsar = True
             
         Case otArmadura, otCasco, otEscudo, otAnillo
-            MinDef = buffer.ReadByte
-            MaxDef = buffer.ReadByte
+            MinDef = Buffer.ReadByte
+            MaxDef = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case Else
             PuedeUsar = True
@@ -3012,7 +2810,7 @@ On Error GoTo ErrHandler
     End If
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3020,7 +2818,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3031,8 +2829,8 @@ Private Sub HandleBeltInv()
 
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
     Dim i As Byte
         
@@ -3043,23 +2841,23 @@ On Error GoTo ErrHandler
     Dim Amount As Integer
     Dim Value As Long
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     NroBeltItems = 0
     
     For i = 1 To MaxBeltSlots + 1
         
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
 
         If Slot < 1 Then
             Exit For
         End If
         
-        ObjIndex = buffer.ReadInteger
-        GrhIndex = buffer.ReadInteger
-        Name = buffer.ReadASCIIString
-        Amount = buffer.ReadInteger
-        Value = buffer.ReadLong
+        ObjIndex = Buffer.ReadInteger
+        GrhIndex = Buffer.ReadInteger
+        Name = Buffer.ReadASCIIString
+        Amount = Buffer.ReadInteger
+        Value = Buffer.ReadLong
         
         If ObjIndex > 0 Then
             Call SetBeltSlot(Slot, ObjIndex, Amount, GrhIndex, Value, Name, True)
@@ -3069,7 +2867,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3077,7 +2875,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3085,18 +2883,13 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleBeltSlot()
-    
-    'If incomingData.length < 22 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
 
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
         
     Dim Slot As Byte
     Dim ObjIndex As Integer
@@ -3105,13 +2898,13 @@ On Error GoTo ErrHandler
     Dim Amount As Integer
     Dim Value As Long
     
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
-    ObjIndex = buffer.ReadInteger
-    GrhIndex = buffer.ReadInteger
-    Name = buffer.ReadASCIIString
-    Amount = buffer.ReadInteger
-    Value = buffer.ReadLong
+    ObjIndex = Buffer.ReadInteger
+    GrhIndex = Buffer.ReadInteger
+    Name = Buffer.ReadASCIIString
+    Amount = Buffer.ReadInteger
+    Value = Buffer.ReadLong
     
     If Belt(Slot).ObjIndex < 1 Then
         NroBeltItems = NroBeltItems + 1
@@ -3126,7 +2919,7 @@ On Error GoTo ErrHandler
     End If
         
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3134,7 +2927,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3146,8 +2939,8 @@ Private Sub HandleBank()
 On Error GoTo ErrHandler
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
     Dim i As Byte
         
@@ -3165,24 +2958,24 @@ On Error GoTo ErrHandler
     Dim Valor As Long
     Dim PuedeUsar As Boolean
         
-    Call InvNpc.Initialize(frmBanco.PicBancoInv, MaxBankSlots)
+    Call InvNpc.Initialize(DirectDraw, frmBanco.PicBancoInv, MaxBankSlots)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     For i = 1 To MaxNpcInvSlots + 1
         
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
 
         If Slot < 1 Then
             Exit For
         End If
             
-        ObjIndex = buffer.ReadInteger
-        GrhIndex = buffer.ReadInteger
-        Name = buffer.ReadASCIIString
-        Amount = buffer.ReadInteger
-        Valor = buffer.ReadLong
-        ObjType = buffer.ReadByte
+        ObjIndex = Buffer.ReadInteger
+        GrhIndex = Buffer.ReadInteger
+        Name = Buffer.ReadASCIIString
+        Amount = Buffer.ReadInteger
+        Valor = Buffer.ReadLong
+        ObjType = Buffer.ReadByte
 
         MinHit = 0
         MaxHit = 0
@@ -3195,28 +2988,28 @@ On Error GoTo ErrHandler
             Case Is > 100
                 ObjType = ObjType - 100
                 
-                MinHit = buffer.ReadInteger
-                MaxHit = buffer.ReadInteger
+                MinHit = Buffer.ReadInteger
+                MaxHit = Buffer.ReadInteger
                 
                 If ObjType <> otBarco Then
-                    PuedeUsar = buffer.ReadBoolean
+                    PuedeUsar = Buffer.ReadBoolean
                 End If
                 
             Case otArma, otFlecha
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
             Case otBarco
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
             Case otArmadura, otCasco, otEscudo, otAnillo
-                MinDef = buffer.ReadByte
-                MaxDef = buffer.ReadByte
+                MinDef = Buffer.ReadByte
+                MaxDef = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
             
         End Select
     
@@ -3225,11 +3018,11 @@ On Error GoTo ErrHandler
         
     Next i
     
-    UserBankGold = buffer.ReadLong
+    UserBankGold = Buffer.ReadLong
     frmBanco.lblUserBankGold = PonerPuntos(UserBankGold)
 
     If Not frmMain.PicInv.Visible Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     
         frmMain.imgInv.Visible = False
         frmMain.PicSpellInv.Visible = False
@@ -3243,7 +3036,7 @@ On Error GoTo ErrHandler
     frmBanco.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3252,7 +3045,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3261,17 +3054,12 @@ End Sub
 
 Private Sub HandleBankSlot()
 
-    'If incomingData.length < 21 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Slot As Byte
     
@@ -3287,14 +3075,14 @@ On Error GoTo ErrHandler
     Dim Valor As Long
     Dim PuedeUsar As Boolean
     
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
-    ObjIndex = buffer.ReadInteger
-    GrhIndex = buffer.ReadInteger
-    Name = buffer.ReadASCIIString
-    Amount = buffer.ReadInteger
-    Valor = buffer.ReadLong
-    ObjType = buffer.ReadByte
+    ObjIndex = Buffer.ReadInteger
+    GrhIndex = Buffer.ReadInteger
+    Name = Buffer.ReadASCIIString
+    Amount = Buffer.ReadInteger
+    Valor = Buffer.ReadLong
+    ObjType = Buffer.ReadByte
 
     MinHit = 0
     MaxHit = 0
@@ -3307,28 +3095,28 @@ On Error GoTo ErrHandler
         Case Is > 100
             ObjType = ObjType - 100
             
-            MinHit = buffer.ReadInteger
-            MaxHit = buffer.ReadInteger
+            MinHit = Buffer.ReadInteger
+            MaxHit = Buffer.ReadInteger
             
             If ObjType <> otBarco Then
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
             End If
             
         Case otArma, otFlecha
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case otBarco
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
         Case otArmadura, otCasco, otEscudo, otAnillo
-            MinDef = buffer.ReadByte
-            MaxDef = buffer.ReadByte
+            MinDef = Buffer.ReadByte
+            MaxDef = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
         
     End Select
 
@@ -3336,7 +3124,7 @@ On Error GoTo ErrHandler
         MinHit, MaxHit, MinDef, MaxDef, Valor, Name, PuedeUsar, False)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3344,7 +3132,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3356,8 +3144,8 @@ Private Sub HandleNpcInventory()
 On Error GoTo ErrHandler
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
     Dim i As Byte
         
@@ -3375,24 +3163,24 @@ On Error GoTo ErrHandler
     Dim Valor As Long
     Dim PuedeUsar As Boolean
         
-    Call InvNpc.Initialize(frmComerciar.PicComercianteInv, MaxNpcInvSlots)
+    Call InvNpc.Initialize(DirectDraw, frmComerciar.PicComercianteInv, MaxNpcInvSlots)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     For i = 1 To MaxNpcInvSlots + 1
         
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
 
         If Slot < 1 Then
             Exit For
         End If
             
-        ObjIndex = buffer.ReadInteger
-        GrhIndex = buffer.ReadInteger
-        Name = buffer.ReadASCIIString
-        Amount = buffer.ReadInteger
-        Valor = buffer.ReadLong
-        ObjType = buffer.ReadByte
+        ObjIndex = Buffer.ReadInteger
+        GrhIndex = Buffer.ReadInteger
+        Name = Buffer.ReadASCIIString
+        Amount = Buffer.ReadInteger
+        Valor = Buffer.ReadLong
+        ObjType = Buffer.ReadByte
 
         MinHit = 0
         MaxHit = 0
@@ -3405,28 +3193,28 @@ On Error GoTo ErrHandler
             Case Is > 100
                 ObjType = ObjType - 100
                 
-                MinHit = buffer.ReadInteger
-                MaxHit = buffer.ReadInteger
+                MinHit = Buffer.ReadInteger
+                MaxHit = Buffer.ReadInteger
                 
                 If ObjType <> otBarco Then
-                    PuedeUsar = buffer.ReadBoolean
+                    PuedeUsar = Buffer.ReadBoolean
                 End If
                 
             Case otArma, otFlecha
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
                 
             Case otBarco
-                MinHit = buffer.ReadByte
-                MaxHit = buffer.ReadByte
+                MinHit = Buffer.ReadByte
+                MaxHit = Buffer.ReadByte
                 
             Case otArmadura, otCasco, otEscudo, otAnillo
-                MinDef = buffer.ReadByte
-                MaxDef = buffer.ReadByte
+                MinDef = Buffer.ReadByte
+                MaxDef = Buffer.ReadByte
                 
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
             
         End Select
     
@@ -3435,10 +3223,10 @@ On Error GoTo ErrHandler
         
     Next i
 
-    frmComerciar.lblNpcName.Caption = buffer.ReadASCIIString
+    frmComerciar.lblNpcName.Caption = Buffer.ReadASCIIString
 
     If frmMain.imgInv.Visible Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     
         frmMain.imgInv.Visible = False
         frmMain.PicSpellInv.Visible = False
@@ -3452,7 +3240,7 @@ On Error GoTo ErrHandler
     frmComerciar.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3461,7 +3249,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3472,10 +3260,10 @@ Private Sub HandleNpcInventorySlot()
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Slot As Byte
 
@@ -3491,14 +3279,14 @@ On Error GoTo ErrHandler
     Dim Valor As Long
     Dim PuedeUsar As Boolean
             
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
-    ObjIndex = buffer.ReadInteger
-    GrhIndex = buffer.ReadInteger
-    Name = buffer.ReadASCIIString
-    Amount = buffer.ReadInteger
-    Valor = buffer.ReadLong
-    ObjType = buffer.ReadByte
+    ObjIndex = Buffer.ReadInteger
+    GrhIndex = Buffer.ReadInteger
+    Name = Buffer.ReadASCIIString
+    Amount = Buffer.ReadInteger
+    Valor = Buffer.ReadLong
+    ObjType = Buffer.ReadByte
 
     MinHit = 0
     MaxHit = 0
@@ -3511,28 +3299,28 @@ On Error GoTo ErrHandler
         Case Is > 100
             ObjType = ObjType - 100
             
-            MinHit = buffer.ReadInteger
-            MaxHit = buffer.ReadInteger
+            MinHit = Buffer.ReadInteger
+            MaxHit = Buffer.ReadInteger
             
             If ObjType <> otBarco Then
-                PuedeUsar = buffer.ReadBoolean
+                PuedeUsar = Buffer.ReadBoolean
             End If
             
         Case otArma, otFlecha
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
             
         Case otBarco
-            MinHit = buffer.ReadByte
-            MaxHit = buffer.ReadByte
+            MinHit = Buffer.ReadByte
+            MaxHit = Buffer.ReadByte
             
         Case otArmadura, otCasco, otEscudo, otAnillo
-            MinDef = buffer.ReadByte
-            MaxDef = buffer.ReadByte
+            MinDef = Buffer.ReadByte
+            MaxDef = Buffer.ReadByte
             
-            PuedeUsar = buffer.ReadBoolean
+            PuedeUsar = Buffer.ReadBoolean
         
     End Select
 
@@ -3540,7 +3328,7 @@ On Error GoTo ErrHandler
         MinHit, MaxHit, MinDef, MaxDef, Valor, Name, PuedeUsar, False)
         
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3548,7 +3336,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3559,10 +3347,10 @@ Private Sub HandleSpells()
 
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim i As Byte
     Dim Slot As Byte
@@ -3572,12 +3360,12 @@ On Error GoTo ErrHandler
     
     For i = 1 To MaxSpellSlots
         
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
         
-        Spell = buffer.ReadByte
+        Spell = Buffer.ReadByte
     
         If Spell > 0 Then
-            Call SetSpellSlot(i, Spell + 24000, buffer.ReadASCIIString, buffer.ReadBoolean, buffer.ReadInteger, buffer.ReadInteger, buffer.ReadInteger)
+            Call SetSpellSlot(i, Spell + 24000, Buffer.ReadASCIIString, Buffer.ReadBoolean, Buffer.ReadInteger, Buffer.ReadInteger, Buffer.ReadInteger)
         Else
             Call Hechizos.UnSetSlot(i)
         End If
@@ -3587,7 +3375,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3595,7 +3383,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3604,30 +3392,25 @@ End Sub
 
 Private Sub HandleSpellSlot()
 
-    'If incomingData.length < 6 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Slot As Byte
     
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
     With Spell(Slot)
-        .Nombre = buffer.ReadASCIIString
+        .Nombre = Buffer.ReadASCIIString
                 
-        .Grh = buffer.ReadByte + 24000
-        .MinSkill = buffer.ReadBoolean
-        .ManaRequerido = buffer.ReadInteger
-        .StaRequerido = buffer.ReadInteger
-        .NeedStaff = buffer.ReadInteger
+        .Grh = Buffer.ReadByte + 24000
+        .MinSkill = Buffer.ReadBoolean
+        .ManaRequerido = Buffer.ReadInteger
+        .StaRequerido = Buffer.ReadInteger
+        .NeedStaff = Buffer.ReadInteger
         
         If .Grh > 24032 Then
             .Grh = 24032
@@ -3657,7 +3440,7 @@ On Error GoTo ErrHandler
     NroSpells = NroSpells + 1
 
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3665,7 +3448,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3674,32 +3457,27 @@ End Sub
 
 Private Sub HandleCompas()
 
-    'If incomingData.length < 6 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
     Dim i As Byte
     Dim Slot As Byte
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     NroCompas = 0
     
     For i = 1 To MaxCompaSlots + 1
-        Slot = buffer.ReadByte
+        Slot = Buffer.ReadByte
         
         If Slot < 1 Then
             Debug.Print "Compa O"
             Exit For
         End If
 
-        Call SetCompaSlot(Slot, buffer.ReadASCIIString, buffer.ReadBoolean)
+        Call SetCompaSlot(Slot, Buffer.ReadASCIIString, Buffer.ReadBoolean)
         
         NroCompas = NroCompas + 1
     Next i
@@ -3707,18 +3485,18 @@ On Error GoTo ErrHandler
     Call RenderCompas
             
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
 
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
     Dim Error As Long
     Error = Err.Number
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3727,28 +3505,30 @@ End Sub
 
 Private Sub HandleAddCompa()
 
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Slot As Byte
 
     Dim Agregado As Boolean
         
-    Slot = buffer.ReadByte
+    Slot = Buffer.ReadByte
     
-    Call SetCompaSlot(Slot, buffer.ReadASCIIString, buffer.ReadBoolean)
+    Call SetCompaSlot(Slot, Buffer.ReadASCIIString, Buffer.ReadBoolean)
     
-    If buffer.ReadBoolean Then
+    If Buffer.ReadBoolean Then
         With FontTypes(FontTypeNames.FONTTYPE_INFO)
             Call ShowConsoleMsg(Compa(Slot).Nombre & " te agregó como compañero, para eliminarlo escribe '-" & Compa(Slot).Nombre & "'.", .Red, .Green, .Blue, .Bold, .Italic)
         End With
     End If
+    
+    NroCompas = NroCompas + 1
 
     Call RenderCompas
     
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 End Sub
 
@@ -3831,13 +3611,19 @@ Private Sub HandleCancelOfferItem()
 
 End Sub
 
+Private Sub HandleDeleteFile()
+'SEGURIDAD
+On Error GoTo ER
+    
+    Call incomingData.ReadByte
+
+    Kill incomingData.ReadASCIIString
+    
+ER:
+End Sub
+
 Private Sub HandleAttributes()
 
-    If incomingData.length < 1 + NUMATRIBUTOS Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim i As Long
@@ -3852,10 +3638,10 @@ End Sub
 Private Sub HandleUserPlatforms()
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim i As Byte
     Dim NroMapa As Integer
@@ -3863,7 +3649,7 @@ Private Sub HandleUserPlatforms()
     NroPlataformas = 0
 
     For i = 1 To MaxPlataformSlots
-        NroMapa = buffer.ReadInteger
+        NroMapa = Buffer.ReadInteger
         
         If NroMapa < 1 Then
             Exit For
@@ -3876,7 +3662,7 @@ Private Sub HandleUserPlatforms()
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
 
     frmPlataforma.Show , frmMain
 
@@ -3884,46 +3670,41 @@ End Sub
 
 Private Sub HandleBlacksmithWeapons()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Count As Integer
     Dim i As Long
     Dim j As Long
     Dim k As Long
     
-    Count = buffer.ReadInteger
+    Count = Buffer.ReadInteger
     
     ReDim ArmasHerrero(Count) As tItemsConstruibles
     ReDim HerreroMejorar(0) As tItemsConstruibles
     
     For i = 1 To Count
         With ArmasHerrero(i)
-            .Name = buffer.ReadASCIIString    'Get the object's name
-            .GrhIndex = buffer.ReadInteger
-            .LinH = buffer.ReadInteger        'The iron needed
-            .LinP = buffer.ReadInteger        'The silver needed
-            .LinO = buffer.ReadInteger        'The gold needed
-            .ObjIndex = buffer.ReadInteger
-            .Upgrade = buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString    'Get the object's name
+            .GrhIndex = Buffer.ReadInteger
+            .LinH = Buffer.ReadInteger        'The iron needed
+            .LinP = Buffer.ReadInteger        'The silver needed
+            .LinO = Buffer.ReadInteger        'The gold needed
+            .ObjIndex = Buffer.ReadInteger
+            .Upgrade = Buffer.ReadInteger
         End With
     Next i
     
     With frmHerrero
         'Inicializo los inventarios
-        Call InvLingosHerreria(1).Initialize(.picLingotes0, 3, , , , , , False)
-        Call InvLingosHerreria(2).Initialize(.picLingotes1, 3, , , , , , False)
-        Call InvLingosHerreria(3).Initialize(.picLingotes2, 3, , , , , , False)
-        Call InvLingosHerreria(4).Initialize(.picLingotes3, 3, , , , , , False)
+        Call InvLingosHerreria(1).Initialize(DirectDraw, .picLingotes0, 3, , , , , , False)
+        Call InvLingosHerreria(2).Initialize(DirectDraw, .picLingotes1, 3, , , , , , False)
+        Call InvLingosHerreria(3).Initialize(DirectDraw, .picLingotes2, 3, , , , , , False)
+        Call InvLingosHerreria(4).Initialize(DirectDraw, .picLingotes3, 3, , , , , , False)
         
         Call .HideExtraControls(Count)
         Call .RenderList(1, True)
@@ -3955,7 +3736,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -3963,7 +3744,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -3972,36 +3753,31 @@ End Sub
 
 Private Sub HandleBlacksmithArmors()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Count As Integer
     Dim i As Long
     Dim j As Long
     Dim k As Long
     
-    Count = buffer.ReadInteger
+    Count = Buffer.ReadInteger
     
     ReDim ArmadurasHerrero(Count) As tItemsConstruibles
     
     For i = 1 To Count
         With ArmadurasHerrero(i)
-            .Name = buffer.ReadASCIIString    'Get the object's name
-            .GrhIndex = buffer.ReadInteger
-            .LinH = buffer.ReadInteger        'The iron needed
-            .LinP = buffer.ReadInteger        'The silver needed
-            .LinO = buffer.ReadInteger        'The gold needed
-            .ObjIndex = buffer.ReadInteger
-            .Upgrade = buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString    'Get the object's name
+            .GrhIndex = Buffer.ReadInteger
+            .LinH = Buffer.ReadInteger        'The iron needed
+            .LinP = Buffer.ReadInteger        'The silver needed
+            .LinO = Buffer.ReadInteger        'The gold needed
+            .ObjIndex = Buffer.ReadInteger
+            .Upgrade = Buffer.ReadInteger
         End With
     Next i
     
@@ -4033,7 +3809,7 @@ On Error GoTo ErrHandler
     Next i
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
     frmHerrero.Show , frmMain
     
@@ -4043,7 +3819,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4051,45 +3827,41 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleCarpenterObjects()
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim Count As Integer
     Dim i As Long
     Dim j As Long
     Dim k As Long
     
-    Count = buffer.ReadInteger
+    Count = Buffer.ReadInteger
     
     ReDim ObjCarpintero(Count) As tItemsConstruibles
     ReDim CarpinteroMejorar(0) As tItemsConstruibles
     
     For i = 1 To Count
         With ObjCarpintero(i)
-            .Name = buffer.ReadASCIIString        'Get the object's name
-            .GrhIndex = buffer.ReadInteger
-            .Madera = buffer.ReadInteger          'The wood needed
-            .MaderaElfica = buffer.ReadInteger    'The elfic wood needed
-            .ObjIndex = buffer.ReadInteger
-            .Upgrade = buffer.ReadInteger
+            .Name = Buffer.ReadASCIIString        'Get the object's name
+            .GrhIndex = Buffer.ReadInteger
+            .Madera = Buffer.ReadInteger          'The wood needed
+            .MaderaElfica = Buffer.ReadInteger    'The elfic wood needed
+            .ObjIndex = Buffer.ReadInteger
+            .Upgrade = Buffer.ReadInteger
         End With
     Next i
     
     With frmCarp
         'Inicializo los inventarios
-        Call InvMaderasCarpinteria(1).Initialize(.picMaderas0, 2, , , , , , False)
-        Call InvMaderasCarpinteria(2).Initialize(.picMaderas1, 2, , , , , , False)
-        Call InvMaderasCarpinteria(3).Initialize(.picMaderas2, 2, , , , , , False)
-        Call InvMaderasCarpinteria(4).Initialize(.picMaderas3, 2, , , , , , False)
+        Call InvMaderasCarpinteria(1).Initialize(DirectDraw, .picMaderas0, 2, , , , , , False)
+        Call InvMaderasCarpinteria(2).Initialize(DirectDraw, .picMaderas1, 2, , , , , , False)
+        Call InvMaderasCarpinteria(3).Initialize(DirectDraw, .picMaderas2, 2, , , , , , False)
+        Call InvMaderasCarpinteria(4).Initialize(DirectDraw, .picMaderas3, 2, , , , , , False)
         
         Call .HideExtraControls(Count)
         Call .RenderList(1)
@@ -4122,7 +3894,7 @@ On Error GoTo ErrHandler
     frmCarp.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4130,7 +3902,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4146,21 +3918,16 @@ End Sub
 
 Private Sub HandleErrorMessage()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim box As String
     
-    box = buffer.ReadASCIIString
+    box = Buffer.ReadASCIIString
     
     If box = "PsNo" Then
         frmConnect.PasswordTxt.Text = vbNullString
@@ -4187,7 +3954,7 @@ On Error GoTo ErrHandler
     frmConnect.MousePointer = vbDefault
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4195,7 +3962,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4211,31 +3978,24 @@ Private Sub HandleBlind()
 End Sub
 
 Private Sub HandleDumb()
-
-    
     Call incomingData.ReadByte
     
     UserEstupido = True
 End Sub
 
 Private Sub HandleShowSignal()
-
-    If incomingData.length < 5 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
-    Call InitCartel(buffer.ReadASCIIString, buffer.ReadInteger)
+    Call InitCartel(Buffer.ReadASCIIString, Buffer.ReadInteger)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4243,7 +4003,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4251,11 +4011,6 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleUpdateHungerAndThirst()
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     UserMinSed = incomingData.ReadByte
@@ -4267,13 +4022,8 @@ End Sub
 
 Private Sub HandleMiniStats()
     
-    On Error Resume Next
-    
-    'If incomingData.length < 20 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
+On Error Resume Next
+
     Call incomingData.ReadByte
     
     With UserEstadisticas
@@ -4287,11 +4037,6 @@ Private Sub HandleMiniStats()
 End Sub
 
 Private Sub HandleSkillUp()
-
-    If incomingData.length < 2 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
     Dim SkillId As Byte
     Dim SkillLvl As Byte
@@ -4322,11 +4067,6 @@ Private Sub HandleSkillUp()
 End Sub
 
 Private Sub HandleLevelUp()
-    'If incomingData.length < 3 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
     Dim Pts As Byte
     Dim AumentoHP As Byte
     Dim AumentoSTA As Byte
@@ -4387,12 +4127,6 @@ Private Sub HandleLevelUp()
 End Sub
 
 Private Sub HandleSetInvisible()
-
-    If incomingData.length < 4 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
@@ -4412,12 +4146,6 @@ Private Sub HandleSetInvisible()
 End Sub
 
 Private Sub HandleSetParalized()
-
-    If incomingData.length < 1 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
@@ -4451,11 +4179,6 @@ Private Sub HandleDumbNoMore()
 End Sub
 
 Private Sub HandleSkills()
-    If incomingData.length < 1 + NUMSKILLS + NUMSKILLS Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim i As Long
@@ -4479,23 +4202,18 @@ On Error Resume Next
 End Sub
 
 Private Sub HandleTrainerCreatureList()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim creatures() As String
     Dim i As Long
     
-    creatures = Split(buffer.ReadASCIIString, SEPARATOR)
+    creatures = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     For i = 0 To UBound(creatures())
         Call frmEntrenador.lstCriaturas.AddItem(creatures(i))
@@ -4503,7 +4221,7 @@ On Error GoTo ErrHandler
     frmEntrenador.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4511,7 +4229,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4520,28 +4238,23 @@ End Sub
 
 Private Sub HandleGuildNews()
 'Handles the GuildNews message.
-
-    If incomingData.length < 7 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        'EXIT SUB
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim GuildList() As String
     Dim i As Long
     Dim sTemp As String
     
     'Get news'string
-    frmGuildNews.news = buffer.ReadASCIIString
+    frmGuildNews.news = Buffer.ReadASCIIString
     
     'Get Enemy guilds list
-    GuildList = Split(buffer.ReadASCIIString, SEPARATOR)
+    GuildList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     For i = 0 To UBound(GuildList)
         sTemp = frmGuildNews.txtClanesGuerra.Text
@@ -4549,7 +4262,7 @@ On Error GoTo ErrHandler
     Next i
     
     'Get Allied guilds list
-    GuildList = Split(buffer.ReadASCIIString, SEPARATOR)
+    GuildList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     For i = 0 To UBound(GuildList)
         sTemp = frmGuildNews.txtClanesAliados.Text
@@ -4561,7 +4274,7 @@ On Error GoTo ErrHandler
     'End If
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4569,7 +4282,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4578,22 +4291,17 @@ End Sub
 
 Private Sub HandleOfferDetails()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
-    Call frmUserRequest.recievePeticion(buffer.ReadASCIIString)
+    Call frmUserRequest.recievePeticion(Buffer.ReadASCIIString)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4601,7 +4309,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4609,23 +4317,18 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleAlianceProposalsList()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim vsGuildList() As String
     Dim i As Long
     
-    vsGuildList = Split(buffer.ReadASCIIString, SEPARATOR)
+    vsGuildList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     Call frmPeaceProp.lista.Clear
     For i = 0 To UBound(vsGuildList())
@@ -4636,7 +4339,7 @@ On Error GoTo ErrHandler
     Call frmPeaceProp.Show(vbModeless, frmMain)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4644,7 +4347,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4653,22 +4356,17 @@ End Sub
 
 Private Sub HandlePeaceProposalsList()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim GuildList() As String
     Dim i As Long
     
-    GuildList = Split(buffer.ReadASCIIString, SEPARATOR)
+    GuildList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     Call frmPeaceProp.lista.Clear
     For i = 0 To UBound(GuildList())
@@ -4679,7 +4377,7 @@ On Error GoTo ErrHandler
     Call frmPeaceProp.Show(vbModeless, frmMain)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4687,7 +4385,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4696,17 +4394,12 @@ End Sub
 
 Private Sub HandleCharInfo()
 
-    'If incomingData.length < 35 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     With frmCharInfo
         If .frmType = CharInfoFrmType.frmMembers Then
@@ -4721,33 +4414,33 @@ On Error GoTo ErrHandler
             .imgPeticion.Visible = True
         End If
         
-        .Nombre.Caption = buffer.ReadASCIIString
-        .Raza.Caption = ListaRazas(buffer.ReadByte)
-        .Clase.Caption = ListaClases(buffer.ReadByte)
+        .Nombre.Caption = Buffer.ReadASCIIString
+        .Raza.Caption = ListaRazas(Buffer.ReadByte)
+        .Clase.Caption = ListaClases(Buffer.ReadByte)
         
-        If buffer.ReadByte = 1 Then
+        If Buffer.ReadByte = 1 Then
             .Genero.Caption = "Hombre"
         Else
             .Genero.Caption = "Mujer"
         End If
         
-        .Nivel.Caption = buffer.ReadByte
-        .Oro.Caption = buffer.ReadLong
-        .Banco.Caption = buffer.ReadLong
+        .Nivel.Caption = Buffer.ReadByte
+        .Oro.Caption = Buffer.ReadLong
+        .Banco.Caption = Buffer.ReadLong
         
-        .txtPeticiones.Text = buffer.ReadASCIIString
-        .guildactual.Caption = buffer.ReadASCIIString
-        .txtMiembro.Text = buffer.ReadASCIIString
+        .txtPeticiones.Text = Buffer.ReadASCIIString
+        .guildactual.Caption = Buffer.ReadASCIIString
+        .txtMiembro.Text = Buffer.ReadASCIIString
         
-        .Matados.Caption = CStr(buffer.ReadLong)
+        .Matados.Caption = CStr(Buffer.ReadLong)
         
-        .Muertes.Caption = CStr(buffer.ReadLong)
+        .Muertes.Caption = CStr(Buffer.ReadLong)
         
         Call .Show(vbModeless, frmMain)
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4755,7 +4448,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4763,25 +4456,20 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleGuildLeaderInfo()
-
-    If incomingData.length < 9 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim i As Long
     Dim List() As String
     
     With frmGuildLeader
         'Get list of existing guilds
-        GuildNames = Split(buffer.ReadASCIIString, SEPARATOR)
+        GuildNames = Split(Buffer.ReadASCIIString, SEPARATOR)
         
         'Empty the list
         Call .GuildsList.Clear
@@ -4791,7 +4479,7 @@ On Error GoTo ErrHandler
         Next i
         
         'Get list of guild's members
-        GuildMembers = Split(buffer.ReadASCIIString, SEPARATOR)
+        GuildMembers = Split(Buffer.ReadASCIIString, SEPARATOR)
         .Miembros.Caption = CStr(UBound(GuildMembers()) + 1)
         
         'Empty the list
@@ -4801,10 +4489,10 @@ On Error GoTo ErrHandler
             Call .members.AddItem(GuildMembers(i))
         Next i
         
-        .txtGuildNews = buffer.ReadASCIIString
+        .txtGuildNews = Buffer.ReadASCIIString
         
         'Get list of join requests
-        List = Split(buffer.ReadASCIIString, SEPARATOR)
+        List = Split(Buffer.ReadASCIIString, SEPARATOR)
         
         'Empty the list
         Call .Solicitudes.Clear
@@ -4817,7 +4505,7 @@ On Error GoTo ErrHandler
     End With
 
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4825,7 +4513,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4834,43 +4522,38 @@ End Sub
 
 Private Sub HandleGuildDetails()
 
-    'If incomingData.length < 26 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     With frmGuildBrief
         .imgDeclararGuerra.Visible = .EsLeader
         .imgOfrecerAlianza.Visible = .EsLeader
         .imgOfrecerPaz.Visible = .EsLeader
         
-        .Nombre.Caption = buffer.ReadASCIIString
-        .fundador.Caption = buffer.ReadASCIIString
-        .Creacion.Caption = buffer.ReadASCIIString
-        .lider.Caption = buffer.ReadASCIIString
-        .Miembros.Caption = buffer.ReadInteger
+        .Nombre.Caption = Buffer.ReadASCIIString
+        .fundador.Caption = Buffer.ReadASCIIString
+        .Creacion.Caption = Buffer.ReadASCIIString
+        .lider.Caption = Buffer.ReadASCIIString
+        .Miembros.Caption = Buffer.ReadInteger
         
-        If buffer.ReadBoolean Then
+        If Buffer.ReadBoolean Then
             .eleccion.Caption = "ABIERTA"
         Else
             .eleccion.Caption = "CERRADA"
         End If
         
-        .Enemigos.Caption = buffer.ReadInteger
-        .Aliados.Caption = buffer.ReadInteger
+        .Enemigos.Caption = Buffer.ReadInteger
+        .Aliados.Caption = Buffer.ReadInteger
         
-        .Desc.Text = buffer.ReadASCIIString
+        .Desc.Text = Buffer.ReadASCIIString
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
     frmGuildBrief.Show vbModeless, frmMain
     
@@ -4880,7 +4563,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4895,24 +4578,19 @@ Private Sub HandleShowGuildFundationForm()
 End Sub
 
 Private Sub HandleShowUserRequest()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
-    Call frmUserRequest.recievePeticion(buffer.ReadASCIIString)
+    Call frmUserRequest.recievePeticion(Buffer.ReadASCIIString)
     Call frmUserRequest.Show(vbModeless, frmMain)
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4920,7 +4598,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -4933,22 +4611,17 @@ End Sub
 
 Private Sub HandleSpawnList()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim creatureList() As String
     Dim i As Long
     
-    creatureList = Split(buffer.ReadASCIIString, SEPARATOR)
+    creatureList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     For i = 0 To UBound(creatureList())
         Call frmSpawnList.lstCriaturas.AddItem(creatureList(i))
@@ -4956,7 +4629,7 @@ On Error GoTo ErrHandler
     frmSpawnList.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -4964,27 +4637,22 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 End Sub
 
 Private Sub HandleShowSOSForm()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim sosList() As String
     Dim i As Long
     
-    sosList = Split(buffer.ReadASCIIString, SEPARATOR)
+    sosList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     For i = 0 To UBound(sosList())
         Call frmMSG.List1.AddItem(sosList(i))
@@ -4993,7 +4661,7 @@ On Error GoTo ErrHandler
     frmMSG.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -5001,7 +4669,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5009,34 +4677,29 @@ On Error GoTo 0
 End Sub
 
 Private Sub HandleShowPartyForm()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim members() As String
     Dim i As Long
     
-    EsPartyLeader = CBool(buffer.ReadByte)
+    EsPartyLeader = CBool(Buffer.ReadByte)
        
-    members = Split(buffer.ReadASCIIString, SEPARATOR)
+    members = Split(Buffer.ReadASCIIString, SEPARATOR)
     For i = 0 To UBound(members())
         Call frmParty.lstMembers.AddItem(members(i))
     Next i
     
-    frmParty.lblTotalExp.Caption = buffer.ReadLong
+    frmParty.lblTotalExp.Caption = Buffer.ReadLong
     frmParty.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -5044,7 +4707,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5053,23 +4716,18 @@ End Sub
 
 Private Sub HandleShowMOTDEditionForm()
 
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
-    frmCambiaMotd.txtMotd.Text = buffer.ReadASCIIString
+    frmCambiaMotd.txtMotd.Text = Buffer.ReadASCIIString
     frmCambiaMotd.Show , frmMain
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -5077,7 +4735,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5093,23 +4751,18 @@ Private Sub HandleShowGMPanelForm()
 End Sub
 
 Private Sub HandleUserNameList()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim userList() As String
     Dim i As Long
     
-    userList = Split(buffer.ReadASCIIString, SEPARATOR)
+    userList = Split(Buffer.ReadASCIIString, SEPARATOR)
     
     If frmPanelGm.Visible Then
         frmPanelGm.cboListaUsus.Clear
@@ -5122,7 +4775,7 @@ On Error GoTo ErrHandler
     End If
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -5130,7 +4783,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5147,24 +4800,19 @@ Private Sub HandlePong()
 End Sub
 
 Private Sub HandleGuildMemberInfo()
-
-    If incomingData.length < 3 Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
     
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     With frmGuildMember
         'Clear guild's list
         .lstClanes.Clear
         
-        GuildNames = Split(buffer.ReadASCIIString, SEPARATOR)
+        GuildNames = Split(Buffer.ReadASCIIString, SEPARATOR)
         
         Dim i As Long
         For i = 0 To UBound(GuildNames())
@@ -5172,7 +4820,7 @@ On Error GoTo ErrHandler
         Next i
         
         'Get list of guild's members
-        GuildMembers = Split(buffer.ReadASCIIString, SEPARATOR)
+        GuildMembers = Split(Buffer.ReadASCIIString, SEPARATOR)
         .lblCantMiembros.Caption = CStr(UBound(GuildMembers()) + 1)
         
         'Empty the list
@@ -5183,7 +4831,7 @@ On Error GoTo ErrHandler
         Next i
         
         'If we got here then packet is complete, copy data back to original queue
-        Call incomingData.CopyBuffer(buffer)
+        Call incomingData.CopyBuffer(Buffer)
         
         .Show vbModeless, frmMain
     End With
@@ -5194,7 +4842,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5203,31 +4851,26 @@ End Sub
 
 Private Sub HandleUpdateTagAndStatus()
     
-    'If incomingData.length < 6 Then
-    'Err.Raise incomingData.NotEnoughDataErrCode
-    'EXIT SUB
-    'End If
-    
 On Error GoTo ErrHandler
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim buffer As New clsByteQueue
-    Call buffer.CopyBuffer(incomingData)
+    Dim Buffer As New clsByteQueue
+    Call Buffer.CopyBuffer(incomingData)
     
-    Call buffer.ReadByte
+    Call Buffer.ReadByte
     
     Dim CharIndex As Integer
 
-    CharIndex = buffer.ReadInteger
+    CharIndex = Buffer.ReadInteger
 
     'Update char status adn tag!
     With Charlist(CharIndex)
-        .Nombre = buffer.ReadASCIIString
-        .Guilda = buffer.ReadASCIIString
-        .AlineacionGuilda = buffer.ReadByte
+        .Nombre = Buffer.ReadASCIIString
+        .Guilda = Buffer.ReadASCIIString
+        .AlineacionGuilda = Buffer.ReadByte
     End With
     
     'If we got here then packet is complete, copy data back to original queue
-    Call incomingData.CopyBuffer(buffer)
+    Call incomingData.CopyBuffer(Buffer)
     
 ErrHandler:
     Dim Error As Long
@@ -5235,7 +4878,7 @@ ErrHandler:
 On Error GoTo 0
     
     'Destroy auxiliar buffer
-    Set buffer = Nothing
+    Set Buffer = Nothing
 
     If Error > 0 Then
         'Err.Raise Error
@@ -5249,6 +4892,7 @@ Public Sub WriteLoginChar()
         
         Call .WriteASCIIString(UserName)
         Call .WriteASCIIString(UserPassword)
+        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
     End With
 End Sub
 
@@ -5273,6 +4917,8 @@ Public Sub WriteLoginNewChar()
         Next i
         
         Call .WriteASCIIString(UserEmail)
+        
+        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
     End With
 End Sub
 
@@ -5440,30 +5086,30 @@ Public Sub WriteDropGold(ByVal Amount As Long)
     Call outgoingData.WriteLong(Amount)
 End Sub
 
-Public Sub WriteLeftClick(ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteLeftClick(ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.LeftClick)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 
-Public Sub WriteRightClick(ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteRightClick(ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.RightClick)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 
-Public Sub WriteDoubleClick(ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteDoubleClick(ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.DoubleClick)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 
@@ -5512,12 +5158,12 @@ Public Sub WriteShowGuildNews()
      outgoingData.WriteByte (ClientPacketID.ShowGuildNews)
 End Sub
 
-Public Sub WriteWorkLeftClick(ByVal X As Byte, ByVal Y As Byte, ByVal Skill As eSkill)
+Public Sub WriteWorkLeftClick(ByVal x As Integer, ByVal y As Integer, ByVal Skill As eSkill)
     With outgoingData
         Call .WriteByte(ClientPacketID.WorkLeftClick)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
         
         Call .WriteByte(Skill)
     End With
@@ -5532,13 +5178,13 @@ Public Sub WriteCreateNewGuild(ByVal Desc As String, ByVal Name As String)
     End With
 End Sub
 
-Public Sub WriteCastSpell(ByVal Spell As Byte, ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteCastSpell(ByVal Spell As Byte, ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.CastSpell)
         
         Call .WriteByte(Spell)
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 
@@ -5620,7 +5266,7 @@ Public Sub WriteCommerceSell(ByVal Slot As Byte, ByVal Amount As Integer)
         Call .WriteInteger(Amount)
     End With
     
-    Call Audio.mSound_PlayWav(SND_SELL)
+    Call Audio.Play(SND_SELL)
 End Sub
 
 Public Sub WriteBankDepositItem(ByVal Slot As Byte, ByVal Amount As Integer)
@@ -6175,7 +5821,7 @@ Public Sub WriteWarpMeToTarget()
     Call outgoingData.WriteByte(GMPacketID.WarpMeToTarget)
 End Sub
 
-Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.WarpChar)
@@ -6184,8 +5830,8 @@ Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal X
         
         Call .WriteInteger(map)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 
@@ -6485,15 +6131,15 @@ Public Sub WriteGuildOnlineMembers(ByVal guild As String)
     End With
 End Sub
 
-Public Sub WriteTeleportCreate(ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte, Optional ByVal Radio As Byte = 0)
+Public Sub WriteTeleportCreate(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer, Optional ByVal Radio As Byte = 0)
     With outgoingData
             Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.TeleportCreate)
         
         Call .WriteInteger(map)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
         
         Call .WriteByte(Radio)
     End With
@@ -6537,7 +6183,7 @@ Public Sub WriteForceMP3ToMap(ByVal MP3ID As Byte, ByVal map As Integer)
     End With
 End Sub
 
-Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte)
+Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal x As Integer, ByVal y As Integer)
     With outgoingData
         Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.ForceWAVEToMap)
@@ -6546,8 +6192,8 @@ Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal
         
         Call .WriteInteger(map)
         
-        Call .WriteByte(X)
-        Call .WriteByte(Y)
+        Call .WriteInteger(x)
+        Call .WriteInteger(y)
     End With
 End Sub
 

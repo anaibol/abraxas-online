@@ -11,7 +11,7 @@ Begin VB.Form frmOpciones
    ClipControls    =   0   'False
    ControlBox      =   0   'False
    BeginProperty Font 
-      Name            =   "Arial"
+      Name            =   "FrizQuadrata BT"
       Size            =   9
       Charset         =   0
       Weight          =   400
@@ -32,7 +32,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Frag Shooter"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   700
@@ -50,7 +50,7 @@ Begin VB.Form frmOpciones
          Alignment       =   2  'Center
          BackColor       =   &H00000000&
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -72,7 +72,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "Al morir"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -93,7 +93,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "Al matar personajes mayores a nivel"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -115,7 +115,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Noticias del clan"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   700
@@ -134,7 +134,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "Mostrar noticias al conectarse"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -155,7 +155,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "No mostrarlas"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -176,7 +176,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Cambiar Contraseña"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -197,7 +197,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Configurar Teclas"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -218,7 +218,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Mensajes Personalizados"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   11.25
          Charset         =   0
          Weight          =   400
@@ -239,7 +239,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Audio"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   700
@@ -258,7 +258,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "Efectos de sonido"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9
             Charset         =   0
             Weight          =   700
@@ -291,7 +291,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "Música"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9
             Charset         =   0
             Weight          =   700
@@ -326,7 +326,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Diálogos de clan"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   9.75
          Charset         =   0
          Weight          =   700
@@ -345,7 +345,7 @@ Begin VB.Form frmOpciones
          Appearance      =   0  'Flat
          BackColor       =   &H00000000&
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -367,7 +367,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "En pantalla,"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -388,7 +388,7 @@ Begin VB.Form frmOpciones
          BackColor       =   &H00000000&
          Caption         =   "En consola"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -407,7 +407,7 @@ Begin VB.Form frmOpciones
          BackStyle       =   0  'Transparent
          Caption         =   "mensajes"
          BeginProperty Font 
-            Name            =   "Arial"
+            Name            =   "FrizQuadrata BT"
             Size            =   9.75
             Charset         =   0
             Weight          =   700
@@ -428,7 +428,7 @@ Begin VB.Form frmOpciones
       BackColor       =   &H00000000&
       Caption         =   "Guardar y Cerrar"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   12
          Charset         =   0
          Weight          =   700
@@ -453,7 +453,7 @@ Begin VB.Form frmOpciones
       BackStyle       =   0  'Transparent
       Caption         =   "Opciones"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "FrizQuadrata BT"
          Size            =   18
          Charset         =   0
          Weight          =   700
@@ -488,11 +488,14 @@ Private Sub chckMsc_Click()
         MusicActivated = False
         SlMsc.Enabled = False
         Call Audio.MusicMP3Stop
-        Call Audio.mMusic_StopMid
+    
+        If Audio.PlayingMusic Then
+            Call Audio.StopMidi
+        End If
     End If
     
     If Not loading Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     End If
 End Sub
 
@@ -506,13 +509,13 @@ Private Sub chckSndFx_Click()
     End If
     
     If Not loading Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     End If
 End Sub
 
 Private Sub cmdCustomKeys_Click()
     If Not loading Then
-        Call Audio.mSound_PlayWav(SND_CLICK)
+        Call Audio.Play(SND_CLICK)
     End If
     Call frmCustomKeys.Show(vbModal, Me)
 End Sub
@@ -536,17 +539,17 @@ End Sub
 
 Private Sub Form_Load()
     
-    Dim X As Long
-    Dim Y As Long
+    Dim x As Long
+    Dim y As Long
     Dim n As Long
 
-    X = Width / Screen.TwipsPerPixelX
-    Y = Height / Screen.TwipsPerPixelY
+    x = Width / Screen.TwipsPerPixelX
+    y = Height / Screen.TwipsPerPixelY
 
     'set the corner angle by changing the value of 'n'
     n = 25
 
-    SetWindowRgn hwnd, CreateRoundRectRgn(0, 0, X, Y, n, n), True
+    SetWindowRgn hWnd, CreateRoundRectRgn(0, 0, x, y, n, n), True
 
     loading = True      'Prevent sounds when setting check's values
     
@@ -575,14 +578,14 @@ Private Sub Form_Load()
         optNoMostrar.Value = True
     'End If
     
-    Call Make_Transparent_Form(hwnd, 200)
+    Call Make_Transparent_Form(hWnd, 200)
     
     loading = False     'Enable sounds when setting check's values
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Button = vbLeftButton Then
-    Call Auto_Drag(hwnd)
+    Call Auto_Drag(hWnd)
 Else
     Unload Me
 End If
