@@ -17,6 +17,3 @@ Run ```npm install``` (joke)
 You may set the server's listening port on Servidor.ini and set it with the host IP (or domain) on the client. It's currently configured with localhost at port 7666.
 
 
-# Abraxas Online
-
-![](http://i.imm.io/8w4c.png)
