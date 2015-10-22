@@ -12,6 +12,6 @@ Abraxas is an MMORPG. This repo has a VB6 (yes, Visual Basic VI) version based o
  - MySQL Server (dont't tested with MariaDB). You can use AppServ 2.5.10.
  - MySQL ODBC 3.51 (https://dev.mysql.com/downloads/connector/odbc/3.51.html)
 
-You may set the server's listening port on Servidor.ini and set it with the host IP (or domain) on the client. It's currently configured with localhost at port 7666.
+You may want to set the server's listening port on Servidor.ini and set it with the host IP (or domain) on the client. It's currently configured with localhost at port 7666.
 
 
