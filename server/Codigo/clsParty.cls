@@ -274,7 +274,7 @@ Public Function HacerLeader(ByVal UserIndex As Integer) As Boolean
     If UserIndexIndex = 0 Then
         'catastrofe! esto no deberia pasar nunca! pero como es AO.... :p
         Call LogError("INCONSISTENCIA DE PARTIES")
-        Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("¡¡¡Inconsistencia de parties en HACERLeader (UII = 0), AVISE A UN PROGRAMADOR ESTO ES UNA CATASTROFE!!!!", FontTypeNames.FONTTYPE_GUILD))
+        Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg("¡¡¡Inconsistencia de parties en HACERLeader (UII = 0), AVISE A UN PROGRAMADOR ESTO ES UNA CATASTROFE!!!!", FontTypeNames.FONTTYPE_GUILD))
         HacerLeader = False
         Exit Function
     End If

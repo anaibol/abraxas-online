@@ -312,19 +312,7 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
         Call UserList(NewIndex).outgoingData.ReadASCIIStringFixed(UserList(NewIndex).outgoingData.length)
 
         UserList(NewIndex).Ip = GetAscIP(sa.sin_addr)
-        
-        'Busca si esta banneada la ip
-        For i = 1 To BanIps.Count
-            If BanIps.Item(i) = UserList(NewIndex).Ip Then
-                'Call apiclosesocket(NuevoSock)
-                Call WriteErrorMsg(NewIndex, "Fuiste desterrado del mundo de Abraxas.")
-                Call FlushBuffer(NewIndex)
-                'Call SecurityIp.IpRestarConexion(sa.sin_addr)
-                Call WSApiCloseSocket(NuevoSock)
-                Exit Sub
-            End If
-        Next i
-        
+
         If NewIndex > LastUser Then
             LastUser = NewIndex
         End If
@@ -337,7 +325,7 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
         Dim str As String
         Dim data() As Byte
         
-        str = Protocol.PrepareMessageErrorMsg("Abraxas está lleno. Probá ingresar más tarde.")
+        str = Protocol.Msg_ErrorMsg("Abraxas está lleno. Probá ingresar más tarde.")
         
         ReDim Preserve data(Len(str) - 1) As Byte
         

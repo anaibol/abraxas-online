@@ -416,7 +416,7 @@ Private Sub CMDDUMP_Click()
 End Sub
 
 Private Sub Command1_Click()
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageShowMessageBox(BroadMsg.Text))
+    Call SendData(SendTarget.ToAll, 0, Msg_ShowMessageBox(BroadMsg.Text))
 End Sub
 
 Public Sub InitMain(ByVal f As Byte)
@@ -428,7 +428,7 @@ Public Sub InitMain(ByVal f As Byte)
 End Sub
 
 Private Sub Command2_Click()
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> " & BroadMsg.Text, FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> " & BroadMsg.Text, FontTypeNames.FONTTYPE_SERVER))
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
@@ -785,19 +785,17 @@ Private Sub TIMER_AI_Timer()
                         Else
                             .flags.Paralizado = 0
                             .flags.Inmovilizado = 0
-                            Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageSetParalized(.Char.CharIndex, 0))
+                            Call SendData(SendTarget.ToNpcArea, NpcIndex, Msg_SetParalized(.Char.CharIndex, 0))
                         End If
                         
                     Else
                         mapa = .Pos.Map
                         
                         If mapa > 0 Then
-                            If MapInfo(mapa).Poblacion > 0 Then
-                                If .Movement <> TipoAI.Estatico Then
-                                    If .flags.Paralizado < 1 Then
-                                        If .MaestroUser < 1 Then
-                                            Call NpcAI(NpcIndex)
-                                        End If
+                            If .Movement <> TipoAI.Estatico Then
+                                If .flags.Paralizado < 1 Then
+                                    If .MaestroUser < 1 Then
+                                        Call NpcAI(NpcIndex)
                                     End If
                                 End If
                             End If
@@ -853,11 +851,10 @@ On Error Resume Next
                 Call RegistrarEstadisticas
                 Call LimpiarMundo
                 Call GuardarUsuarios
-                Call SecurityIp.IpSecurityMantenimientoLista
                 Minutos = 0
             
             Case 59
-                Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("El mundo será limpiado en un minuto.", FontTypeNames.FONTTYPE_VENENO))
+                Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("El mundo será limpiado en un minuto.", FontTypeNames.FONTTYPE_VENENO))
     
         End Select
         
@@ -878,7 +875,7 @@ On Error Resume Next
             
             If TempTiempo <> Tiempo Then
                 Tiempo = TempTiempo
-                Call SendData(SendTarget.ToAll, 0, PrepareMessageWeather())
+                Call SendData(SendTarget.ToAll, 0, Msg_Weather())
             End If
         End If
         
@@ -925,24 +922,24 @@ Private Sub tLluviaEvent_Timer()
                 If RandomNumber(1, 100) <= 2 Then
                     Lloviendo = True
                     MinutosSinLluvia = 0
-                    Call SendData(SendTarget.ToAll, 0, PrepareMessageRainToggle())
+                    Call SendData(SendTarget.ToAll, 0, Msg_RainToggle())
                 End If
         ElseIf MinutosSinLluvia >= 1440 Then
                     Lloviendo = True
                     MinutosSinLluvia = 0
-                    Call SendData(SendTarget.ToAll, 0, PrepareMessageRainToggle())
+                    Call SendData(SendTarget.ToAll, 0, Msg_RainToggle())
         End If
     Else
         MinutosLloviendo = MinutosLloviendo + 1
         If MinutosLloviendo >= 5 Then
                 Lloviendo = False
-                Call SendData(SendTarget.ToAll, 0, PrepareMessageRainToggle())
+                Call SendData(SendTarget.ToAll, 0, Msg_RainToggle())
                 MinutosLloviendo = 0
         Else
                 If RandomNumber(1, 100) <= 2 Then
                     Lloviendo = False
                     MinutosLloviendo = 0
-                    Call SendData(SendTarget.ToAll, 0, PrepareMessageRainToggle())
+                    Call SendData(SendTarget.ToAll, 0, Msg_RainToggle())
                 End If
         End If
     End If

@@ -199,7 +199,7 @@ Public Function CrearNuevaGuilda(ByVal FundadorIndex As Integer, ByRef Desc As S
     DB_RS!Nombre = GuildName
     
     DB_RS.Update
-    DB_RS.Close
+    DB_RS_Close
     
     'UserList(FundadorIndex).Name
     
@@ -471,16 +471,16 @@ Public Sub v_RutinaElecciones()
     Dim i As Integer
 
 On Error GoTo errh
-    'Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Revisando elecciones", FontTypeNames.FONTTYPE_SERVER))
+    'Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> Revisando elecciones", FontTypeNames.FONTTYPE_SERVER))
     For i = 1 To CantidadDEGUILDAS
         If Not Guilds(i) Is Nothing Then
             If Guilds(i).RevisarElecciones Then
-                Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> " & Guilds(i).GetLeader & " es el nuevo líder de " & Guilds(i).GuildName & ".", FontTypeNames.FONTTYPE_SERVER))
+                Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> " & Guilds(i).GetLeader & " es el nuevo líder de " & Guilds(i).GuildName & ".", FontTypeNames.FONTTYPE_SERVER))
             End If
         End If
 proximo:
     Next i
-    'Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Elecciones revisadas.", FontTypeNames.FONTTYPE_SERVER))
+    'Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> Elecciones revisadas.", FontTypeNames.FONTTYPE_SERVER))
 Exit Sub
 errh:
     Call LogError("modGuilds.v_RutinaElecciones():" & Err.description)

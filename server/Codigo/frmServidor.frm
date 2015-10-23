@@ -552,37 +552,6 @@ Private Sub Command14_Click()
     Call LoadMotd
 End Sub
 
-Private Sub Command15_Click()
-On Error Resume Next
-
-    Dim Fn As String
-    Dim cad$
-    Dim N As Integer, k As Integer
-    
-    Dim sENtrada As String
-    
-    sENtrada = InputBox("Escribe vbnullstringestoy DE acuerdovbnullstring entre comillas y con distición de mayusculas minusculas para desbanear a todos los personajes", "UnBan", "hola")
-    If sENtrada = "estoy DE acuerdo" Then
-    
-        Fn = App.Path & "/logs/genteBanned.log"
-        
-        If FileExist(Fn, vbNormal) Then
-            N = FreeFile
-            Open Fn For Input Shared As #N
-            Do While Not EOF(N)
-                k = k + 1
-                Input #N, cad$
-                Call UnBan(cad$)
-                
-            Loop
-            Close #N
-            MsgBox "Se han habilitado " & k & " personajes."
-            Kill Fn
-        End If
-    End If
-
-End Sub
-
 Private Sub Command16_Click()
     Call LoadSini
 End Sub
@@ -599,24 +568,6 @@ Private Sub Command18_Click()
     MsgBox "Grabado de personajes OK!"
 End Sub
 
-Private Sub Command19_Click()
-    Dim i As Long, N As Long
-    
-    Dim sENtrada As String
-    
-    sENtrada = InputBox("Escribe vbnullstringestoy DE acuerdovbnullstring sin comillas y con distición de mayusculas minusculas para desbanear a todos los personajes", "UnBan", "hola")
-    If sENtrada = "estoy DE acuerdo" Then
-        
-        N = BanIps.Count
-        For i = 1 To BanIps.Count
-            BanIps.Remove 1
-        Next i
-        
-        MsgBox "Se han habilitado " & N & " ipes"
-    End If
-
-End Sub
-
 Private Sub Command2_Click()
 frmServidor.Visible = False
 End Sub
@@ -629,11 +580,11 @@ Private Sub Command21_Click()
 
     If EnPausa = False Then
         EnPausa = True
-        Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+        Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
         Command21.Caption = "Reanudar el servidor"
     Else
         EnPausa = False
-        Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+        Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
         Command21.Caption = "Pausar el servidor"
     End If
 
@@ -754,6 +705,7 @@ On Error Resume Next
     Call FreeCharIndexes
     
     Call LoadSini
+    Call CargarBackUp
     Call LoadOBJData
     
     SockListen = ListenForConnect(Puerto, hWndMsg, vbNullString)

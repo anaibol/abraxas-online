@@ -154,9 +154,9 @@ Public Sub ResetUserPlataformas(ByVal UserIndex As Integer)
     For LoopC = 1 To MaxPlataformSlots
             
         With UserList(UserIndex).Plataformas.Plataforma(LoopC)
-          .map = 0
-          .x = 0
-          .y = 0
+          .Map = 0
+          .X = 0
+          .Y = 0
         End With
         
     Next LoopC
@@ -166,7 +166,7 @@ End Sub
 
 Public Sub TirarOro(ByVal Cantidad As Long, ByVal UserIndex As Integer)
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     With UserList(UserIndex)
     
@@ -184,24 +184,24 @@ On Error GoTo ErrHandler
                 Dim M As Integer
                 Dim Cercanos As String
                 
-                M = .Pos.map
+                M = .Pos.Map
                 
-                For j = .Pos.x - 10 To .Pos.x + 10
-                    For k = .Pos.y - 10 To .Pos.y + 10
+                For j = .Pos.X - 10 To .Pos.X + 10
+                    For k = .Pos.Y - 10 To .Pos.Y + 10
                         If InMapBounds(M, j, k) Then
-                            If maps(M).mapData(j, k).UserIndex > 0 Then
-                                Cercanos = Cercanos & UserList(maps(M).mapData(j, k).UserIndex).name & ","
+                            If MapData(j, k).UserIndex > 0 Then
+                                Cercanos = Cercanos & UserList(MapData(j, k).UserIndex).Name & ","
                             End If
                         End If
                     Next k
                 Next j
                 
-                Call LogDesarrollo(.name & " tiró " & Cantidad & " monedas de oro. Cercanos: " & Cercanos)
+                Call LogDesarrollo(.Name & " tiró " & Cantidad & " monedas de oro. Cercanos: " & Cercanos)
                 
             End If
     
             If EsGM(UserIndex) Then
-                Call LogGM(.name, "Tiró " & Cantidad & " monedas de oro. Cercanos: " & Cercanos)
+                Call LogGM(.Name, "Tiró " & Cantidad & " monedas de oro. Cercanos: " & Cercanos)
             End If
             
             MiObj.index = iORO
@@ -212,14 +212,14 @@ On Error GoTo ErrHandler
             If .Clase = eClass.Pirat And .Inv.Ship = 476 Then
                 AuxPos = TirarItemAlPiso(.Pos, MiObj, False, UserIndex)
                 
-                If AuxPos.x > 0 And AuxPos.y > 0 Then
+                If AuxPos.X > 0 And AuxPos.Y > 0 Then
                     .Stats.Gld = .Stats.Gld - Cantidad
                 End If
                 
             Else
                 AuxPos = TirarItemAlPiso(.Pos, MiObj, , UserIndex)
                 
-                If AuxPos.x > 0 And AuxPos.y > 0 Then
+                If AuxPos.X > 0 And AuxPos.Y > 0 Then
                     .Stats.Gld = .Stats.Gld - Cantidad
                 End If
             End If
@@ -230,7 +230,7 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en TirarOro. Error " & Err.Number & ": " & Err.description)
 End Sub
 
@@ -264,7 +264,7 @@ End Sub
 
 Public Sub QuitarBeltItem(ByVal UserIndex As Integer, ByVal Slot As Byte, Optional ByVal Cantidad As Integer = 1)
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     If Slot < 1 Or Slot > MaxBeltSlots Then
         Exit Sub
     End If
@@ -283,7 +283,7 @@ On Error GoTo ErrHandler
     End With
 Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en QuitarInvItem. Error " & Err.Number & ": " & Err.description)
     
 End Sub
@@ -313,17 +313,17 @@ Public Sub DropObj(ByVal UserIndex As Integer, ByVal Slot As Byte, ByVal Num As 
             End If
             
             If Not .flags.Privilegios And PlayerType.User Then
-                Call LogGM(.name, "Tiro Cantidad:" & Num & " Objeto:" & ObjData(Obj.index).name)
+                Call LogGM(.Name, "Tiro Cantidad:" & Num & " Objeto:" & ObjData(Obj.index).Name)
             End If
             
             'Log de Objetos que se tiran al piso
             'Es un Objeto que tenemos que loguear?
             If ObjData(Obj.index).Log = 1 Then
-                Call LogDesarrollo(.name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).name & " Mapa: " & .Pos.map & " X: " & .Pos.x & " Y: " & .Pos.y)
+                Call LogDesarrollo(.Name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).Name & " Mapa: " & .Pos.Map & " X: " & .Pos.X & " Y: " & .Pos.Y)
             ElseIf Obj.Amount > 5000 Then 'Es mucha cantidad? > Subí a 5000 el minimo porque si no se llenaba el log de cosas al pedo. (NicoNZ)
                 'Si no es de los prohibidos de loguear, lo logueamos.
                 If ObjData(Obj.index).NoLog <> 1 Then
-                    Call LogDesarrollo(.name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).name & " Mapa: " & .Pos.map & " X: " & .Pos.x & " Y: " & .Pos.y)
+                    Call LogDesarrollo(.Name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).Name & " Mapa: " & .Pos.Map & " X: " & .Pos.X & " Y: " & .Pos.Y)
                 End If
             End If
         End If
@@ -353,19 +353,19 @@ Public Sub DropBeltObj(ByVal UserIndex As Integer, ByVal Slot As Byte, ByVal Num
             'Log de Objetos que se tiran al piso
             'Es un Objeto que tenemos que loguear?
             If ObjData(Obj.index).Log = 1 Then
-                Call LogDesarrollo(.name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).name & " Mapa: " & .Pos.map & " X: " & .Pos.x & " Y: " & .Pos.y)
+                Call LogDesarrollo(.Name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).Name & " Mapa: " & .Pos.Map & " X: " & .Pos.X & " Y: " & .Pos.Y)
             ElseIf Obj.Amount > 5000 Then 'Es mucha cantidad? > Subí a 5000 el minimo porque si no se llenaba el log de cosas al pedo. (NicoNZ)
                 'Si no es de los prohibidos de loguear, lo logueamos.
                 If ObjData(Obj.index).NoLog <> 1 Then
-                    Call LogDesarrollo(.name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).name & " Mapa: " & .Pos.map & " X: " & .Pos.x & " Y: " & .Pos.y)
+                    Call LogDesarrollo(.Name & " tiró al piso " & Obj.Amount & " " & ObjData(Obj.index).Name & " Mapa: " & .Pos.Map & " X: " & .Pos.X & " Y: " & .Pos.Y)
                 End If
             End If
         End If
     End With
 End Sub
 
-Public Sub EraseObj(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer, Optional ByVal Num As Long = -1)
-    With maps(map).mapData(x, y)
+Public Sub EraseObj(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer, Optional ByVal Num As Long = -1)
+    With MapData(X, Y)
     
         If .ObjInfo.Amount > 0 Then
             If Num = -1 Then
@@ -378,7 +378,7 @@ Public Sub EraseObj(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer
                 .ObjInfo.Amount = 0
                 .ObjInfo.index = 0
                 
-                Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjDelete(x, y))
+                Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjDelete(X, Y))
             End If
             
             'If .ObjInfo.index = iObjCuerpoMuerto Then
@@ -391,18 +391,18 @@ Public Sub EraseObj(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer
             .ObjInfo.index = 0
             .ObjInfo.Amount = 0
             
-            Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjDelete(x, y))
+            Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjDelete(X, Y))
         End If
     
     End With
 End Sub
 
-Public Sub MakeObj(ByRef Obj As Obj, ByVal map As Integer, ByVal x As Byte, ByVal y As Byte)
+Public Sub MakeObj(ByRef Obj As Obj, ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer)
     
     If Obj.index > 0 Then
         If Obj.index <= UBound(ObjData) Then
         
-            With maps(map).mapData(x, y)
+            With MapData(X, Y)
             
                 If .ObjInfo.index > 0 Then
                     If .ObjInfo.index = Obj.index Then
@@ -417,27 +417,27 @@ Public Sub MakeObj(ByRef Obj As Obj, ByVal map As Integer, ByVal x As Byte, ByVa
                 End If
                     
                 If ObjData(.ObjInfo.index).Type = otPortal Then
-                    Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y, , 10000 + .TileExit.map))
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y, , 10000 + .TileExit.Map))
                     
                 ElseIf ObjData(.ObjInfo.index).Type = otAlijo Then
-                    Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y, ObjData(.ObjInfo.index).name, 1))
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y, ObjData(.ObjInfo.index).Name, 1))
                                 
                 ElseIf ObjData(.ObjInfo.index).Type = otCuerpoMuerto Then
                     If .ObjInfo.Amount > 0 Then
                         If UserList(.ObjInfo.Amount).Stats.Muerto Then
-                            Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y, UserList(.ObjInfo.Amount).name))
+                            Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y, UserList(.ObjInfo.Amount).Name))
                         Else
-                            Call EraseObj(map, x, y, .ObjInfo.Amount)
+                            Call EraseObj(Map, X, Y, .ObjInfo.Amount)
                         End If
                     Else
-                        Call EraseObj(map, x, y, -1)
+                        Call EraseObj(Map, X, Y, -1)
                     End If
              
                 ElseIf ObjData(.ObjInfo.index).Type = otGuita Then
-                    Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(0, ObjData(.ObjInfo.index).Type, x, y, , .ObjInfo.Amount))
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(0, ObjData(.ObjInfo.index).Type, X, Y, , .ObjInfo.Amount))
 
                 Else
-                    Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y, ObjData(.ObjInfo.index).name, .ObjInfo.Amount))
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y, ObjData(.ObjInfo.index).Name, .ObjInfo.Amount))
                 End If
                 
             End With
@@ -446,12 +446,12 @@ Public Sub MakeObj(ByRef Obj As Obj, ByVal map As Integer, ByVal x As Byte, ByVa
 End Sub
 
 Public Function MeterEnInventario(ByVal UserIndex As Integer, ByRef MiObj As Obj, Optional ByVal Update = True) As Boolean
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     'Call LogTarea("MeterEnInventario")
 
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Integer
+    Dim Y As Integer
     Dim Slot As Byte
     
     With UserList(UserIndex)
@@ -528,17 +528,17 @@ On Error GoTo ErrHandler
     End With
     
     Exit Function
-ErrHandler:
+errhandler:
     Call LogError("Error en MeterEnInventario. Error " & Err.Number & ": " & Err.description)
 End Function
 
 Public Function MeterEnCinturon(ByVal UserIndex As Integer, ByRef MiObj As Obj) As Boolean
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     'Call LogTarea("MeterEnCinturon")
 
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Integer
+    Dim Y As Integer
     Dim Slot As Byte
     
     If ObjData(MiObj.index).Type <> otPocion Then
@@ -595,7 +595,7 @@ On Error GoTo ErrHandler
     End With
     
     Exit Function
-ErrHandler:
+errhandler:
     Call LogError("Error en MeterEnCinturon. Error " & Err.Number & ": " & Err.description)
 End Function
 
@@ -607,25 +607,25 @@ Public Sub GetObj(ByVal UserIndex As Integer)
     
     With UserList(UserIndex)
         '¿Hay algun obj?
-        If maps(.Pos.map).mapData(.Pos.x, .Pos.y).ObjInfo.index > 0 Then
+        If MapData(.Pos.X, .Pos.Y).ObjInfo.index > 0 Then
         
             '¿Esta permitido agarrar este obj?
-            If ObjData(maps(.Pos.map).mapData(.Pos.x, .Pos.y).ObjInfo.index).Agarrable Then
+            If ObjData(MapData(.Pos.X, .Pos.Y).ObjInfo.index).Agarrable Then
             
-                Dim x As Integer
-                Dim y As Integer
+                Dim X As Integer
+                Dim Y As Integer
                 Dim Slot As Byte
             
-                x = .Pos.x
-                y = .Pos.y
-                Obj = ObjData(maps(.Pos.map).mapData(x, y).ObjInfo.index)
-                MiObj.Amount = maps(.Pos.map).mapData(x, y).ObjInfo.Amount
-                MiObj.index = maps(.Pos.map).mapData(x, y).ObjInfo.index
+                X = .Pos.X
+                Y = .Pos.Y
+                Obj = ObjData(MapData(X, Y).ObjInfo.index)
+                MiObj.Amount = MapData(X, Y).ObjInfo.Amount
+                MiObj.index = MapData(X, Y).ObjInfo.index
             
                 If ObjData(MiObj.index).Type = otGuita Then
                 
                     UserList(UserIndex).Stats.Gld = UserList(UserIndex).Stats.Gld + MiObj.Amount
-                    Call EraseObj(UserList(UserIndex).Pos.map, x, y, -1)
+                    Call EraseObj(UserList(UserIndex).Pos.Map, X, Y, -1)
                                         
                     Call WriteUpdateGold(UserIndex)
                 Else
@@ -636,22 +636,22 @@ Public Sub GetObj(ByVal UserIndex As Integer)
                     End If
                 
                     'Quitamos el objeto
-                    Call EraseObj(.Pos.map, x, y, maps(.Pos.map).mapData(x, y).ObjInfo.Amount)
+                    Call EraseObj(.Pos.Map, X, Y, MapData(X, Y).ObjInfo.Amount)
                     
                     If Not .flags.Privilegios And PlayerType.User Then
-                        Call LogGM(.name, "Agarro:" & MiObj.Amount & " Objeto:" & ObjData(MiObj.index).name)
+                        Call LogGM(.Name, "Agarro:" & MiObj.Amount & " Objeto:" & ObjData(MiObj.index).Name)
                     End If
                 
                     'Log de Objetos que se agarran del piso.
                     'Es un Objeto que tenemos que loguear?
                     If ObjData(MiObj.index).Log = 1 Then
-                        ObjPos = " Mapa: " & .Pos.map & " X: " & x & " Y: " & y
-                        Call LogDesarrollo(.name & " juntó del piso " & MiObj.Amount & " " & ObjData(MiObj.index).name & ObjPos)
+                        ObjPos = " Mapa: " & .Pos.Map & " X: " & X & " Y: " & Y
+                        Call LogDesarrollo(.Name & " juntó del piso " & MiObj.Amount & " " & ObjData(MiObj.index).Name & ObjPos)
                     ElseIf MiObj.Amount >= MaxInvObjs - 1000 Then 'Es mucha cantidad?
                         'Si no es de los prohibidos de loguear, lo logueamos.
                         If ObjData(MiObj.index).NoLog <> 1 Then
-                            ObjPos = " Mapa: " & .Pos.map & " X: " & x & " Y: " & y
-                            Call LogDesarrollo(.name & " juntó del piso " & MiObj.Amount & " " & ObjData(MiObj.index).name & ObjPos)
+                            ObjPos = " Mapa: " & .Pos.Map & " X: " & X & " Y: " & Y
+                            Call LogDesarrollo(.Name & " juntó del piso " & MiObj.Amount & " " & ObjData(MiObj.index).Name & ObjPos)
                         End If
                     End If
                 End If
@@ -785,7 +785,7 @@ Public Sub Equipar(ByVal UserIndex As Integer, ByVal Slot As Byte)
                                         
                     'El sonido solo se envia si no lo produce un admin invisible
                     If .flags.AdminInvisible < 1 Then
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_SACARARMA, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_SACARARMA, .Pos.X, .Pos.Y))
                     End If
                     
                     If .flags.Mimetizado Then
@@ -902,7 +902,7 @@ Public Sub Equipar(ByVal UserIndex As Integer, ByVal Slot As Byte)
 End Sub
 
 Public Function CheckRazaUsaRopa(ByVal UserIndex As Integer, ItemIndex As Integer) As Boolean
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     With UserList(UserIndex)
         'Verifica si la raza puede usar la ropa
@@ -921,7 +921,7 @@ On Error GoTo ErrHandler
     End With
 
     Exit Function
-ErrHandler:
+errhandler:
     Call LogError("Error CheckRazaUsaRopa ItemIndex:" & ItemIndex)
 
 End Function
@@ -1034,9 +1034,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                     
                     'Los admin invisibles solo producen sonidos a si mismos
                     If .flags.AdminInvisible > 0 Then
-                        Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     Else
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     End If
 
                 Case 2 'Modif la fuerza
@@ -1061,9 +1061,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                     
                     'Los admin invisibles solo producen sonidos a si mismos
                     If .flags.AdminInvisible > 0 Then
-                        Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     Else
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     End If
                     
                 Case 3 'Pocion roja, restaura HP
@@ -1078,9 +1078,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                         
                         'Los admin invisibles solo producen sonidos a si mismos
                         If .flags.AdminInvisible > 0 Then
-                            Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         Else
-                            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         End If
                     End If
                     
@@ -1096,9 +1096,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                         
                         'Los admin invisibles solo producen sonidos a si mismos
                         If .flags.AdminInvisible > 0 Then
-                            Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         Else
-                            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         End If
                     End If
                     
@@ -1115,9 +1115,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                         
                         'Los admin invisibles solo producen sonidos a si mismos
                         If .flags.AdminInvisible > 0 Then
-                            Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         Else
-                            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                         End If
                     End If
                     
@@ -1146,9 +1146,9 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
             
             'Los admin invisibles solo producen sonidos a si mismos
             If .flags.AdminInvisible > 0 Then
-                Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
             Else
-                Call SendData(SendTarget.ToPCAreaButIndex, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                Call SendData(SendTarget.ToUserAreaButIndex, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
             End If
         
         Case otLlave
@@ -1161,14 +1161,14 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
             '¿El objeto clickeado es una puerta?
             If TargObj.Type = otPuerta Then
                 '¿Esta cerrada?
-                If TargObj.Cerrada = 1 Then
+                If TargObj.Cerrada Then
                       '¿Cerrada con llave?
                       If TargObj.Llave > 0 Then
                          If TargObj.clave = Obj.clave Then
              
-                            maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index _
-                            = ObjData(maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index).IndexCerrada
-                            .flags.TargetObjIndex = maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index
+                            MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index _
+                            = ObjData(MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index).IndexCerrada
+                            .flags.TargetObjIndex = MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index
                             Call WriteConsoleMsg(UserIndex, "Has abierto la puerta.", FontTypeNames.FONTTYPE_INFO)
                             Exit Sub
                          Else
@@ -1177,10 +1177,10 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                          End If
                       Else
                          If TargObj.clave = Obj.clave Then
-                            maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index _
-                            = ObjData(maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index).IndexCerradaLlave
+                            MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index _
+                            = ObjData(MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index).IndexCerradaLlave
                             Call WriteConsoleMsg(UserIndex, "Has cerrado con llave la puerta.", FontTypeNames.FONTTYPE_INFO)
-                            .flags.TargetObjIndex = maps(.flags.TargetObjMap).mapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index
+                            .flags.TargetObjIndex = MapData(.flags.TargetObjX, .flags.TargetObjY).ObjInfo.index
                             Exit Sub
                          Else
                             Call WriteConsoleMsg(UserIndex, "La llave no sirve.", FontTypeNames.FONTTYPE_INFO)
@@ -1195,7 +1195,7 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
         
         Case otBotellaVacia
         
-            If Not HayAgua(.Pos.map, .flags.TargetX, .flags.TargetY) Then
+            If Not HayAgua(.Pos.Map, .flags.TargetX, .flags.TargetY) Then
                 Call WriteConsoleMsg(UserIndex, "No hay agua ahí.", FontTypeNames.FONTTYPE_INFO)
                 Exit Sub
             End If
@@ -1256,7 +1256,7 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                 Exit Sub
             End If
            
-            If .Pos.map <> Obj.DesdeMap Then
+            If .Pos.Map <> Obj.DesdeMap Then
                 Call WriteConsoleMsg(UserIndex, "¡El pasaje no lo compraste aquí! ¡Lárgate!", FontTypeNames.FONTTYPE_INFO)
                 Exit Sub
             End If
@@ -1285,25 +1285,25 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
         Case otInstrumento
         
             If GuildaPuedeUsarItem(UserIndex, ObjIndex) Then
-                If MapInfo(.Pos.map).PK = False Then
+                If MapInfo(.Pos.Map).PK = False Then
                     Call WriteConsoleMsg(UserIndex, "No hay peligro aquí. Es Zona Segura ", FontTypeNames.FONTTYPE_INFO)
                     Exit Sub
                 End If
                 
                 'Los admin invisibles solo producen sonidos a si mismos
                 If .flags.AdminInvisible > 0 Then
-                    Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(Obj.Snd1, .Pos.x, .Pos.y))
+                    Call EnviarDatosASlot(UserIndex, Msg_SoundFX(Obj.Snd1, .Pos.X, .Pos.Y))
                 Else
-                    Call SendData(SendTarget.toMap, .Pos.map, PrepareMessagePlayWave(Obj.Snd1, .Pos.x, .Pos.y))
+                    Call SendData(SendTarget.toMap, .Pos.Map, Msg_SoundFX(Obj.Snd1, .Pos.X, .Pos.Y))
                 End If
                 
                 Exit Sub
             End If
             
             If .flags.AdminInvisible > 0 Then
-                Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(Obj.Snd1, .Pos.x, .Pos.y))
+                Call EnviarDatosASlot(UserIndex, Msg_SoundFX(Obj.Snd1, .Pos.X, .Pos.Y))
             Else
-                Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(Obj.Snd1, .Pos.x, .Pos.y))
+                Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(Obj.Snd1, .Pos.X, .Pos.Y))
             End If
            
         Case otBarco
@@ -1325,16 +1325,16 @@ Public Sub UseInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                 End If
             End If
             
-            If ((LegalPos(.Pos.map, .Pos.x - 1, .Pos.y, True, False) _
-                    Or LegalPos(.Pos.map, .Pos.x, .Pos.y - 1, True, False) _
-                    Or LegalPos(.Pos.map, .Pos.x + 1, .Pos.y, True, False) _
-                    Or LegalPos(.Pos.map, .Pos.x, .Pos.y + 1, True, False)) _
+            If ((LegalPos(.Pos.Map, .Pos.X - 1, .Pos.Y, True, False) _
+                    Or LegalPos(.Pos.Map, .Pos.X, .Pos.Y - 1, True, False) _
+                    Or LegalPos(.Pos.Map, .Pos.X + 1, .Pos.Y, True, False) _
+                    Or LegalPos(.Pos.Map, .Pos.X, .Pos.Y + 1, True, False)) _
                     And Not .flags.Navegando) _
                     Or (.flags.Navegando And _
-                    (LegalPos(.Pos.map, .Pos.x - 1, .Pos.y, False, True) _
-                    Or LegalPos(.Pos.map, .Pos.x, .Pos.y - 1, False, True) _
-                    Or LegalPos(.Pos.map, .Pos.x + 1, .Pos.y, False, True) _
-                    Or LegalPos(.Pos.map, .Pos.x, .Pos.y + 1, False, True))) Then
+                    (LegalPos(.Pos.Map, .Pos.X - 1, .Pos.Y, False, True) _
+                    Or LegalPos(.Pos.Map, .Pos.X, .Pos.Y - 1, False, True) _
+                    Or LegalPos(.Pos.Map, .Pos.X + 1, .Pos.Y, False, True) _
+                    Or LegalPos(.Pos.Map, .Pos.X, .Pos.Y + 1, False, True))) Then
                 Call DoNavega(UserIndex, Obj, Slot)
             Else
                 If .flags.Navegando Then
@@ -1398,9 +1398,9 @@ Public Sub UseBeltInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                 
                 'Los admin invisibles solo producen sonidos a si mismos
                 If .flags.AdminInvisible > 0 Then
-                    Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                    Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                 Else
-                    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                 End If
     
             Case 2 'Modif la fuerza
@@ -1425,9 +1425,9 @@ Public Sub UseBeltInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                 
                 'Los admin invisibles solo producen sonidos a si mismos
                 If .flags.AdminInvisible > 0 Then
-                    Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                    Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                 Else
-                    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                 End If
                 
             Case 3 'Pocion roja, restaura HP
@@ -1442,9 +1442,9 @@ Public Sub UseBeltInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                     
                     'Los admin invisibles solo producen sonidos a si mismos
                     If .flags.AdminInvisible > 0 Then
-                        Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     Else
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     End If
                 End If
                 
@@ -1460,9 +1460,9 @@ Public Sub UseBeltInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                     
                     'Los admin invisibles solo producen sonidos a si mismos
                     If .flags.AdminInvisible > 0 Then
-                        Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     Else
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     End If
                 End If
                 
@@ -1479,9 +1479,9 @@ Public Sub UseBeltInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte)
                     
                     'Los admin invisibles solo producen sonidos a si mismos
                     If .flags.AdminInvisible > 0 Then
-                        Call EnviarDatosASlot(UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call EnviarDatosASlot(UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     Else
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_DRINK, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_DRINK, .Pos.X, .Pos.Y))
                     End If
                 End If
                 

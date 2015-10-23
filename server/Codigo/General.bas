@@ -40,7 +40,7 @@ Public Sub DarImagen(ByVal UserIndex As Integer)
         End If
                 
         If .Inv.Ship > 0 Then
-            If HayAgua(.Pos.map, .Pos.x, .Pos.y) Then
+            If HayAgua(.Pos.Map, .Pos.X, .Pos.Y) Then
                 Call ToogleBoatBody(UserIndex)
                 .flags.Navegando = True
                 Call WriteNavigateToggle(UserIndex)
@@ -105,7 +105,7 @@ Public Sub DarCuerpoDesnudo(ByVal UserIndex As Integer, Optional ByVal Mimetizad
 
 End Sub
 
-Public Sub Bloquear(ByVal toMap As Boolean, ByVal sndIndex As Integer, ByVal x As Byte, ByVal y As Byte, ByVal b As Boolean)
+Public Sub Bloquear(ByVal toMap As Boolean, ByVal sndIndex As Integer, ByVal X As Integer, ByVal Y As Integer, ByVal b As Boolean)
     'b ahora es boolean,
     'b=true bloquea el tile en (x,y)
     'b=false desbloquea el tile en (x,y)
@@ -115,17 +115,17 @@ Public Sub Bloquear(ByVal toMap As Boolean, ByVal sndIndex As Integer, ByVal x A
     'Puede llegar a ser, que se quiera mandar el mapa, habria que agregar un nuevo parametro y modificar.. lo quite porque no se usaba ni aca ni en el cliente :s
     
     If toMap Then
-        Call SendData(SendTarget.toMap, sndIndex, PrepareMessageBlockPosition(x, y, b))
+        Call SendData(SendTarget.toMap, sndIndex, Msg_BlockPosition(X, Y, b))
     Else
-        Call WriteBlockPosition(sndIndex, x, y, b)
+        Call WriteBlockPosition(sndIndex, X, Y, b)
     End If
 
 End Sub
 
-Public Function HayAgua(ByVal map As Integer, ByVal x As Byte, ByVal y As Byte) As Boolean
+Public Function HayAgua(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
     
-    If map > 0 And map < NumMaps + 1 And x > 0 And x < 101 And y > 0 And y < 101 Then
-        With maps(map).mapData(x, y)
+    If Map > 0 And Map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
+        With MapData(X, Y)
             If ((.Graphic(1) >= 1505 And .Graphic(1) <= 1520) Or _
             (.Graphic(1) >= 5665 And .Graphic(1) <= 5680) Or _
             (.Graphic(1) >= 13547 And .Graphic(1) <= 13562)) And _
@@ -141,10 +141,10 @@ Public Function HayAgua(ByVal map As Integer, ByVal x As Byte, ByVal y As Byte) 
 
 End Function
 
-Private Function HayLava(ByVal map As Integer, ByVal x As Byte, ByVal y As Byte) As Boolean
+Private Function HayLava(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer) As Boolean
     
-    If map > 0 And map < NumMaps + 1 And x > 0 And x < 101 And y > 0 And y < 101 Then
-        If maps(map).mapData(x, y).Graphic(1) >= 5837 And maps(map).mapData(x, y).Graphic(1) <= 5852 Then
+    If Map > 0 And Map < NumMaps + 1 And X > 0 And X < 101 And Y > 0 And Y < 101 Then
+        If MapData(X, Y).Graphic(1) >= 5837 And MapData(X, Y).Graphic(1) <= 5852 Then
             HayLava = True
         Else
             HayLava = False
@@ -169,25 +169,25 @@ On Error Resume Next
     '    Set d = Nothing
     'Next i
 
-    Dim map As Integer
-    Dim x As Byte
-    Dim y As Byte
+    Dim Map As Integer
+    Dim X As Integer
+    Dim Y As Integer
     
-    For map = 1 To NumMaps
-        For y = YMinMapSize To YMaxMapSize
-            For x = XMinMapSize To XMaxMapSize
-                If maps(map).mapData(x, y).UserIndex < 1 Then
-                    If Not maps(map).mapData(x, y).Blocked Then
-                        If maps(map).mapData(x, y).ObjInfo.index > 0 And maps(map).mapData(x, y).ObjInfo.index < NumObjDatas Then
-                            If Not EsObjetoFijo(ObjData(maps(map).mapData(x, y).ObjInfo.index).Type) Then
-                                Call EraseObj(map, x, y, -1)
+    For Map = 1 To NumMaps
+        For Y = YMinMapSize To YMaxMapSize
+            For X = XMinMapSize To XMaxMapSize
+                If MapData(X, Y).UserIndex < 1 Then
+                    If Not MapData(X, Y).Blocked Then
+                        If MapData(X, Y).ObjInfo.index > 0 And MapData(X, Y).ObjInfo.index < NumObjDatas Then
+                            If Not EsObjetoFijo(ObjData(MapData(X, Y).ObjInfo.index).Type) Then
+                                Call EraseObj(Map, X, Y, -1)
                             End If
                         End If
                     End If
                 End If
-            Next x
-        Next y
-    Next map
+            Next X
+        Next Y
+    Next Map
 
 End Sub
 
@@ -232,15 +232,13 @@ On Error Resume Next
     
     Call LoadMotd
 
-    Call BanIpCargar
-        
-    Prision.map = 66
-    Libertad.map = 66
+    Prision.Map = 66
+    Libertad.Map = 66
     
-    Prision.x = 75
-    Prision.y = 47
-    Libertad.x = 75
-    Libertad.y = 65
+    Prision.X = 75
+    Prision.Y = 47
+    Libertad.X = 75
+    Libertad.Y = 65
     
     LastBackup = Format(Now, "Short Time")
     Minutos = Format(Now, "Short Time")
@@ -346,9 +344,9 @@ On Error Resume Next
     
     'Bordes del mapa
     MinXBorder = 1 'XMinMapSize + (XWindow * 0.5)
-    MaxXBorder = 100 'XMaxMapSize - (XWindow * 0.5)
+    MaxXBorder = 100 * 5 'XMaxMapSize - (XWindow * 0.5)
     MinYBorder = 1 'YMinMapSize + (YWindow * 0.5)
-    MaxYBorder = 100 'YMaxMapSize - (YWindow * 0.5)
+    MaxYBorder = 100 * 5 'YMaxMapSize - (YWindow * 0.5)
     DoEvents
 
     Call LoadGuildsDB
@@ -373,10 +371,15 @@ On Error Resume Next
         DB_RS.Update
     End If
     
-    DB_RS.Close
+    DB_RS_Close
     
-    frmCargando.Label1(2).Caption = "Cargando Mapas"
-    Call LoadMaps
+    If BootDelBackUp Then
+        frmCargando.Label1(2).Caption = "Cargando BackUp"
+        Call CargarBackUp
+    Else
+        frmCargando.Label1(2).Caption = "Cargando Mapas"
+        Call LoadMapData
+    End If
     
     Call SonidosMapas.LoadSoundMapInfo
 
@@ -410,8 +413,6 @@ On Error Resume Next
     
     '¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿
     'Configuracion de los sockets
-    
-    Call SecurityIp.InitIpTables(1000)
     
     Call IniciaWsApi(frmMain.hWnd)
     SockListen = ListenForConnect(Puerto, hWndMsg, vbNullString)
@@ -475,12 +476,12 @@ Public Function ReadField(ByVal Pos As Integer, ByRef Text As String, ByVal SepA
     End If
 End Function
 
-Public Function MapaValido(ByVal map As Integer) As Boolean
-    MapaValido = map > 0 And map <= NumMaps
+Public Function MapaValido(ByVal Map As Integer) As Boolean
+    MapaValido = Map > 0 And Map <= NumMaps
 End Function
 
 Public Sub LogCriticEvent(Desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
 Dim nfile As Integer
 nfile = FreeFile 'obtenemos un canal
@@ -490,12 +491,12 @@ Close #nfile
 
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogIndex(ByVal index As Integer, ByVal Desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -505,12 +506,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogError(Desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -520,12 +521,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogStatic(Desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -535,12 +536,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogTarea(Desc As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     
     Dim nfile As Integer
     nfile = FreeFile(1) 'obtenemos un canal
@@ -550,7 +551,7 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
@@ -585,7 +586,7 @@ Public Sub LogDesarrollo(ByVal str As String)
 End Sub
 
 Public Sub LogGM(Nombre As String, texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -596,12 +597,12 @@ On Error GoTo ErrHandler
     
 Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogAsesinato(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     
@@ -613,11 +614,11 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 Public Sub logVentaCasa(ByVal texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -630,12 +631,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
     
-ErrHandler:
+errhandler:
 
 
 End Sub
 Public Sub LogHackAttemp(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -647,12 +648,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogCheating(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -662,12 +663,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
     
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogCriticalHackAttemp(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -679,12 +680,12 @@ On Error GoTo ErrHandler
     
     Exit Sub
     
-ErrHandler:
+errhandler:
 
 End Sub
 
 Public Sub LogAntiCheat(texto As String)
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     
     Dim nfile As Integer
     nfile = FreeFile 'obtenemos un canal
@@ -695,7 +696,7 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
 
 End Sub
 
@@ -774,7 +775,7 @@ Public Sub Restart()
     Call LoadSini
     Call LoadOBJData
     
-    'Call LoadMapData
+    Call LoadMapData
     
     Call CargarHechizos
     
@@ -802,9 +803,9 @@ End Sub
 Public Function Intemperie(ByVal UserIndex As Integer) As Boolean
     
     With UserList(UserIndex)
-        If MapInfo(.Pos.map).Zona <> Dungeon Then
-            If maps(.Pos.map).mapData(.Pos.x, .Pos.y).Trigger <> 1 And _
-               maps(.Pos.map).mapData(.Pos.x, .Pos.y).Trigger <> 4 Then
+        If MapInfo(.Pos.Map).Zona <> Dungeon Then
+            If MapData(.Pos.X, .Pos.Y).Trigger <> 1 And _
+               MapData(.Pos.X, .Pos.Y).Trigger <> 4 Then
                 Intemperie = True
             End If
         Else
@@ -820,7 +821,7 @@ End Function
 
 Public Sub EfectoLluvia(ByVal UserIndex As Integer)
 
-    On Error GoTo ErrHandler
+    On Error GoTo errhandler
     
     If UserList(UserIndex).flags.Logged Then
         If Intemperie(UserIndex) Then
@@ -832,7 +833,7 @@ Public Sub EfectoLluvia(ByVal UserIndex As Integer)
     End If
     
     Exit Sub
-ErrHandler:
+errhandler:
  LogError ("Error en EfectoLluvia")
 End Sub
 
@@ -875,7 +876,7 @@ Public Sub EfectoFrio(ByVal UserIndex As Integer)
         If .Counters.Frio < IntervaloFrio Then
             .Counters.Frio = .Counters.Frio + 1
     Else
-            If MapInfo(.Pos.map).terreno = Nieve Then
+            If MapInfo(.Pos.Map).terreno = Nieve Then
                 modifi = Porcentaje(.Stats.MaxHP, 5)
                 .Stats.MinHP = .Stats.MinHP - modifi
                     
@@ -902,7 +903,7 @@ Public Sub EfectoLava(ByVal UserIndex As Integer)
         If .Counters.Lava < IntervaloFrio Then 'Usamos el mismo intervalo que el del frio
             .Counters.Lava = .Counters.Lava + 1
         Else
-            If HayLava(.Pos.map, .Pos.x, .Pos.y) Then
+            If HayLava(.Pos.Map, .Pos.X, .Pos.Y) Then
                 Call WriteConsoleMsg(UserIndex, "Te estás quemando.", FontTypeNames.FONTTYPE_INFO)
                 .Stats.MinHP = .Stats.MinHP - Porcentaje(.Stats.MaxHP, 5)
             
@@ -979,7 +980,7 @@ Public Sub EfectoInvisibilidad(ByVal UserIndex As Integer)
             .Counters.Invisibilidad = RandomNumber(-100, 100)
             .flags.Invisible = 0
             If .flags.Oculto < 1 Then
-                Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageSetInvisible(.Char.CharIndex, False))
+                Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SetInvisible(.Char.CharIndex, False))
             End If
         End If
     End With
@@ -1013,7 +1014,7 @@ Public Sub EfectoParalisisUser(ByVal UserIndex As Integer)
             .flags.Paralizado = 0
             .flags.Inmovilizado = 0
             '.Flags.AdministrativeParalisis = 0
-            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageSetParalized(.Char.CharIndex, 0))
+            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SetParalized(.Char.CharIndex, 0))
         End If
     End With
 End Sub
@@ -1021,8 +1022,8 @@ End Sub
 Public Sub RecStamina(ByVal UserIndex As Integer, ByVal Intervalo As Integer)
 
     With UserList(UserIndex)
-        'If maps(.Pos.map).mapData( .Pos.X, .Pos.Y).Trigger = 1 And _
-        '   maps(.Pos.map).mapData( .Pos.X, .Pos.Y).Trigger = 4 Then
+        'If Maps(.Pos.Map).mapData( .Pos.X, .Pos.Y).Trigger = 1 And _
+        '   Maps(.Pos.Map).mapData( .Pos.X, .Pos.Y).Trigger = 4 Then
         '   EXIT SUB
         'End If
         
@@ -1143,8 +1144,8 @@ End Sub
 Public Sub Sanar(ByVal UserIndex As Integer, ByVal Intervalo As Integer)
 
     With UserList(UserIndex)
-        If maps(.Pos.map).mapData(.Pos.x, .Pos.y).Trigger = 1 And _
-            maps(.Pos.map).mapData(.Pos.x, .Pos.y).Trigger = 4 Then
+        If MapData(.Pos.X, .Pos.Y).Trigger = 1 And _
+            MapData(.Pos.X, .Pos.Y).Trigger = 4 Then
             Exit Sub
         End If
     
@@ -1186,7 +1187,7 @@ Public Sub CargaNpcsDat()
 End Sub
 
 Public Sub PasarSegundo()
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     Dim i As Long
     
     For i = 1 To LastUser
@@ -1218,8 +1219,8 @@ On Error GoTo ErrHandler
             
                     Call ClosestLegalPos(UserList(i).Pos, nPos)
             
-                    If nPos.x > 0 And nPos.y > 0 Then
-                        Call WarpUserChar(i, UserList(i).Pos.map, nPos.x, nPos.y, False)
+                    If nPos.X > 0 And nPos.Y > 0 Then
+                        Call WarpUserChar(i, UserList(i).Pos.Map, nPos.X, nPos.Y, False)
                         
                         UserList(i).Counters.EnPlataforma = 0
                     End If
@@ -1229,7 +1230,7 @@ On Error GoTo ErrHandler
     Next i
 Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en PasarSegundo. Err: " & Err.description & " - " & Err.Number & " - UserIndex: " & i)
     Resume Next
 End Sub
@@ -1262,7 +1263,7 @@ Public Sub GuardarUsuarios()
         End If
     Next i
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Los personajes fueron grabados.", FontTypeNames.FONTTYPE_VENENO))
+    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Los personajes fueron grabados.", FontTypeNames.FONTTYPE_VENENO))
     'haciendoBK = False
 End Sub
 
@@ -1271,7 +1272,7 @@ Public Sub FreeNpcs()
     Dim LoopC As Long
     
     'Free all Npc Indexes
-    For LoopC = 1 To MaxNpcS
+    For LoopC = 1 To MaxNpcs
         NpcList(LoopC).flags.NpcActive = False
     Next LoopC
 End Sub
@@ -1279,7 +1280,7 @@ End Sub
 Public Sub FreeCharIndexes()
 'Releases all char Indexes
     'Free all char Indexes (set them all to 0)
-    Call ZeroMemory(CharList(1), MaxCHARS * Len(CharList(1)))
+    Call ZeroMemory(CharList(1), MaxChars * Len(CharList(1)))
 End Sub
 
 Public Function Tilde(data As String) As String
@@ -1288,7 +1289,7 @@ End Function
 
 Public Function EsCompaniero(ByVal UserIndex As Integer, ByVal CompaName As String) As Byte
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
     
     Dim j As Byte
     For j = 1 To MaxCompaSlots
@@ -1301,7 +1302,7 @@ On Error GoTo ErrHandler
     Next
 
 Exit Function
-ErrHandler:
+errhandler:
 
 End Function
 
@@ -1315,7 +1316,7 @@ Public Sub AgregarCompaniero(ByVal UserIndex As Integer, ByVal CompaName As Stri
         CompaIndex = NameIndex(CompaName)
     
         If CompaIndex > 0 Then
-            If .Pos.map <> UserList(CompaIndex).Pos.map Then
+            If .Pos.Map <> UserList(CompaIndex).Pos.Map Then
                 If .flags.Privilegios And PlayerType.User Then
                     Exit Sub
                 End If
@@ -1332,7 +1333,7 @@ Public Sub AgregarCompaniero(ByVal UserIndex As Integer, ByVal CompaName As Stri
         If EsAdmin(CompaName) Or EsDios(CompaName) Or _
         EsSemiDios(CompaName) Or EsConsejero(CompaName) Then
             If .flags.Privilegios And PlayerType.User Then
-                Call WriteConsoleMsg(UserIndex, "No podés agregar como compañeros a los administradores.", FontTypeNames.FONTTYPE_INFO)
+                Call WriteConsoleMsg(UserIndex, "No podés agregar como compañeros a un administrador.", FontTypeNames.FONTTYPE_INFO)
                 Exit Sub
             End If
         End If
@@ -1364,7 +1365,7 @@ Public Sub AgregarCompaniero(ByVal UserIndex As Integer, ByVal CompaName As Stri
             If .Compas.Nro = MaxCompaSlots Then
                 Call WriteConsoleMsg(CompaIndex, "No tenés espacio para más compañeros.", FontTypeNames.FONTTYPE_INFO)
             Else
-                .Compas.Compa(j) = UserList(UserIndex).name
+                .Compas.Compa(j) = UserList(UserIndex).Name
                 .Compas.Nro = .Compas.Nro + 1
                 
                 Call WriteAddCompa(CompaIndex, j, True, True)
@@ -1381,15 +1382,15 @@ Public Sub AgregarCompaniero(ByVal UserIndex As Integer, ByVal CompaName As Stri
         CompaStr = DB_RS!Compas
         
         If LenB(CompaStr) > 0 Then
-            CompaStr = CompaStr & vbNewLine & UserList(UserIndex).name
+            CompaStr = CompaStr & vbNewLine & UserList(UserIndex).Name
         Else
-            CompaStr = UserList(UserIndex).name
+            CompaStr = UserList(UserIndex).Name
         End If
 
         DB_RS!Compas = CompaStr
         
         DB_RS.Update
-        DB_RS.Close
+        DB_RS_Close
     End If
 End Sub
 
@@ -1415,8 +1416,8 @@ Public Sub QuitarCompaniero(ByVal UserIndex As Integer, ByVal Slot As Byte)
         
         With UserList(CompaIndex)
             For j = 1 To MaxCompaSlots
-                If LenB(.Compas.Compa(j)) = LenB(UserList(UserIndex).name) Then
-                    If .Compas.Compa(j) = UserList(UserIndex).name Then
+                If LenB(.Compas.Compa(j)) = LenB(UserList(UserIndex).Name) Then
+                    If .Compas.Compa(j) = UserList(UserIndex).Name Then
                         Exit For
                     End If
                 End If
@@ -1434,10 +1435,10 @@ Public Sub QuitarCompaniero(ByVal UserIndex As Integer, ByVal Slot As Byte)
         
         CompaStr = DB_RS!Compas
         
-        If InStr(CompaStr, vbNewLine & UserList(UserIndex).name) > 0 Then
-            CompaStr = Replace(CompaStr, vbNewLine & UserList(UserIndex).name, vbNullString)
-        ElseIf InStr(CompaStr, UserList(UserIndex).name & vbNewLine) > 0 Then
-            CompaStr = Replace(CompaStr, UserList(UserIndex).name & vbNewLine, vbNullString)
+        If InStr(CompaStr, vbNewLine & UserList(UserIndex).Name) > 0 Then
+            CompaStr = Replace(CompaStr, vbNewLine & UserList(UserIndex).Name, vbNullString)
+        ElseIf InStr(CompaStr, UserList(UserIndex).Name & vbNewLine) > 0 Then
+            CompaStr = Replace(CompaStr, UserList(UserIndex).Name & vbNewLine, vbNullString)
         Else
             CompaStr = vbNullString
         End If
@@ -1445,7 +1446,7 @@ Public Sub QuitarCompaniero(ByVal UserIndex As Integer, ByVal Slot As Byte)
         DB_RS!Compas = CompaStr
         
         DB_RS.Update
-        DB_RS.Close
+        DB_RS_Close
     End If
 
 End Sub
@@ -1459,7 +1460,7 @@ Public Sub RegistrarEstadisticas()
     DB_RS!Record = RecordPoblacion
     
     DB_RS.Update
-    DB_RS.Close
+    DB_RS_Close
 End Sub
 
 Public Function Calcular_ELU(ByVal Nivel As Byte) As Long
@@ -1534,7 +1535,7 @@ Public Function ExistePlataforma(ByVal mapa As Integer) As Byte
     Dim i As Byte
     
     For i = 1 To MaxPlataformSlots
-        If Plataforma(i).map = mapa Then
+        If Plataforma(i).Map = mapa Then
             ExistePlataforma = i
             Exit For
         End If
@@ -1545,7 +1546,7 @@ Public Function TienePlataforma(ByVal UserIndex As Integer, ByVal mapa As Intege
     Dim i As Byte
     
     For i = 1 To MaxPlataformSlots
-        If UserList(UserIndex).Plataformas.Plataforma(i).map = mapa Then
+        If UserList(UserIndex).Plataformas.Plataforma(i).Map = mapa Then
             TienePlataforma = i
             Exit Function
         End If
@@ -1559,8 +1560,8 @@ Public Sub AgregarPlataforma(ByVal UserIndex As Integer, ByVal mapa As Integer)
             
             With UserList(UserIndex)
                 For i = 1 To MaxPlataformSlots
-                    If .Plataformas.Plataforma(i).map = 0 Then
-                        .Plataformas.Plataforma(i).map = mapa
+                    If .Plataformas.Plataforma(i).Map = 0 Then
+                        .Plataformas.Plataforma(i).Map = mapa
                         .Plataformas.Nro = .Plataformas.Nro + 1
                         Exit For
                     End If

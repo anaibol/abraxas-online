@@ -7,6 +7,8 @@ Public CharPath As String
 
 Public ServidorIni As String
 
+Public aClon As New clsAntiMassClon
+
 'Public TrashCollector As New Collection
 
 Public Enum eChatType
@@ -226,8 +228,8 @@ Public Const LingoteOro As Integer = 388
 Public Const Leña As Integer = 58
 Public Const LeñaElfica As Integer = 1006
 
-Public Const MaxNpcS As Integer = 10000
-Public Const MaxCHARS As Integer = 10000
+Public Const MaxNpcs As Integer = 10000
+Public Const MaxChars As Integer = 10000
 
 Public Const HACHA_LEÑADOR As Integer = 127
 Public Const HACHA_LEÑA_ELFICA As Integer = 1005
@@ -345,9 +347,9 @@ Public Const AumentoSTLadron As Byte = AumentoSTDef + 3
 Public Const AumentoSTMago As Byte = AumentoSTDef - 1
 
 'Tamaño del mapa
-Public Const XMaxMapSize As Byte = 100
+Public Const XMaxMapSize As Integer = 500
 Public Const XMinMapSize As Byte = 1
-Public Const YMaxMapSize As Byte = 100
+Public Const YMaxMapSize As Integer = 500
 Public Const YMinMapSize As Byte = 1
 
 'Tamaño en Tiles de la pantalla de visualizacion
@@ -492,14 +494,14 @@ Public Const EXP_FALLO_SKILL As Byte = 3
 '**************************************************************
 '**************************************************************
     Public Type Position
-        x As Integer
-        y As Integer
+        X As Integer
+        Y As Integer
     End Type
     
     Public Type WorldPos
-        map As Integer
-        x As Integer
-        y As Integer
+        Map As Integer
+        X As Integer
+        Y As Integer
     End Type
 
     Public Type tHechizo
@@ -715,12 +717,13 @@ Public Type Char
     
     FX As Integer
     Loops As Integer
-    
+    NpcIndex As Integer
+    UserIndex As Integer
 End Type
 
 'Tipos de objetos
 Public Type ObjData
-    name As String 'Nombre del obj
+    Name As String 'Nombre del obj
     
     Type As eObjType 'Tipo enum que determina cuales son las caract del obj
     
@@ -779,7 +782,7 @@ Public Type ObjData
     
     Valor As Long     'Precio
     
-    Cerrada As Byte
+    Cerrada As Boolean
     Llave As Byte
     clave As Long 'si clave=llave la puerta se abre o cierra
     
@@ -840,8 +843,8 @@ Public Type ObjData
     
     DesdeMap As Integer
     HastaMap As Integer
-    HastaY As Byte
-    HastaX As Byte
+    HastaY As Integer
+    HastaX As Integer
     NecesitasSkill As Byte
     CantidadSkill As Byte
     
@@ -1048,7 +1051,7 @@ End Type
 
 'Tipo de los Usuarios
 Public Type User
-    name As String
+    Name As String
     Id As Long
         
     ShowName As Boolean 'Permite que los GMs oculten su nick con el comando /sHOWNAME
@@ -1103,7 +1106,7 @@ Public Type User
     PartyIndex As Integer   'Index a la party q es miembro
     PartySolicitud As Integer   'Index a la party q solicito
     
-    AreasInfo As AreaInfo
+    Area As Areas
     
     'Outgoing and incoming Messages
     outgoingData As clsByteQueue
@@ -1188,7 +1191,7 @@ Public Type tDrop
 End Type
 
 Public Type Npc
-    name As String
+    Name As String
     Char As Char 'Define como se vera
     Desc As String
 
@@ -1239,7 +1242,7 @@ Public Type Npc
     
     'New!! Needed for pathfindig
     PFINFO As NpcPathFindingInfo
-    AreasInfo As AreaInfo
+    Area As Areas
     
     'Ciudad As Byte
     
@@ -1247,6 +1250,38 @@ Public Type Npc
 End Type
 
 '******************** Tipos del mapa **********************
+
+'Tile
+Public Type MapBlock
+    Blocked As Boolean
+    Graphic(1 To 4) As Integer
+    UserIndex As Integer
+    NpcIndex As Integer
+    ObjInfo As Obj
+    TileExit As WorldPos
+    Trigger As eTrigger
+End Type
+
+'Info del mapa
+Type MapInfo
+    Music As String
+    'Name As String
+    StartPos As WorldPos
+    MapVersion As Integer
+    PK As Boolean
+    MagiaSinEfecto As Byte
+    InviSinEfecto As Byte
+    ResuSinEfecto As Byte
+    OcultarSinEfecto As Byte
+    InvocarSinEfecto As Byte
+    
+    RoboNpcsPermitido As Byte
+    
+    terreno As String
+    Zona As String
+    restringir As String
+    BackUp As Byte
+End Type
 
 Public ListaRazas(1 To NUMRAZAS) As String
 Public SkillName(1 To NumSkills) As String
@@ -1256,10 +1291,10 @@ Public ListaAtributos(1 To NUMATRIBUTOS) As String
 Public RecordPoblacion As Integer
 
 'Bordes del mapa
-Public MinXBorder As Byte
-Public MaxXBorder As Byte
-Public MinYBorder As Byte
-Public MaxYBorder As Byte
+Public MinXBorder As Integer
+Public MaxXBorder As Integer
+Public MinYBorder As Integer
+Public MaxYBorder As Integer
 
 'Numero de usuarios actual
 Public Poblacion As Integer
@@ -1286,10 +1321,11 @@ Public EnPausa As Boolean
 
 '*****************ARRAYS PUBLICOS*************************
 Public UserList() As User 'USUARIOS
-Public NpcList(1 To MaxNpcS) As Npc 'NpcS
+Public NpcList(1 To MaxNpcs) As Npc 'Npcs
+Public MapData() As MapBlock
 Public MapInfo() As MapInfo
 Public Hechizos() As tHechizo
-Public CharList(1 To MaxCHARS) As Integer
+Public CharList(1 To MaxChars) As Char
 Public ObjData() As ObjData
 Public FX() As FXdata
 Public Spawn_List() As tCriaturasEntrenador
@@ -1298,7 +1334,6 @@ Public ForbidenNames() As String
 Public ArmasHerrero() As Integer
 Public ArmadurasHerrero() As Integer
 Public ObjCarpintero() As Integer
-Public BanIps As New Collection
 Public Parties(1 To Max_PARTIES) As clsParty
 Public ModClase(1 To NUMCLASES) As ModClase
 Public ModRaza(1 To NUMRAZAS) As ModRaza
@@ -1387,48 +1422,4 @@ Public DataSent As Long
 Public DataReceived As Long
 
 Public Administradores As clsIniManager
-
-
-'Tile
-Public Type MapBlock
-    Blocked As Boolean
-    Graphic(1 To 4) As Integer
-    UserIndex As Integer
-    NpcIndex As Integer
-    ObjInfo As Obj
-    TileExit As WorldPos
-    Trigger As eTrigger
-End Type
-
-Public Type tMap
-    mapData() As MapBlock
-    dX As Long
-    dY As Long
-End Type
-
-Public maps() As tMap
-
-'Info del mapa
-Type MapInfo
-    Poblacion As Integer
-    Music As String
-    'Name As String
-    StartPos As WorldPos
-    MapVersion As Integer
-    PK As Boolean
-    MagiaSinEfecto As Byte
-    NoEncriptarMP As Byte
-    InviSinEfecto As Byte
-    ResuSinEfecto As Byte
-    OcultarSinEfecto As Byte
-    InvocarSinEfecto As Byte
-    
-    RoboNpcsPermitido As Byte
-    
-    terreno As String
-    Zona As String
-    restringir As String
-    BackUp As Byte
-End Type
-
 

@@ -35,20 +35,20 @@ On Error GoTo ErrOut
     
     'Run test queries to make sure the tables are there
     'Call DB_RS_Open ("SELECT * FROM banned_ips WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     'Call DB_RS_Open ("SELECT * FROM mail WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     'Call DB_RS_Open ("SELECT * FROM mail_lastid WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     'Call DB_RS_Open ("SELECT * FROM npcs WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     'Call DB_RS_Open ("SELECT * FROM objs WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     'Call DB_RS_Open ("SELECT * FROM quests WHERE 0=1")
-    'DB_RS.Close
+    'DB_RS_Close
     
     Call DB_RS_Open("SELECT 1 from people WHERE 0=1")
-    DB_RS.Close
+    DB_RS_Close
 
     On Error GoTo 0
     
@@ -156,15 +156,21 @@ Public Sub DB_RS_Open(ByVal Query As String)
 
 On Error GoTo Error
 1
-    If DB_RS.State = 1 Then DB_RS.Close
     DB_RS.Open Query, DB_Conn, adOpenStatic, adLockOptimistic
             
     Exit Sub
     
 Error:
-    DB_RS.Close
+    DB_RS_Close
     
     GoTo 1
+End Sub
+
+Public Sub DB_RS_Close()
+
+On Error Resume Next
+    DB_RS.Close
+    
 End Sub
 
 Public Sub OnlinePlayers()
@@ -174,7 +180,7 @@ Public Sub OnlinePlayers()
     DB_RS!Online_Players = Poblacion
     DB_RS.Update
     
-    DB_RS.Close
+    DB_RS_Close
 
 End Sub
 
@@ -184,7 +190,7 @@ Public Function User_Exist(ByVal UserName As String) As Boolean
 
     User_Exist = Not DB_RS.EOF
     
-    DB_RS.Close
+    DB_RS_Close
     
 End Function
 
@@ -193,11 +199,9 @@ Public Function Check_Password(ByVal UserName As String, ByVal Password As Strin
     Call DB_RS_Open("SELECT * FROM people WHERE `name`='" & UserName & "'")
     
     Dim Pass As String
-    Call DB_RS_Open("SELECT * FROM people WHERE `name`='" & UserName & "'")
-    
     Pass = DB_RS!Pass
     
-    DB_RS.Close
+    DB_RS_Close
     
     Check_Password = (Password = Pass)
     
@@ -209,6 +213,133 @@ Public Function Ban_Check(ByVal UserName As String) As Boolean
     
     Ban_Check = Not DB_RS.EOF
         
-    DB_RS.Close
+    DB_RS_Close
+        
+End Function
+
+Public Function SaveItem(ByVal ObjIndex As Integer) As Boolean
+    
+    'Open the database with an empty record and create the new user
+    Call DB_RS_Open("SELECT * FROM items WHERE 0=1")
+
+    DB_RS.AddNew
+    
+    With ObjData(ObjIndex)
+        
+        'Put the data in the recordset
+        'DB_RS!Name = .Name
+        'DB_RS!price = .flags.Password
+        'DB_RS!ObjType = Act_Code
+        'DB_RS!weapontype = .Email
+        'DB_RS!weaponrange = .Raza
+        'DB_RS!classreq = .Clase
+        'DB_RS!GrhIndex = .Genero
+        'DB_RS!usegrh = .Hogar
+        'DB_RS!usesfx = .Char.Head
+        'DB_RS!projectilerotatespeed = .Stats.Atributos(1)
+        'DB_RS!stacking = .Stats.Atributos(2)
+        'DB_RS!sprite_body = .Stats.Atributos(3)
+        'DB_RS!sprite_weapon = .Stats.Atributos(4)
+        'DB_RS!sprite_hair = .Stats.Atributos(5)
+        'DB_RS!sprite_head = .Stats.Elv
+        'DB_RS!sprite_wings = .Stats.Exp
+        'DB_RS!replenish_hp = KSStr
+        'DB_RS!replenish_mp = .Skills.NroFree
+        'DB_RS!replenish_sp = SpellsStr
+        'DB_RS!replenish_hp_percent = .Pos.Map
+        'DB_RS!replenish_mp_percent = .Pos.X
+        'DB_RS!replenish_sp_percent = .Pos.Y
+        'DB_RS!stat_str = .Stats.MinHP
+        'DB_RS!stat_agi = .Stats.MaxHP
+        'DB_RS!stat_mag = .Stats.MinMan
+        'DB_RS!stat_def = .Stats.MaxMan
+        'DB_RS!stat_speed = .Stats.MinSta
+        'DB_RS!stat_hit_min = .Stats.MaxSta
+        'DB_RS!stat_hit_max = .Stats.MinHit
+        'DB_RS!stat_hp = .Stats.MaxHit
+        'DB_RS!stat_mp = .Stats.MinSed
+        'DB_RS!stat_sp = .Stats.MinHam
+        'DB_RS!req_str = .InvStr
+        'DB_RS!req_agi = .BeltStr
+        'DB_RS!req_mag = .BankStr
+        'DB_RS!req_lvl = .req_lvl
+        
+    End With
+    
+    DB_RS_Close
+        
+End Function
+
+Public Function SaveSpell(ByVal SpellIndex As Integer) As Boolean
+    
+    'Open the database with an empty record and create the new user
+    Call DB_RS_Open("SELECT * FROM spells WHERE 0=1")
+
+    DB_RS.AddNew
+    
+    With Hechizos(SpellIndex)
+        
+        'Put the data in the recordset
+        'DB_RS!Name = .Name
+        'DB_RS!Desc = .flags.Password
+        'DB_RS!magicWords = Act_Code
+        'DB_RS!HechizeroMsg = .Email
+        'DB_RS!PropioMsg = .Raza
+        'DB_RS!TargetMsg = .Clase
+        'DB_RS!Type = .Genero
+        'DB_RS!snd = .Hogar
+        'DB_RS!FXgrh = .Char.Head
+        'DB_RS!FXLoops = .Stats.Atributos(1)
+        'DB_RS!MinSkill = .Stats.Atributos(2)
+        'DB_RS!manaRequired = .Stats.Atributos(3)
+        'DB_RS!staRequired = .Stats.Atributos(4)
+        'DB_RS!TargetType = .Stats.Atributos(5)
+        'DB_RS!SubeHP = .Stats.Elv
+        'DB_RS!MinHP = .Stats.Exp
+        'DB_RS!MaxHP = KSStr
+        'DB_RS!SubeMana = .Skills.NroFree
+        'DB_RS!minMana = SpellsStr
+        'DB_RS!maxMana = .Pos.Map
+        'DB_RS!SubeSta = .Pos.X
+        'DB_RS!MinSta = .Pos.Y
+        'DB_RS!MaxSta = .Stats.MinHP
+        'DB_RS!SubeHam = .Stats.MaxHP
+        'DB_RS!MinHam = .Stats.MinMan
+        'DB_RS!MaxHam = .Stats.MaxMan
+        'DB_RS!SubeSed = .Stats.MinSta
+        'DB_RS!MinSed = .Stats.MaxSta
+        'DB_RS!MaxSed = .Stats.MinHit
+        'DB_RS!subeAg = .Stats.MaxHit
+        'DB_RS!minAg = .Stats.MinSed
+        'DB_RS!maxAg = .Stats.MinHam
+        'DB_RS!subeFu = .InvStr
+        'DB_RS!minFu = .BeltStr
+        'DB_RS!maxFu = .BankStr
+        'DB_RS!subeCa = .InvStr
+        'DB_RS!minCa = .BeltStr
+        'DB_RS!maxCa = .BankStr
+        'DB_RS!invi = .InvStr
+        'DB_RS!Paraliza = .BeltStr
+        'DB_RS!inmo = .BankStr
+        'DB_RS!remueveInmo = .InvStr
+        'DB_RS!remueveEstupidez = .BeltStr
+        'DB_RS!remueveInviParcial = .BankStr
+        'DB_RS!CuraVeneno = .InvStr
+        'DB_RS!Envenena = .BeltStr
+        'DB_RS!revive = .BankStr
+        'DB_RS!enceguece = .BankStr
+        'DB_RS!Estupidez = .InvStr
+        'DB_RS!Invoca = .BeltStr
+        'DB_RS!NumNpc = .BankStr
+        'DB_RS!cantidadNpc = .InvStr
+        'DB_RS!Mimetiza = .BeltStr
+        'DB_RS!materializa = .BankStr
+        'DB_RS!ItemIndex = .InvStr
+        'DB_RS!StaffAffected = .BeltStr
+        'DB_RS!NeedStaff = .BankStr
+        'DB_RS!resistencia = .InvStr
+    End With
+    
+    DB_RS_Close
         
 End Function

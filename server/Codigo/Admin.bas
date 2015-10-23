@@ -69,7 +69,7 @@ Public Sub WorldSave()
     Dim loopX As Integer
     Dim Porc As Long
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Iniciando WorldSave", FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> Iniciando WorldSave", FontTypeNames.FONTTYPE_SERVER))
         
     'Dim j As Integer , k As Integer
     
@@ -106,7 +106,7 @@ Public Sub WorldSave()
         End If
     Next
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> WorldSave ha concluído.", FontTypeNames.FONTTYPE_SERVER))
+    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> WorldSave ha concluído.", FontTypeNames.FONTTYPE_SERVER))
 
 End Sub
 
@@ -202,96 +202,6 @@ On Error Resume Next
      
 End Sub
 
-Public Function UnBan(ByVal Name As String) As Boolean
-    'Unban the Char
-    Call WriteVar(CharPath & Name & ".chr", "FLAGS", "Ban", "0")
-    
-    'Remove it from the banned people database
-    Call WriteVar(App.Path & "/logs/" & "BanDetail.dat", Name, "BannedBy", "NOBODY")
-    Call WriteVar(App.Path & "/logs/" & "BanDetail.dat", Name, "Reason", "NO REASON")
-End Function
-
-Public Sub BanIpAgrega(ByVal Ip As String)
-    BanIps.Add Ip
-    
-    Call BanIpGuardar
-End Sub
-
-Public Function BanIpBuscar(ByVal Ip As String) As Long
-    Dim Dale As Boolean
-    Dim LoopC As Long
-    
-    Dale = True
-    LoopC = 1
-    Do While LoopC <= BanIps.Count And Dale
-        Dale = (BanIps.Item(LoopC) <> Ip)
-        LoopC = LoopC + 1
-    Loop
-    
-    If Dale Then
-        BanIpBuscar = 0
-    Else
-        BanIpBuscar = LoopC - 1
-    End If
-End Function
-
-Public Function BanIpQuita(ByVal Ip As String) As Boolean
-
-    On Error Resume Next
-    
-    Dim N As Long
-    
-    N = BanIpBuscar(Ip)
-    If N > 0 Then
-        BanIps.Remove N
-        BanIpGuardar
-        BanIpQuita = True
-    Else
-        BanIpQuita = False
-    End If
-
-End Function
-
-Public Sub BanIpGuardar()
-    Dim ArchivoBanIp As String
-    Dim ArchN As Long
-    Dim LoopC As Long
-    
-    ArchivoBanIp = DatPath & "banIps.dat"
-    
-    ArchN = FreeFile()
-    Open ArchivoBanIp For Output As #ArchN
-    
-    For LoopC = 1 To BanIps.Count
-        Print #ArchN, BanIps.Item(LoopC)
-    Next LoopC
-    
-    Close #ArchN
-End Sub
-
-Public Sub BanIpCargar()
-    Dim ArchN As Long
-    Dim Tmp As String
-    Dim ArchivoBanIp As String
-    
-    ArchivoBanIp = DatPath & "banIps.dat"
-    
-    Do While BanIps.Count > 0
-        BanIps.Remove 1
-    Loop
-    
-    ArchN = FreeFile()
-    Open ArchivoBanIp For Input As #ArchN
-    
-    Do While Not EOF(ArchN)
-        Line Input #ArchN, Tmp
-        BanIps.Add Tmp
-    Loop
-    
-    Close #ArchN
-
-End Sub
-
 Public Function UserDarPrivilegioLevel(ByVal Name As String) As PlayerType
     If EsAdmin(Name) Then
         UserDarPrivilegioLevel = PlayerType.Admin
@@ -335,7 +245,7 @@ Public Sub BanCharacter(ByVal bannerUserIndex As Integer, ByVal UserName As Stri
                         Call WriteConsoleMsg(bannerUserIndex, "El personaje ya se encuentra baneado.", FontTypeNames.FONTTYPE_INFO)
                     Else
                         Call LogBanFromName(UserName, bannerUserIndex, Reason)
-                        Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> " & .Name & " ha baneado a " & UserName & ".", FontTypeNames.FONTTYPE_SERVER))
+                        Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg("Servidor> " & .Name & " ha baneado a " & UserName & ".", FontTypeNames.FONTTYPE_SERVER))
                         
                         'ponemos el flag de ban a 1
                         Call WriteVar(CharPath & UserName & ".chr", "FLAGS", "Ban", "1")
@@ -346,7 +256,7 @@ Public Sub BanCharacter(ByVal bannerUserIndex As Integer, ByVal UserName As Stri
                         
                         If (userPriv And rank) = (.flags.Privilegios And rank) Then
                             .flags.Ban = 1
-                            Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(.Name & " banned by the server por bannear un Administrador.", FontTypeNames.FONTTYPE_FIGHT))
+                            Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg(.Name & " banned by the server por bannear un Administrador.", FontTypeNames.FONTTYPE_FIGHT))
                             Call CloseSocket(bannerUserIndex)
                         End If
                         
@@ -362,14 +272,14 @@ Public Sub BanCharacter(ByVal bannerUserIndex As Integer, ByVal UserName As Stri
             End If
             
             Call LogBan(tUser, bannerUserIndex, Reason)
-            Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> " & .Name & " ha baneado a " & UserList(tUser).Name & ".", FontTypeNames.FONTTYPE_SERVER))
+            Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg("Servidor> " & .Name & " ha baneado a " & UserList(tUser).Name & ".", FontTypeNames.FONTTYPE_SERVER))
             
             'Ponemos el flag de ban a 1
             UserList(tUser).flags.Ban = 1
             
             If (UserList(tUser).flags.Privilegios And rank) = (.flags.Privilegios And rank) Then
                 .flags.Ban = 1
-                Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(.Name & " banned by the server por bannear un Administrador.", FontTypeNames.FONTTYPE_FIGHT))
+                Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg(.Name & " banned by the server por bannear un Administrador.", FontTypeNames.FONTTYPE_FIGHT))
                 Call CloseSocket(bannerUserIndex)
             End If
             

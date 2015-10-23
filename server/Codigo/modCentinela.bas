@@ -98,7 +98,7 @@ Public Sub CallUserAttention()
                     If getInterval(TActual, .SpawnTime) >= 5000 Then
                     
                         If Not UserList(UserIndex).flags.CentinelaOK Then
-                            Call WritePlayWave(UserIndex, SND_WARP, NpcList(.NpcIndex).Pos.X, NpcList(.NpcIndex).Pos.Y)
+                            Call WriteSoundFX(UserIndex, SND_WARP, NpcList(.NpcIndex).Pos.X, NpcList(.NpcIndex).Pos.Y)
                             Call WriteCreateFX(UserIndex, NpcList(.NpcIndex).Pos.X, NpcList(.NpcIndex).Pos.Y, FXIDs.FX_WARP, 0)
                             
                             'Resend the key
@@ -221,7 +221,7 @@ On Error GoTo Error_Handler
             Call LogCentinela("Centinela ejecuto y echó a " & UserName & " por uso de macro inasistido.")
             
             'Avisamos a los admins
-            Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> El centinela ha ejecutado a " & UserName & " y lo echó del juego.", FontTypeNames.FONTTYPE_SERVER))
+            Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg("Servidor> El centinela ha ejecutado a " & UserName & " y lo echó del juego.", FontTypeNames.FONTTYPE_SERVER))
             
             ' Evitamos loguear el logout
             .RevisandoUserIndex = 0
@@ -379,7 +379,7 @@ Public Sub PasarMinutoCentinela()
 'Control del timer. Llamado cada un minuto.
 '03/10/2010: ZaMa - Adaptado para que funcione mas de un centinela en paralelo.
 '*************************************************
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim index As Long
     Dim UserIndex As Integer
@@ -461,7 +461,7 @@ On Error GoTo ErrHandler
     End If
     
     Exit Sub
-ErrHandler:
+errhandler:
     Call LogError("Error en PasarMinutoCentinela. Error: " & Err.Number & " - " & Err.description)
 End Sub
 
@@ -534,7 +534,7 @@ Private Sub LogCentinela(ByVal texto As String)
 'Last modified: 03/15/2006
 'Loguea un evento del centinela
 '*************************************************
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     Dim nfile As Integer
     nfile = FreeFile ' obtenemos un canal
@@ -544,7 +544,7 @@ On Error GoTo ErrHandler
     Close #nfile
 Exit Sub
 
-ErrHandler:
+errhandler:
 End Sub
 
 Public Sub ResetCentinelas()

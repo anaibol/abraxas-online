@@ -11,11 +11,11 @@ Public Sub UserReciveObj(ByVal UserIndex As Integer, ByVal ObjIndex As Byte, ByV
             Exit Sub
         End If
         
-        obji = .Bank.Obj(ObjIndex).Index
+        obji = .Bank.Obj(ObjIndex).index
         
         '¿Ya tiene un objeto de este tipo?
         Slot = 1
-        Do Until .Inv.Obj(Slot).Index = obji And _
+        Do Until .Inv.Obj(Slot).index = obji And _
            .Inv.Obj(Slot).Amount + Cantidad <= MaxInvObjs
             
             Slot = Slot + 1
@@ -27,7 +27,7 @@ Public Sub UserReciveObj(ByVal UserIndex As Integer, ByVal ObjIndex As Byte, ByV
         'Sino se fija por un slot vacio
         If Slot > MaxInvSlots Then
             Slot = 1
-            Do Until .Inv.Obj(Slot).Index = 0
+            Do Until .Inv.Obj(Slot).index = 0
                 Slot = Slot + 1
     
                 If Slot > MaxInvSlots Then
@@ -41,7 +41,7 @@ Public Sub UserReciveObj(ByVal UserIndex As Integer, ByVal ObjIndex As Byte, ByV
         'Mete el obj en el slot
         If .Inv.Obj(Slot).Amount + Cantidad <= MaxInvObjs Then
             'Menor que MaxInvObjs
-            .Inv.Obj(Slot).Index = obji
+            .Inv.Obj(Slot).index = obji
             .Inv.Obj(Slot).Amount = .Inv.Obj(Slot).Amount + Cantidad
             
             Call QuitarBancoInvItem(UserIndex, ObjIndex, Cantidad)
@@ -64,12 +64,12 @@ Public Sub QuitarBancoInvItem(ByVal UserIndex As Integer, ByVal Slot As Byte, By
     Dim ObjIndex As Integer
     
     With UserList(UserIndex)
-        ObjIndex = .Bank.Obj(Slot).Index
+        ObjIndex = .Bank.Obj(Slot).index
     
         .Bank.Obj(Slot).Amount = .Bank.Obj(Slot).Amount - Cantidad
         
         If .Bank.Obj(Slot).Amount < 1 Then
-            .Bank.Obj(Slot).Index = 0
+            .Bank.Obj(Slot).index = 0
             .Bank.Obj(Slot).Amount = 0
             
             .Bank.NroItems = .Bank.NroItems - 1
@@ -91,15 +91,15 @@ Public Sub UserDejaObj(ByVal UserIndex As Integer, ByVal Slot As Byte, ByVal Can
     
     With UserList(UserIndex)
         If Slot > 200 Then
-            ObjIndex = .Belt.Obj(Slot - 200).Index
+            ObjIndex = .Belt.Obj(Slot - 200).index
         Else
-            ObjIndex = .Inv.Obj(Slot).Index
+            ObjIndex = .Inv.Obj(Slot).index
         End If
     
         '¿Ya tiene un objeto de este tipo?
         BankSlot = 1
         
-        Do Until .Bank.Obj(BankSlot).Index = ObjIndex And _
+        Do Until .Bank.Obj(BankSlot).index = ObjIndex And _
             .Bank.Obj(BankSlot).Amount + Cantidad <= MaxInvObjs
             BankSlot = BankSlot + 1
             
@@ -111,7 +111,7 @@ Public Sub UserDejaObj(ByVal UserIndex As Integer, ByVal Slot As Byte, ByVal Can
         'Sino se fija por un slot vacio antes del slot devuelto
         If BankSlot > MaxBankSlots Then
             BankSlot = 1
-            Do Until .Bank.Obj(BankSlot).Index = 0
+            Do Until .Bank.Obj(BankSlot).index = 0
                 BankSlot = BankSlot + 1
                 
                 If BankSlot > MaxBankSlots Then
@@ -128,7 +128,7 @@ Public Sub UserDejaObj(ByVal UserIndex As Integer, ByVal Slot As Byte, ByVal Can
             If .Bank.Obj(BankSlot).Amount + Cantidad <= MaxInvObjs Then
                 
                 'Menor que MaxInvObjs
-                .Bank.Obj(BankSlot).Index = ObjIndex
+                .Bank.Obj(BankSlot).index = ObjIndex
                 .Bank.Obj(BankSlot).Amount = .Bank.Obj(BankSlot).Amount + Cantidad
                         
                 If Slot > 200 Then
@@ -156,8 +156,8 @@ On Error Resume Next
     Call WriteConsoleMsg(SendIndex, "Tiene " & UserList(UserIndex).Bank.NroItems & " objetos.", FontTypeNames.FONTTYPE_INFO)
     
     For j = 1 To MaxBankSlots
-        If UserList(UserIndex).Bank.Obj(j).Index > 0 Then
-            Call WriteConsoleMsg(SendIndex, "Objeto " & j & " " & ObjData(UserList(UserIndex).Bank.Obj(j).Index).Name & " Cantidad:" & UserList(UserIndex).Bank.Obj(j).Amount, FontTypeNames.FONTTYPE_INFO)
+        If UserList(UserIndex).Bank.Obj(j).index > 0 Then
+            Call WriteConsoleMsg(SendIndex, "Objeto " & j & " " & ObjData(UserList(UserIndex).Bank.Obj(j).index).Name & " Cantidad:" & UserList(UserIndex).Bank.Obj(j).Amount, FontTypeNames.FONTTYPE_INFO)
         End If
     Next
 
@@ -182,7 +182,7 @@ On Error Resume Next
         
         BankStr = DB_RS!Bank
         
-        DB_RS.Close
+        DB_RS_Close
         
         'Inventory string
         If LenB(BankStr) > 0 Then

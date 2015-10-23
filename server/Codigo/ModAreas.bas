@@ -4,12 +4,12 @@ Attribute VB_Name = "ModAreas"
 
 Option Explicit
 
-Public Type AreaInfo
-    AreaPerteneceX As Integer
-    AreaPerteneceY As Integer
+Public Type Areas
+    AreaPerteneceX As Double
+    AreaPerteneceY As Double
     
-    AreaReciveX As Integer
-    AreaReciveY As Integer
+    AreaReciveX As Double
+    AreaReciveY As Double
     
     MinX As Integer
     MinY As Integer
@@ -30,33 +30,30 @@ Public Const USER_NUEVO As Byte = 255
 Private CurDay As Byte
 Private CurHour As Byte
 
-Private AreasInfo(1 To 100, 1 To 100) As Byte
-Private PosToArea(1 To 100) As Byte
-
-Private AreasRecive(12) As Integer
-
+Private AreasIds(1 To 500, 1 To 500) As Integer
+Private AreasRecive(12) As Integer '12=NumeroDeAreas
 Public ConnGroups() As ConnGroup
 
 Public Sub InitAreas()
 
-    Dim LoopC As Long
-    Dim loopX As Long
+    Dim i As Byte
+    Dim X As Long
+    Dim Y As Long
 
+    Dim NumeroDeAreasMenosUno As Byte
+    NumeroDeAreasMenosUno = 11
+    
 'Setup areas...
-    For LoopC = 0 To 11
-        AreasRecive(LoopC) = (2 ^ LoopC) Or IIf(LoopC > 0, 2 ^ (LoopC - 1), 0) Or IIf(LoopC <> 11, 2 ^ (LoopC + 1), 0)
-    Next LoopC
-    
-    For LoopC = 1 To 100
-        PosToArea(LoopC) = LoopC \ 9
-    Next LoopC
-    
-    For LoopC = 1 To 100
-        For loopX = 1 To 100
+    For i = 1 To NumeroDeAreasMenosUno
+        AreasRecive(i) = (2 ^ i) Or IIf(i > 0, 2 ^ (i - 1), 0) Or IIf(i < NumeroDeAreasMenosUno, 2 ^ (i + 1), 0)
+    Next i
+        
+    For X = MinXBorder To MaxXBorder
+        For Y = MinYBorder To MaxYBorder
             'Usamos 121 IDs de area para saber si pasasamos de area "más rápido"
-            AreasInfo(LoopC, loopX) = (LoopC \ 9 + 1) * (loopX \ 9 + 1)
-        Next loopX
-    Next LoopC
+            AreasIds(X, Y) = (X \ 9 + 1) * (Y \ 9 + 1)
+        Next Y
+    Next X
 
 'Setup AutoOptimizacion de areas
     CurDay = IIf(Weekday(Date) > 6, 1, 2) 'A ke tipo de dia pertenece?
@@ -64,17 +61,17 @@ Public Sub InitAreas()
     
     ReDim ConnGroups(1 To NumMaps) As ConnGroup
     
-    For LoopC = 1 To NumMaps
-        ConnGroups(LoopC).OptValue = Val(GetVar(DatPath & "AreasStats.dat", "Mapa" & LoopC, CurDay & "-" & CurHour))
-        
-        If ConnGroups(LoopC).OptValue = 0 Then ConnGroups(LoopC).OptValue = 1
-        ReDim ConnGroups(LoopC).UserEntrys(1 To ConnGroups(LoopC).OptValue) As Long
-    Next LoopC
+    For X = 1 To NumMaps
+        ConnGroups(X).OptValue = Val(GetVar(DatPath & "AreasStats.dat", "Mapa" & X, CurDay & "-" & CurHour))
+        Debug.Print ConnGroups(X).OptValue
+        If ConnGroups(X).OptValue = 0 Then ConnGroups(X).OptValue = 1
+        ReDim ConnGroups(X).UserEntrys(1 To ConnGroups(X).OptValue) As Long
+    Next X
 End Sub
 
 Public Sub AreasOptimizacion()
 'Es la función de autooptimizacion.... la idea es no mandar redimensionando arrays grandes todo el tiempo
-
+    Exit Sub
     Dim LoopC As Long
     Dim tCurDay As Byte
     Dim tCurHour As Byte
@@ -94,9 +91,9 @@ Public Sub AreasOptimizacion()
                 ConnGroups(LoopC).OptValue = 1
             End If
             
-            If ConnGroups(LoopC).OptValue >= MapInfo(LoopC).Poblacion Then
-                ReDim Preserve ConnGroups(LoopC).UserEntrys(1 To ConnGroups(LoopC).OptValue) As Long
-            End If
+            'If ConnGroups(LoopC).OptValue >= MapInfo(LoopC).Poblacion Then
+            '    ReDim Preserve ConnGroups(LoopC).UserEntrys(1 To ConnGroups(LoopC).OptValue) As Long
+            'End If
         Next LoopC
         
         CurDay = tCurDay
@@ -106,96 +103,96 @@ End Sub
 
 Public Sub CheckUpdateNeededUser(ByVal UserIndex As Integer, ByVal Head As Byte, Optional ByVal ButIndex As Boolean = False)
     
-    If UserList(UserIndex).AreasInfo.AreaID = AreasInfo(UserList(UserIndex).Pos.x, UserList(UserIndex).Pos.y) Then
+    If UserList(UserIndex).Area.AreaID = AreasIds(UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y) Then
         Exit Sub
     End If
     
-    Dim MinX As Long, MaxX As Long, MinY As Long, MaxY As Long, x As Long, y As Long
-    Dim TempInt As Long, map As Long
+    Dim MinX As Long, MaxX As Long, MinY As Long, MaxY As Long, X As Long, Y As Long
+    Dim TempInt As Long, Map As Long
     
     With UserList(UserIndex)
-        MinX = .AreasInfo.MinX
-        MinY = .AreasInfo.MinY
+        MinX = .Area.MinX
+        MinY = .Area.MinY
         
         If Head = eHeading.NORTH Then
             MaxY = MinY - 1
             MinY = MinY - 9
             MaxX = MinX + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         
         ElseIf Head = eHeading.SOUTH Then
             MaxY = MinY + 35
             MinY = MinY + 27
             MaxX = MinX + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY - 18)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY - 18)
         
         ElseIf Head = eHeading.WEST Then
             MaxX = MinX - 1
             MinX = MinX - 9
             MaxY = MinY + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         
         ElseIf Head = eHeading.EAST Then
             MaxX = MinX + 35
             MinX = MinX + 27
             MaxY = MinY + 26
-            .AreasInfo.MinX = CInt(MinX - 18)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX - 18)
+            .Area.MinY = CInt(MinY)
            
         ElseIf Head = USER_NUEVO Then
             'Esto pasa por cuando cambiamos de mapa o logeamos...
-            MinY = ((.Pos.y \ 9) - 1) * 9
+            MinY = ((.Pos.Y \ 9) - 1) * 9
             MaxY = MinY + 26
             
-            MinX = ((.Pos.x \ 9) - 1) * 9
+            MinX = ((.Pos.X \ 9) - 1) * 9
             MaxX = MinX + 26
             
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         End If
         
-        If MinY < 1 Then
-            MinY = 1
+        If MinX < MinXBorder Then
+            MinX = MinXBorder
+        End If
+
+        If MaxX > MaxXBorder Then
+            MaxX = MaxXBorder
         End If
         
-        If MinX < 1 Then
-            MinX = 1
-        End If
-            
-        If MaxY > 100 Then
-            MaxY = 100
+        If MinY < MinYBorder Then
+            MinY = MinYBorder
         End If
         
-        If MaxX > 100 Then
-            MaxX = 100
+        If MaxY > MaxYBorder Then
+            MaxY = MaxYBorder
         End If
         
-        map = .Pos.map
+        Map = .Pos.Map
         
         'Esto es para ke el cliente elimine lo "fuera de area..."
         Call WriteAreaChanged(UserIndex)
         
         'Actualizamos!!!
-        For x = MinX To MaxX
-            For y = MinY To MaxY
+        For X = MinX To MaxX
+            For Y = MinY To MaxY
                 
                 '<<< User >>>
-                If maps(map).mapData(x, y).UserIndex > 0 Then
+                If MapData(X, Y).UserIndex > 0 Then
                     
-                    TempInt = maps(map).mapData(x, y).UserIndex
+                    TempInt = MapData(X, Y).UserIndex
                     
                     If UserIndex <> TempInt Then
                     
                         'If UserList(TempInt).Pos.Map <> Map Or UserList(TempInt).Pos.X <> X Or UserList(TempInt).Pos.Y <> Y Then
-                        '    maps(map).mapData( X, Y).UserIndex = 0
+                        '    MapData(x, Y).UserIndex = 0
                         
                         'Else
                             'Solo avisa al otro cliente si no es un admin invisible
                             If UserList(TempInt).flags.AdminInvisible < 1 Then
-                                Call MakeUserChar(False, UserIndex, TempInt, map, x, y)
+                                Call MakeUserChar(False, UserIndex, TempInt, Map, X, Y)
                                 
                                 'Si esta navegando, siempre esta visible
                                 If Not UserList(TempInt).flags.Navegando Then
@@ -210,7 +207,7 @@ Public Sub CheckUpdateNeededUser(ByVal UserIndex As Integer, ByVal Head As Byte,
                                          
                             'Solo avisa al otro cliente si no es un admin invisible
                             If .flags.AdminInvisible < 1 Then
-                                Call MakeUserChar(False, TempInt, UserIndex, .Pos.map, .Pos.x, .Pos.y)
+                                Call MakeUserChar(False, TempInt, UserIndex, .Pos.Map, .Pos.X, .Pos.Y)
                                 
                                 'Si esta navegando, siempre esta visible
                                 If Not .flags.Navegando Then
@@ -239,133 +236,133 @@ Public Sub CheckUpdateNeededUser(ByVal UserIndex As Integer, ByVal Head As Byte,
                     'ENEPECE
                     Dim TempNpc As Integer
                      
-                    TempNpc = maps(map).mapData(x, y).NpcIndex
+                    TempNpc = MapData(X, Y).NpcIndex
     
                     If TempNpc > 0 Then
-                        Call MakeNpcChar(False, TempNpc, map, x, y, UserIndex)
+                        Call MakeNpcChar(False, TempNpc, Map, X, Y, UserIndex)
                         If NpcList(TempNpc).flags.Paralizado > 0 Or NpcList(TempNpc).flags.Inmovilizado > 0 Then
                             Call WriteSetParalized(UserIndex, NpcList(TempNpc).Char.CharIndex, True)
                         End If
                     End If
                 End If
                 
-                TempInt = maps(map).mapData(x, y).ObjInfo.index
+                TempInt = MapData(X, Y).ObjInfo.index
     
                 'ITEM
                 If TempInt > 0 Then
                     Dim TempAmount As Long
                     
-                    TempAmount = maps(map).mapData(x, y).ObjInfo.Amount
+                    TempAmount = MapData(X, Y).ObjInfo.Amount
                     
                     If Not ItemEsDeMapa(ObjData(TempInt).Type) Then
                     
                         If ObjData(TempInt).Type = otGuita Then
-                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y, , TempAmount)
+                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y, , TempAmount)
                             
                         ElseIf ObjData(TempInt).Type = otPortal Then
-                            If maps(map).mapData(x, y).TileExit.map > 0 Then
-                                Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y, , 10000 + maps(map).mapData(x, y).TileExit.map)
+                            If MapData(X, Y).TileExit.Map > 0 Then
+                                Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y, , 10000 + MapData(X, Y).TileExit.Map)
                             End If
 
                         ElseIf ObjData(TempInt).Type = otAlijo Then
-                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y, ObjData(TempInt).name, 1)
+                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y, ObjData(TempInt).Name, 1)
 
                         ElseIf ObjData(TempInt).Type = otCuerpoMuerto Then
                             If TempAmount > 0 Then
                                 If UserList(TempAmount).Stats.Muerto Then
-                                    Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y, UserList(TempAmount).name)
+                                    Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y, UserList(TempAmount).Name)
                                 End If
                             End If
                             
-                            Call EraseObj(map, x, y, -1)
+                            Call EraseObj(Map, X, Y, -1)
                             
                         ElseIf ObjData(TempInt).Type = otPuerta Then
-                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y)
-                            Call Bloquear(False, UserIndex, x, y, maps(map).mapData(x, y).Blocked)
-                            Call Bloquear(False, UserIndex, x - 1, y, maps(map).mapData(x - 1, y).Blocked)
+                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y)
+                            Call Bloquear(False, UserIndex, X, Y, MapData(X, Y).Blocked)
+                            Call Bloquear(False, UserIndex, X - 1, Y, MapData(X - 1, Y).Blocked)
                         
                         ElseIf Not ObjData(TempInt).Agarrable Then
-                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y)
+                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y)
                         
                         Else
-                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, x, y, ObjData(TempInt).name, TempAmount)
+                            Call WriteObjCreate(UserIndex, ObjData(TempInt).GrhIndex, ObjData(TempInt).Type, X, Y, ObjData(TempInt).Name, TempAmount)
                         
-                            If maps(map).mapData(x, y).Blocked Then
-                                Call Bloquear(False, UserIndex, x, y, maps(map).mapData(x, y).Blocked)
+                            If MapData(X, Y).Blocked Then
+                                Call Bloquear(False, UserIndex, X, Y, MapData(X, Y).Blocked)
                             End If
                         End If
                     End If
                 End If
             
-            Next y
-        Next x
+            Next Y
+        Next X
         
         'Precalculados :P
-        TempInt = .Pos.x \ 9
-        .AreasInfo.AreaReciveX = AreasRecive(TempInt)
-        .AreasInfo.AreaPerteneceX = 2 ^ TempInt
+        TempInt = .Pos.X \ 9
+        .Area.AreaReciveX = AreasRecive(TempInt)
+        .Area.AreaPerteneceX = 2 ^ TempInt
         
-        TempInt = .Pos.y \ 9
-        .AreasInfo.AreaReciveY = AreasRecive(TempInt)
-        .AreasInfo.AreaPerteneceY = 2 ^ TempInt
+        TempInt = .Pos.Y \ 9
+        .Area.AreaReciveY = AreasRecive(TempInt)
+        .Area.AreaPerteneceY = 2 ^ TempInt
         
-        .AreasInfo.AreaID = AreasInfo(.Pos.x, .Pos.y)
+        .Area.AreaID = AreasIds(.Pos.X, .Pos.Y)
     End With
 End Sub
 
 Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
     
-    If NpcList(NpcIndex).AreasInfo.AreaID = AreasInfo(NpcList(NpcIndex).Pos.x, NpcList(NpcIndex).Pos.y) Then
+    If NpcList(NpcIndex).Area.AreaID = AreasIds(NpcList(NpcIndex).Pos.X, NpcList(NpcIndex).Pos.Y) Then
         Exit Sub
     End If
     
-    Dim MinX As Long, MaxX As Long, MinY As Long, MaxY As Long, x As Long, y As Long
+    Dim MinX As Long, MaxX As Long, MinY As Long, MaxY As Long, X As Long, Y As Long
     Dim TempInt As Long
     
     With NpcList(NpcIndex)
-        MinX = .AreasInfo.MinX
-        MinY = .AreasInfo.MinY
+        MinX = .Area.MinX
+        MinY = .Area.MinY
         
         If Head = eHeading.NORTH Then
             MaxY = MinY - 1
             MinY = MinY - 9
             MaxX = MinX + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         
         ElseIf Head = eHeading.SOUTH Then
             MaxY = MinY + 35
             MinY = MinY + 27
             MaxX = MinX + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY - 18)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY - 18)
         
         ElseIf Head = eHeading.WEST Then
             MaxX = MinX - 1
             MinX = MinX - 9
             MaxY = MinY + 26
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         
         
         ElseIf Head = eHeading.EAST Then
             MaxX = MinX + 35
             MinX = MinX + 27
             MaxY = MinY + 26
-            .AreasInfo.MinX = CInt(MinX - 18)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX - 18)
+            .Area.MinY = CInt(MinY)
         
            
         ElseIf Head = USER_NUEVO Then
             'Esto pasa por cuando cambiamos de mapa o logeamos...
-            MinY = ((.Pos.y \ 9) - 1) * 9
+            MinY = ((.Pos.Y \ 9) - 1) * 9
             MaxY = MinY + 26
             
-            MinX = ((.Pos.x \ 9) - 1) * 9
+            MinX = ((.Pos.X \ 9) - 1) * 9
             MaxX = MinX + 26
             
-            .AreasInfo.MinX = CInt(MinX)
-            .AreasInfo.MinY = CInt(MinY)
+            .Area.MinX = CInt(MinX)
+            .Area.MinY = CInt(MinY)
         End If
         
         If MinY < 1 Then
@@ -376,91 +373,88 @@ Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
             MinX = 1
         End If
         
-        If MaxY > 100 Then
-            MaxY = 100
+        If MaxY > MaxYBorder Then
+            MaxY = MaxYBorder
         End If
         
-        If MaxX > 100 Then
-            MaxX = 100
+        If MaxX > MaxXBorder Then
+            MaxX = MaxXBorder
         End If
         
         Dim TempUserIndex As Integer
         
-        'Actualizamos!!!
-        If MapInfo(.Pos.map).Poblacion > 0 Then
-            For x = MinX To MaxX
-                For y = MinY To MaxY
-                    TempUserIndex = maps(.Pos.map).mapData(x, y).UserIndex
-                    If TempUserIndex > 0 Then
-                        Call MakeNpcChar(False, NpcIndex, .Pos.map, .Pos.x, .Pos.y, TempUserIndex)
-                        
-                        If NpcList(NpcIndex).flags.Paralizado > 0 Then
-                            Call WriteSetParalized(TempUserIndex, NpcList(NpcIndex).Char.CharIndex, True)
-                        End If
+        For X = MinX To MaxX
+            For Y = MinY To MaxY
+                TempUserIndex = MapData(X, Y).UserIndex
+                If TempUserIndex > 0 Then
+                    Call MakeNpcChar(False, NpcIndex, .Pos.Map, .Pos.X, .Pos.Y, TempUserIndex)
+                    
+                    If NpcList(NpcIndex).flags.Paralizado > 0 Then
+                        Call WriteSetParalized(TempUserIndex, NpcList(NpcIndex).Char.CharIndex, True)
                     End If
-                Next y
-            Next x
-        End If
+                End If
+            Next Y
+        Next X
         
         'Precalculados :P
-        TempInt = .Pos.x \ 9
-        .AreasInfo.AreaReciveX = AreasRecive(TempInt)
-        .AreasInfo.AreaPerteneceX = 2 ^ TempInt
+        TempInt = .Pos.X \ 9
+        .Area.AreaReciveX = AreasRecive(TempInt)
+        .Area.AreaPerteneceX = 2 ^ TempInt
             
-        TempInt = .Pos.y \ 9
-        .AreasInfo.AreaReciveY = AreasRecive(TempInt)
-        .AreasInfo.AreaPerteneceY = 2 ^ TempInt
+        TempInt = .Pos.Y \ 9
+        .Area.AreaReciveY = AreasRecive(TempInt)
+        .Area.AreaPerteneceY = 2 ^ TempInt
         
-        .AreasInfo.AreaID = AreasInfo(.Pos.x, .Pos.y)
+        .Area.AreaID = AreasIds(.Pos.X, .Pos.Y)
     End With
 End Sub
 
-Public Sub QuitarUser(ByVal UserIndex As Integer, ByVal map As Integer)
+Public Sub QuitarUser(ByVal UserIndex As Integer, ByVal Map As Integer)
 
     Dim TempVal As Long
     Dim LoopC As Long
     
     'Search for the user
-    For LoopC = 1 To ConnGroups(map).CountEntrys
-        If ConnGroups(map).UserEntrys(LoopC) = UserIndex Then
+    For LoopC = 1 To ConnGroups(Map).CountEntrys
+        If ConnGroups(Map).UserEntrys(LoopC) = UserIndex Then
             Exit For
         End If
     Next LoopC
     
     'Char not found
-    If LoopC > ConnGroups(map).CountEntrys Then
+    If LoopC > ConnGroups(Map).CountEntrys Then
         Exit Sub
     End If
     
     'Remove from old map
-    ConnGroups(map).CountEntrys = ConnGroups(map).CountEntrys - 1
-    TempVal = ConnGroups(map).CountEntrys
+    ConnGroups(Map).CountEntrys = ConnGroups(Map).CountEntrys - 1
+    TempVal = ConnGroups(Map).CountEntrys
     
     'Move list back
     For LoopC = LoopC To TempVal
-        ConnGroups(map).UserEntrys(LoopC) = ConnGroups(map).UserEntrys(LoopC + 1)
+        ConnGroups(Map).UserEntrys(LoopC) = ConnGroups(Map).UserEntrys(LoopC + 1)
     Next LoopC
     
-    If TempVal > ConnGroups(map).OptValue Then 'Nescesito Redim?
-        ReDim Preserve ConnGroups(map).UserEntrys(1 To TempVal) As Long
+    If TempVal > ConnGroups(Map).OptValue Then 'Nescesito Redim?
+        ReDim Preserve ConnGroups(Map).UserEntrys(1 To TempVal) As Long
     End If
 End Sub
 
-Public Sub AgregarUser(ByVal UserIndex As Integer, ByVal map As Integer)
+Public Sub AgregarUser(ByVal UserIndex As Integer, ByVal Map As Integer)
 
     Dim TempVal As Long
     Dim EsNuevo As Boolean
     Dim i As Long
     
-    If Not MapaValido(map) Then
+    If Not MapaValido(Map) Then
         Exit Sub
     End If
     
     EsNuevo = True
     
     'Prevent adding repeated users
-    For i = 1 To ConnGroups(map).CountEntrys
-        If ConnGroups(map).UserEntrys(i) = UserIndex Then
+    For i = 1 To ConnGroups(Map).CountEntrys
+        If ConnGroups(Map).UserEntrys(i) = UserIndex Then
             EsNuevo = False
             Exit For
         End If
@@ -468,23 +462,23 @@ Public Sub AgregarUser(ByVal UserIndex As Integer, ByVal map As Integer)
     
     If EsNuevo Then
         'Update map and connection groups data
-        ConnGroups(map).CountEntrys = ConnGroups(map).CountEntrys + 1
-        TempVal = ConnGroups(map).CountEntrys
+        ConnGroups(Map).CountEntrys = ConnGroups(Map).CountEntrys + 1
+        TempVal = ConnGroups(Map).CountEntrys
         
-        If TempVal > ConnGroups(map).OptValue Then 'Nescesito Redim
-            ReDim Preserve ConnGroups(map).UserEntrys(1 To TempVal) As Long
+        If TempVal > ConnGroups(Map).OptValue Then 'Nescesito Redim
+            ReDim Preserve ConnGroups(Map).UserEntrys(1 To TempVal) As Long
         End If
         
-        ConnGroups(map).UserEntrys(TempVal) = UserIndex
+        ConnGroups(Map).UserEntrys(TempVal) = UserIndex
     End If
     
     'Update user
-    UserList(UserIndex).AreasInfo.AreaID = 0
+    UserList(UserIndex).Area.AreaID = 0
     
-    UserList(UserIndex).AreasInfo.AreaPerteneceX = 0
-    UserList(UserIndex).AreasInfo.AreaPerteneceY = 0
-    UserList(UserIndex).AreasInfo.AreaReciveX = 0
-    UserList(UserIndex).AreasInfo.AreaReciveY = 0
+    UserList(UserIndex).Area.AreaPerteneceX = 0
+    UserList(UserIndex).Area.AreaPerteneceY = 0
+    UserList(UserIndex).Area.AreaReciveX = 0
+    UserList(UserIndex).Area.AreaReciveY = 0
     
     Call CheckUpdateNeededUser(UserIndex, USER_NUEVO)
 End Sub

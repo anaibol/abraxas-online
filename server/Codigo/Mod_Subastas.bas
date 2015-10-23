@@ -47,7 +47,7 @@ Public Sub Iniciar_Subasta(ByVal UserIndex As Integer, ByVal ObjIndex As Integer
             
             .Tiempo = 3 '3 Minutos de Subasta
                         
-            Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] " & UserList(.UserIndex).Name & " está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ".", FontTypeNames.FONTTYPE_INFO))
+            Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] " & UserList(.UserIndex).Name & " está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ".", FontTypeNames.FONTTYPE_INFO))
             
             Call EraseObj(UserList(UserIndex).Pos.Map, UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y, .Objeto.Amount)
             
@@ -102,9 +102,9 @@ Public Sub Ofertar_Subasta(ByVal UserIndex As Integer, Oferta As Long)
         
         If .Tiempo = 1 Then
             .Tiempo = Tiempo + 1
-            Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ofertó " & .OfertaMayor & " monedas de oro. La subasta se alargó en 1 minuto.", FontTypeNames.FONTTYPE_INFO))
+            Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ofertó " & .OfertaMayor & " monedas de oro. La subasta se alargó en 1 minuto.", FontTypeNames.FONTTYPE_INFO))
         Else
-            Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ofertó " & .OfertaMayor & " monedas de oro.", FontTypeNames.FONTTYPE_INFO))
+            Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ofertó " & .OfertaMayor & " monedas de oro.", FontTypeNames.FONTTYPE_INFO))
         End If
     End With
 End Sub
@@ -120,9 +120,9 @@ Public Sub Actualizar_Subasta()
                 Call Termina_Subasta
             Else
                 If .UserIndex <> -1 Then
-                    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] " & UserList(.UserIndex).Name & " está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ". La mejor oferta es de " & .OfertaMayor & " monedas de oro. La subasta seguirá por " & .Tiempo & IIf(.Tiempo > 1, " minutos.", " minuto."), FontTypeNames.FONTTYPE_INFO))
+                    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] " & UserList(.UserIndex).Name & " está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ". La mejor oferta es de " & .OfertaMayor & " monedas de oro. La subasta seguirá por " & .Tiempo & IIf(.Tiempo > 1, " minutos.", " minuto."), FontTypeNames.FONTTYPE_INFO))
                 Else
-                    Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] Se está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ". La oferta actual es de " & .OfertaMayor & ". Esta subasta seguirá por " & .Tiempo & IIf(.Tiempo > 1, " minutos.", " minuto."), FontTypeNames.FONTTYPE_INFO))
+                    Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] Se está subastando " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & ". La oferta actual es de " & .OfertaMayor & ". Esta subasta seguirá por " & .Tiempo & IIf(.Tiempo > 1, " minutos.", " minuto."), FontTypeNames.FONTTYPE_INFO))
                 End If
             End If
         End If
@@ -132,7 +132,7 @@ End Sub
 Public Sub Termina_Subasta()
     With Subasta
         If .OfertaIndex = 0 Then
-            Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] La subasta de " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & " terminó sin ninguna oferta.", FontTypeNames.FONTTYPE_INFO))
+            Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] La subasta de " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & " terminó sin ninguna oferta.", FontTypeNames.FONTTYPE_INFO))
        
             If .UserIndex <> -1 Then
                 Call MeterEnInventario(.UserIndex, .Objeto)
@@ -146,7 +146,7 @@ Public Sub Termina_Subasta()
             .Tiempo = 0
         Else
             If .OfertaIndex <> -1 Then
-                Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ganó la subasta de " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & " por " & .OfertaMayor & " monedas de oro.", FontTypeNames.FONTTYPE_INFO))
+                Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("[Subasta] " & UserList(.OfertaIndex).Name & " ganó la subasta de " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & " por " & .OfertaMayor & " monedas de oro.", FontTypeNames.FONTTYPE_INFO))
     
                 If MeterEnInventario(.OfertaIndex, .Objeto) Then
                     Call WriteConsoleMsg(.OfertaIndex, "Felicitaciones, ganaste la subasta de " & .Objeto.Amount & " " & ObjData(.Objeto.index).Name & " por " & .OfertaMayor & " monedas de oro.", FontTypeNames.FONTTYPE_INFO)

@@ -4,28 +4,28 @@ Option Explicit
 
 Public Function TirarItemAlPiso(Pos As WorldPos, Obj As Obj, Optional NotPirata As Boolean = True, Optional UserIndexDrop As Integer = 0) As WorldPos
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     If Obj.index < 1 Then
         Exit Function
     End If
     
-    If maps(Pos.map).mapData(Pos.x, Pos.y).ObjInfo.index > 0 Then
-        If maps(Pos.map).mapData(Pos.x, Pos.y).ObjInfo.index = Obj.index Then
-            Call MakeObj(Obj, Pos.map, Pos.x, Pos.y)
+    If MapData(Pos.X, Pos.Y).ObjInfo.index > 0 Then
+        If MapData(Pos.X, Pos.Y).ObjInfo.index = Obj.index Then
+            Call MakeObj(Obj, Pos.Map, Pos.X, Pos.Y)
             TirarItemAlPiso = Pos
         Else
             Dim NuevaPos As WorldPos
             
             Call Tilelibre(Pos, NuevaPos, Obj.index, NotPirata, True)
     
-            If NuevaPos.x > 0 And NuevaPos.y > 0 Then
-                Call MakeObj(Obj, NuevaPos.map, NuevaPos.x, NuevaPos.y)
+            If NuevaPos.X > 0 And NuevaPos.Y > 0 Then
+                Call MakeObj(Obj, NuevaPos.Map, NuevaPos.X, NuevaPos.Y)
                 TirarItemAlPiso = NuevaPos
             End If
         End If
     Else
-        Call MakeObj(Obj, Pos.map, Pos.x, Pos.y)
+        Call MakeObj(Obj, Pos.Map, Pos.X, Pos.Y)
         TirarItemAlPiso = Pos
     End If
     
@@ -60,12 +60,12 @@ On Error GoTo ErrHandler
                 Sonido = SND_DROP_COINS
         End Select
         
-        Call SendData(SendTarget.ToPCArea, UserIndexDrop, PrepareMessagePlayWave(Sonido, Pos.x, Pos.y))
+        Call SendData(SendTarget.ToPCArea, UserIndexDrop, Msg_SoundFX(Sonido, Pos.X, Pos.Y))
     
     End If
     
     Exit Function
-ErrHandler:
+errhandler:
 
 End Function
 
@@ -126,7 +126,7 @@ Public Sub NpcTirarItems(ByRef Npc As Npc, ByVal UserIndexMatador As Integer)
                     Call TirarOroNpc(.Drop(i).Amount * MultiplicadorGld, Npc.Pos)
                 
                     If Not TiroOro Then
-                        Call SendData(SendTarget.ToPCArea, UserIndexMatador, PrepareMessagePlayWave(SND_DROP_COINS, .Pos.x, .Pos.y))
+                        Call SendData(SendTarget.ToPCArea, UserIndexMatador, Msg_SoundFX(SND_DROP_COINS, .Pos.X, .Pos.Y))
                         TiroOro = True
                     End If
                     
@@ -269,7 +269,7 @@ End Sub
 
 Public Sub TirarOroNpc(ByVal Cantidad As Long, ByRef Pos As WorldPos)
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     If Cantidad > 0 Then
         Dim MiObj As Obj
@@ -282,7 +282,7 @@ On Error GoTo ErrHandler
 
     Exit Sub
 
-ErrHandler:
+errhandler:
     Call LogError("Error en TirarOro. Error " & Err.Number & ": " & Err.description)
 End Sub
 

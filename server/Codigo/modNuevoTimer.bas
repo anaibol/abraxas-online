@@ -150,7 +150,7 @@ Public Function IntervaloPermiteUsar(ByVal UserIndex As Integer, Optional ByVal 
         
         'Tolerancia arbitraria - 20 es MUY alta, la está chiteando zarpado
         If UserList(UserIndex).Counters.failedUsageAttempts = 20 Then
-            Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(UserList(UserIndex).Name & " kicked by the server por posible modificación de intervalos.", FontTypeNames.FONTTYPE_FIGHT))
+            Call SendData(SendTarget.ToAdmins, 0, Msg_ConsoleMsg(UserList(UserIndex).Name & " kicked by the server por posible modificación de intervalos.", FontTypeNames.FONTTYPE_FIGHT))
             Call CloseSocket(UserIndex)
         End If
     End If

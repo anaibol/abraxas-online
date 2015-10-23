@@ -210,7 +210,7 @@ Public Sub AprobarIngresoAParty(ByVal Leader As Integer, ByVal NewMember As Inte
                     Else
                         'no pudo entrar
                         'ACA UNO PUEDE CODIFICAR OTRO TIPO DE ERRORES...
-                        Call SendData(SendTarget.ToAdmins, Leader, PrepareMessageConsoleMsg(" Servidor> CATASTROFE EN PARTIES, NUEVOMIEMBRO DIO FALSE! :S ", FontTypeNames.FONTTYPE_PARTY))
+                        Call SendData(SendTarget.ToAdmins, Leader, Msg_ConsoleMsg(" Servidor> CATASTROFE EN PARTIES, NUEVOMIEMBRO DIO FALSE! :S ", FontTypeNames.FONTTYPE_PARTY))
                         End If
                     Else
                     'no debe entrar
@@ -298,16 +298,16 @@ Public Sub ActualizaExperiencias()
     
     If Not PARTY_EXPERIENCIAPORGOLPE Then
         haciendoBK = True
-        Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+        Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
         
-        'Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Distribuyendo experiencia en parties.", FontTypeNames.FONTTYPE_SERVER))
+        'Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> Distribuyendo experiencia en parties.", FontTypeNames.FONTTYPE_SERVER))
         For i = 1 To Max_PARTIES
             If Not Parties(i) Is Nothing Then
                 Call Parties(i).FlushExperiencia
             End If
         Next i
-        'Call SendData(SendTarget.ToAll, 0, PrepareMessageConsoleMsg("Servidor> Experiencia distribuida.", FontTypeNames.FONTTYPE_SERVER))
-        Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+        'Call SendData(SendTarget.ToAll, 0, Msg_ConsoleMsg("Servidor> Experiencia distribuida.", FontTypeNames.FONTTYPE_SERVER))
+        Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
         haciendoBK = False
     End If
 

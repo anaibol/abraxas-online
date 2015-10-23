@@ -4892,7 +4892,6 @@ Public Sub WriteLoginChar()
         
         Call .WriteASCIIString(UserName)
         Call .WriteASCIIString(UserPassword)
-        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
     End With
 End Sub
 
@@ -4918,7 +4917,6 @@ Public Sub WriteLoginNewChar()
         
         Call .WriteASCIIString(UserEmail)
         
-        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
     End With
 End Sub
 

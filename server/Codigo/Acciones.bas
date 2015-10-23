@@ -1,7 +1,7 @@
 Attribute VB_Name = "Acciones"
 Option Explicit
 
-Public Sub AccionParaPuerta(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer, ByVal UserIndex As Integer)
+Public Sub AccionParaPuerta(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer, ByVal UserIndex As Integer)
 
 On Error Resume Next
 
@@ -9,47 +9,40 @@ On Error Resume Next
         Exit Sub
     End If
     
-    If Distance(UserList(UserIndex).Pos.x, UserList(UserIndex).Pos.y, x, y) < 3 Then
+    If Distance(UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y, X, Y) < 3 Then
     
-        With maps(map).mapData(x, y)
+        With MapData(X, Y)
         
-            If Not ObjData(.ObjInfo.index).Llave Then
+            If ObjData(.ObjInfo.index).Llave < 1 Then
                 If ObjData(.ObjInfo.index).Cerrada Then
-                    'Abre la puerta
-                    If Not ObjData(.ObjInfo.index).Llave Then
-                        
-                        .ObjInfo.index = ObjData(.ObjInfo.index).IndexAbierta
-                        
-                        Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y))
-                        
-                        'Desbloquea
-                        .Blocked = False
-                        maps(map).mapData(x - 1, y).Blocked = False
-                        
-                        'Bloquea todos los mapas
-                        Call Bloquear(True, map, x, y, 0)
-                        Call Bloquear(True, map, x - 1, y, 0)
-                          
-                        'Sonido
-                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_PUERTA, x, y))
-                        
-                    Else
-                         Call WriteConsoleMsg(UserIndex, "La puerta esta cerrada con llave.", FontTypeNames.FONTTYPE_INFO)
-                    End If
+                    .ObjInfo.index = ObjData(.ObjInfo.index).IndexAbierta
+                    
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y))
+                    
+                    'Desbloquea
+                    .Blocked = False
+                    MapData(X - 1, Y).Blocked = False
+                    
+                    'Bloquea todos los mapas
+                    Call Bloquear(True, Map, X, Y, 0)
+                    Call Bloquear(True, Map, X - 1, Y, 0)
+                      
+                    'Sonido
+                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_PUERTA, X, Y))
                 Else
                     'Cierra puerta
                     .ObjInfo.index = ObjData(.ObjInfo.index).IndexCerrada
                     
-                    Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y))
+                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y))
                                     
                     .Blocked = True
-                    maps(map).mapData(x - 1, y).Blocked = True
+                    MapData(X - 1, Y).Blocked = True
                     
                     
-                    Call Bloquear(True, map, x - 1, y, 1)
-                    Call Bloquear(True, map, x, y, 1)
+                    Call Bloquear(True, Map, X - 1, Y, 1)
+                    Call Bloquear(True, Map, X, Y, 1)
                     
-                    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_PUERTA, x, y))
+                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_PUERTA, X, Y))
                 End If
                 
                 UserList(UserIndex).flags.TargetObjIndex = .ObjInfo.index
@@ -65,7 +58,7 @@ On Error Resume Next
 
 End Sub
 
-Public Sub AccionParaRamita(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer, ByVal UserIndex As Integer)
+Public Sub AccionParaRamita(ByVal Map As Integer, ByVal X As Integer, ByVal Y As Integer, ByVal UserIndex As Integer)
 On Error Resume Next
 
     Dim Suerte As Byte
@@ -73,9 +66,9 @@ On Error Resume Next
     Dim Obj As Obj
     
     Dim Pos As WorldPos
-    Pos.map = map
-    Pos.x = x
-    Pos.y = y
+    Pos.Map = Map
+    Pos.X = X
+    Pos.Y = Y
     
     With UserList(UserIndex)
         If Distancia(Pos, .Pos) > 2 Then
@@ -83,7 +76,7 @@ On Error Resume Next
             Exit Sub
         End If
         
-        If maps(map).mapData(x, y).Trigger = eTrigger.ZONASEGURA Or maps(map).mapData(x, y).Trigger = eTrigger.EnPlataforma Or MapInfo(map).PK = False Then
+        If MapData(X, Y).Trigger = eTrigger.ZONASEGURA Or MapData(X, Y).Trigger = eTrigger.EnPlataforma Or MapInfo(Map).PK = False Then
             Call WriteConsoleMsg(UserIndex, "No podés hacer fogatas en zona segura.", FontTypeNames.FONTTYPE_INFO)
             Exit Sub
         End If
@@ -99,13 +92,13 @@ On Error Resume Next
         exito = RandomNumber(1, Suerte)
     
         If exito = 1 Then
-            If MapInfo(.Pos.map).Zona <> Ciudad Then
+            If MapInfo(.Pos.Map).Zona <> Ciudad Then
                 Obj.index = FOGATA
                 Obj.Amount = 1
                 
                 Call WriteConsoleMsg(UserIndex, "Prendiste la fogata.", FontTypeNames.FONTTYPE_INFO)
                 
-                Call MakeObj(Obj, map, x, y)
+                Call MakeObj(Obj, Map, X, Y)
                 
                 'Las fogatas prendidas se deben eliminar
                 'Dim Fogatita As New cGarbage

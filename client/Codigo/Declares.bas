@@ -718,8 +718,6 @@ Public Consola As ConsolaLoqui
 
 'Public DragType As BeginDrag
 
-Public HDSerialOK As Boolean
-
 Public PicInvDragging As Boolean
 
 Public InvSelSlot As Byte

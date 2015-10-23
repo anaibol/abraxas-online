@@ -1,8 +1,8 @@
 Attribute VB_Name = "PathFinding"
 Option Explicit
 
-Private Const ROWS As Integer = 100
-Private Const COLUMS As Integer = 100
+Private Const ROWS As Integer = 500
+Private Const COLUMS As Integer = 300
 Private Const MaxINT As Integer = 1000
 
 Private Type tIntermidiateWork
@@ -17,11 +17,11 @@ Private Function Limites(ByVal vfila As Integer, ByVal vcolu As Integer)
     Limites = vcolu >= 1 And vcolu <= COLUMS And vfila >= 1 And vfila <= ROWS
 End Function
 
-Private Function IsWalkable(ByVal map As Integer, ByVal row As Integer, ByVal Col As Integer, ByVal NpcIndex As Integer) As Boolean
-    IsWalkable = Not maps(map).mapData(row, Col).Blocked And maps(map).mapData(row, Col).NpcIndex < 1
+Private Function IsWalkable(ByVal Map As Integer, ByVal Row As Integer, ByVal Col As Integer, ByVal NpcIndex As Integer) As Boolean
+    IsWalkable = Not MapData(Row, Col).Blocked And MapData(Row, Col).NpcIndex < 1
     
-    If maps(map).mapData(row, Col).UserIndex > 0 Then
-        If maps(map).mapData(row, Col).UserIndex <> NpcList(NpcIndex).TargetUser Then
+    If MapData(Row, Col).UserIndex > 0 Then
+        If MapData(Row, Col).UserIndex <> NpcList(NpcIndex).TargetUser Then
             IsWalkable = False
         End If
     End If
@@ -41,11 +41,11 @@ Private Sub ProcessAdjacents(ByVal MapIndex As Integer, ByRef T() As tIntermidia
             If T(j, vcolu).DistV = MaxINT Then
                 'Actualizamos la tabla de calculos intermedios
                 T(j, vcolu).DistV = T(vfila, vcolu).DistV + 1
-                T(j, vcolu).PrevV.x = vcolu
-                T(j, vcolu).PrevV.y = vfila
+                T(j, vcolu).PrevV.X = vcolu
+                T(j, vcolu).PrevV.Y = vfila
                 'Mete el vertice en la cola
-                V.x = vcolu
-                V.y = j
+                V.X = vcolu
+                V.Y = j
                 Call Push(V)
             End If
         End If
@@ -60,11 +60,11 @@ Private Sub ProcessAdjacents(ByVal MapIndex As Integer, ByRef T() As tIntermidia
             If T(j, vcolu).DistV = MaxINT Then
                 'Actualizamos la tabla de calculos intermedios
                 T(j, vcolu).DistV = T(vfila, vcolu).DistV + 1
-                T(j, vcolu).PrevV.x = vcolu
-                T(j, vcolu).PrevV.y = vfila
+                T(j, vcolu).PrevV.X = vcolu
+                T(j, vcolu).PrevV.Y = vfila
                 'Mete el vertice en la cola
-                V.x = vcolu
-                V.y = j
+                V.X = vcolu
+                V.Y = j
                 Call Push(V)
             End If
         End If
@@ -77,11 +77,11 @@ Private Sub ProcessAdjacents(ByVal MapIndex As Integer, ByRef T() As tIntermidia
                 If T(vfila, vcolu - 1).DistV = MaxINT Then
                     'Actualizamos la tabla de calculos intermedios
                     T(vfila, vcolu - 1).DistV = T(vfila, vcolu).DistV + 1
-                    T(vfila, vcolu - 1).PrevV.x = vcolu
-                    T(vfila, vcolu - 1).PrevV.y = vfila
+                    T(vfila, vcolu - 1).PrevV.X = vcolu
+                    T(vfila, vcolu - 1).PrevV.Y = vfila
                     'Mete el vertice en la cola
-                    V.x = vcolu - 1
-                    V.y = vfila
+                    V.X = vcolu - 1
+                    V.Y = vfila
                     Call Push(V)
                 End If
             End If
@@ -94,11 +94,11 @@ Private Sub ProcessAdjacents(ByVal MapIndex As Integer, ByRef T() As tIntermidia
             If T(vfila, vcolu + 1).DistV = MaxINT Then
                 'Actualizamos la tabla de calculos intermedios
                 T(vfila, vcolu + 1).DistV = T(vfila, vcolu).DistV + 1
-                T(vfila, vcolu + 1).PrevV.x = vcolu
-                T(vfila, vcolu + 1).PrevV.y = vfila
+                T(vfila, vcolu + 1).PrevV.X = vcolu
+                T(vfila, vcolu + 1).PrevV.Y = vfila
                 'Mete el vertice en la cola
-                V.x = vcolu + 1
-                V.y = vfila
+                V.X = vcolu + 1
+                V.Y = vfila
                 Call Push(V)
             End If
         End If
@@ -117,13 +117,13 @@ Public Sub SeekPath(ByVal NpcIndex As Integer)
     Dim V As tVertice
     Dim NpcMap As Integer
     
-    NpcMap = NpcList(NpcIndex).Pos.map
+    NpcMap = NpcList(NpcIndex).Pos.Map
         
-    cur_npc_pos.x = NpcList(NpcIndex).Pos.x
-    cur_npc_pos.y = NpcList(NpcIndex).Pos.y
+    cur_npc_pos.X = NpcList(NpcIndex).Pos.X
+    cur_npc_pos.Y = NpcList(NpcIndex).Pos.Y
     
-    tar_npc_pos.x = NpcList(NpcIndex).PFINFO.Target.x
-    tar_npc_pos.y = NpcList(NpcIndex).PFINFO.Target.y
+    tar_npc_pos.X = NpcList(NpcIndex).PFINFO.Target.X
+    tar_npc_pos.Y = NpcList(NpcIndex).PFINFO.Target.Y
     
     Call InitializeTable(TmpArray, cur_npc_pos)
     
@@ -135,11 +135,11 @@ Public Sub SeekPath(ByVal NpcIndex As Integer)
     Do While (Not IsEmpty)
         V = Pop
                 
-        If V.x = tar_npc_pos.x And V.y = tar_npc_pos.y Then
+        If V.X = tar_npc_pos.X And V.Y = tar_npc_pos.Y Then
             Exit Do
         End If
         
-        Call ProcessAdjacents(NpcMap, TmpArray, V.y, V.x, NpcIndex)
+        Call ProcessAdjacents(NpcMap, TmpArray, V.Y, V.X, NpcIndex)
     Loop
     
     Call MakePath(NpcIndex)
@@ -154,7 +154,7 @@ Private Sub MakePath(ByVal NpcIndex As Integer)
     Dim i As Integer
     
     With NpcList(NpcIndex)
-        Pasos = TmpArray(.PFINFO.Target.y, .PFINFO.Target.x).DistV
+        Pasos = TmpArray(.PFINFO.Target.Y, .PFINFO.Target.X).DistV
 
         If Pasos = MaxINT Or Pasos = 0 Then
             .PFINFO.PathLenght = 0
@@ -169,12 +169,12 @@ Private Sub MakePath(ByVal NpcIndex As Integer)
         
         ReDim .PFINFO.Path(0 To Pasos) As tVertice
         
-        miV.x = .PFINFO.Target.x
-        miV.y = .PFINFO.Target.y
+        miV.X = .PFINFO.Target.X
+        miV.Y = .PFINFO.Target.Y
         
         For i = Pasos To 1 Step -1
             .PFINFO.Path(i) = miV
-            miV = TmpArray(miV.y, miV.x).PrevV
+            miV = TmpArray(miV.Y, miV.X).PrevV
         Next i
         
         .PFINFO.CurPos = 1
@@ -190,18 +190,18 @@ Private Sub InitializeTable(ByRef T() As tIntermidiateWork, ByRef S As tVertice)
 
     Dim j As Integer, k As Integer
     
-    For j = S.y - MaxSteps To S.y + MaxSteps
-        For k = S.x - MaxSteps To S.x + MaxSteps
+    For j = S.Y - MaxSteps To S.Y + MaxSteps
+        For k = S.X - MaxSteps To S.X + MaxSteps
             If InMapBounds(1, j, k) Then
                 T(j, k).Known = False
                 T(j, k).DistV = MaxINT
-                T(j, k).PrevV.x = 0
-                T(j, k).PrevV.y = 0
+                T(j, k).PrevV.X = 0
+                T(j, k).PrevV.Y = 0
             End If
         Next
     Next
     
-    T(S.y, S.x).Known = False
-    T(S.y, S.x).DistV = 0
+    T(S.Y, S.X).Known = False
+    T(S.Y, S.X).DistV = 0
     
 End Sub

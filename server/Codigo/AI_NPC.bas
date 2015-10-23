@@ -16,8 +16,8 @@ Public Const ELEMENTALTIERRA As Integer = 94
 Public Const ELEMENTALAGUA As Integer = 92
 
 'Damos a los Npcs el mismo rango de visión que un PJ
-Public Const RANGO_VISION_X As Byte = 8
-Public Const RANGO_VISION_Y As Byte = 6
+Public Const RangoVisionX As Byte = 8
+Public Const RangoVisionY As Byte = 6
 
 Private Sub BuscarUserCerca(ByVal NpcIndex As Integer)
 
@@ -70,15 +70,15 @@ Private Sub BuscarUserCerca(ByVal NpcIndex As Integer)
         'End If
         
         If .TargetUser < 1 Then
-            For i = 1 To ModAreas.ConnGroups(.Pos.map).CountEntrys
-                UserIndex = ModAreas.ConnGroups(.Pos.map).UserEntrys(i)
+            For i = 1 To ModAreas.ConnGroups(.Pos.Map).CountEntrys
+                UserIndex = ModAreas.ConnGroups(.Pos.Map).UserEntrys(i)
                 
                 If UserIndex > 0 Then
                     UserProtected = Not IntervaloPermiteSerAtacado(UserIndex) And UserList(UserIndex).flags.NoPuedeSerAtacado
                     UserProtected = UserProtected Or UserList(UserIndex).flags.Ignorado Or UserList(UserIndex).flags.EnConsulta
                     
-                    If Abs(UserList(UserIndex).Pos.x - .Pos.x) > RangoVisionNpcx Or _
-                        Abs(UserList(UserIndex).Pos.y - .Pos.y) > RangoVisionNpcy Or _
+                    If Abs(UserList(UserIndex).Pos.X - .Pos.X) > RangoVisionNpcx Or _
+                        Abs(UserList(UserIndex).Pos.Y - .Pos.Y) > RangoVisionNpcy Or _
                         UserList(UserIndex).Stats.Muerto Or UserList(UserIndex).flags.Invisible > 0 Or UserList(UserIndex).flags.Oculto > 0 Or _
                         Not UserList(UserIndex).flags.AdminPerseguible Then
                         
@@ -101,8 +101,8 @@ Private Sub BuscarUserCerca(ByVal NpcIndex As Integer)
                     If .flags.Inmovilizado < 1 Or .Char.Heading = tHeading Then
                         Call HeadtoPos(tHeading, nPos)
                         
-                        If InMapBounds(nPos.map, nPos.x, nPos.y) Then
-                            UserIndex = maps(nPos.map).mapData(nPos.x, nPos.y).UserIndex
+                        If InMapBounds(nPos.Map, nPos.X, nPos.Y) Then
+                            UserIndex = MapData(nPos.X, nPos.Y).UserIndex
                             
                             If UserIndex > 0 Then
                                 UserProtected = Not IntervaloPermiteSerAtacado(UserIndex) And UserList(UserIndex).flags.NoPuedeSerAtacado
@@ -160,7 +160,7 @@ Private Sub AiNpcAtacaUser(ByVal NpcIndex As Integer)
     
     With NpcList(NpcIndex)
 
-        If Abs(.Pos.x - UserList(.TargetUser).Pos.x) > 10 Or Abs(.Pos.y - UserList(.TargetUser).Pos.y) > 8 Then
+        If Abs(.Pos.X - UserList(.TargetUser).Pos.X) > 10 Or Abs(.Pos.Y - UserList(.TargetUser).Pos.Y) > 8 Then
             Call BuscarUserCerca(NpcIndex)
         End If
         
@@ -182,7 +182,7 @@ Private Sub AiNpcAtacaUser(ByVal NpcIndex As Integer)
             AttackPos = .Pos
             Call HeadtoPos(.Char.Heading, AttackPos)
             
-            If maps(AttackPos.map).mapData(AttackPos.x, AttackPos.y).NpcIndex = .TargetUser Then
+            If MapData(AttackPos.X, AttackPos.Y).NpcIndex = .TargetUser Then
                 Ataca = True
             
             ElseIf .flags.Inmovilizado < 1 Then
@@ -192,7 +192,7 @@ Private Sub AiNpcAtacaUser(ByVal NpcIndex As Integer)
                 
                 If tHeading <> .Char.Heading Then
                     .Char.Heading = tHeading
-                    Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageChangeCharHeading(.Char.CharIndex, tHeading))
+                    Call SendData(SendTarget.ToNpcArea, NpcIndex, Msg_ChangeCharHeading(.Char.CharIndex, tHeading))
                 End If
             End If
         End If
@@ -239,12 +239,12 @@ End Sub
 Private Sub AiNpcAtacaNpc(ByVal NpcIndex As Integer)
     
     Dim tHeading As Byte
-    Dim x As Long
-    Dim y As Long
+    Dim X As Long
+    Dim Y As Long
         
     With NpcList(NpcIndex)
     
-        If Abs(.Pos.x - NpcList(.TargetNpc).Pos.x) > 10 Or Abs(.Pos.y - NpcList(.TargetNpc).Pos.y) > 8 Then
+        If Abs(.Pos.X - NpcList(.TargetNpc).Pos.X) > 10 Or Abs(.Pos.Y - NpcList(.TargetNpc).Pos.Y) > 8 Then
             If .MaestroUser > 0 Then
                 Call FollowAmo(NpcIndex)
             Else
@@ -290,7 +290,7 @@ Private Sub AiNpcAtacaNpc(ByVal NpcIndex As Integer)
             AttackPos = .Pos
             Call HeadtoPos(.Char.Heading, AttackPos)
             
-            If maps(AttackPos.map).mapData(AttackPos.x, AttackPos.y).NpcIndex = .TargetNpc Then
+            If MapData(AttackPos.X, AttackPos.Y).NpcIndex = .TargetNpc Then
                 Call NpcAtacaNpc(NpcIndex, .TargetNpc)
             End If
         End If
@@ -307,7 +307,7 @@ Private Sub AiNpcAtacaNpc(ByVal NpcIndex As Integer)
             
             ElseIf tHeading <> .Char.Heading Then
                 .Char.Heading = tHeading
-                Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageChangeCharHeading(.Char.CharIndex, tHeading))
+                Call SendData(SendTarget.ToNpcArea, NpcIndex, Msg_ChangeCharHeading(.Char.CharIndex, tHeading))
             End If
         End If
         
@@ -320,22 +320,22 @@ Public Sub Resucitar(ByVal NpcIndex As Integer)
     Dim i As Long
     
     With NpcList(NpcIndex)
-        For i = 1 To ModAreas.ConnGroups(.Pos.map).CountEntrys
-            UserIndex = ModAreas.ConnGroups(.Pos.map).UserEntrys(i)
+        For i = 1 To ModAreas.ConnGroups(.Pos.Map).CountEntrys
+            UserIndex = ModAreas.ConnGroups(.Pos.Map).UserEntrys(i)
             
             'Is it in it's range of vision??
-            If Abs(UserList(UserIndex).Pos.x - .Pos.x) <= RANGO_VISION_X Then
-                If Abs(UserList(UserIndex).Pos.y - .Pos.y) <= RANGO_VISION_Y Then
+            If Abs(UserList(UserIndex).Pos.X - .Pos.X) <= RangoVisionX Then
+                If Abs(UserList(UserIndex).Pos.Y - .Pos.Y) <= RangoVisionY Then
                     
                     With UserList(UserIndex)
                         If .Stats.Muerto Then
-                            If maps(.Pos.map).mapData(.Pos.x, .Pos.y).Blocked Then
+                            If MapData(.Pos.X, .Pos.Y).Blocked Then
                                 Exit Sub
                             End If
                             
                             Call RevivirUsuario(UserIndex)
-                            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(.Pos.x, .Pos.y, 9))
-                            Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(18, .Pos.x, .Pos.y))
+                            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_CreateFX(.Pos.X, .Pos.Y, 9))
+                            Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(18, .Pos.X, .Pos.Y))
                         Else
                             Dim FX As Byte
                             
@@ -365,12 +365,12 @@ Public Sub Resucitar(ByVal NpcIndex As Integer)
                                     FX = 9
                                 End If
                             
-                                Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessageCreateFX(.Pos.x, .Pos.y, FX))
+                                Call SendData(SendTarget.ToPCArea, UserIndex, Msg_CreateFX(.Pos.X, .Pos.Y, FX))
                                 
                                 If FX = 9 Then
-                                    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(18, .Pos.x, .Pos.y))
+                                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(18, .Pos.X, .Pos.Y))
                                 Else
-                                    Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(16, .Pos.x, .Pos.y))
+                                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(16, .Pos.X, .Pos.Y))
                                 End If
                                 
                                 Exit Sub
@@ -464,7 +464,7 @@ Public Sub NpcPetAi()
                         Else
                             .flags.Paralizado = 0
                             .flags.Inmovilizado = 0
-                            Call SendData(SendTarget.ToNPCArea, NpcIndex, PrepareMessageSetParalized(.Char.CharIndex, 0))
+                            Call SendData(SendTarget.ToNpcArea, NpcIndex, Msg_SetParalized(.Char.CharIndex, 0))
                         End If
                         
                     Else
@@ -502,9 +502,9 @@ Public Function FollowPath(ByVal NpcIndex As Integer) As Boolean
             Exit Function
         End If
             
-        tmpPos.map = .Pos.map
-        tmpPos.x = .PFINFO.Path(.PFINFO.CurPos).y 'invertimos las coordenadas
-        tmpPos.y = .PFINFO.Path(.PFINFO.CurPos).x
+        tmpPos.Map = .Pos.Map
+        tmpPos.X = .PFINFO.Path(.PFINFO.CurPos).Y 'invertimos las coordenadas
+        tmpPos.Y = .PFINFO.Path(.PFINFO.CurPos).X
         'Debug.Print "(" & tmpPos.X & "," & tmpPos.Y & ")"
         
         tHeading = FindDirection(.Pos, tmpPos)
@@ -524,11 +524,11 @@ End Function
 Public Function PathFindingAI(ByVal NpcIndex As Integer) As Boolean
     With NpcList(NpcIndex)
         If .TargetUser > 0 Then
-            .PFINFO.Target.x = UserList(.TargetUser).Pos.y
-            .PFINFO.Target.y = UserList(.TargetUser).Pos.x
+            .PFINFO.Target.X = UserList(.TargetUser).Pos.Y
+            .PFINFO.Target.Y = UserList(.TargetUser).Pos.X
         ElseIf .TargetNpc > 0 Then
-            .PFINFO.Target.x = NpcList(.TargetNpc).Pos.y
-            .PFINFO.Target.y = NpcList(.TargetNpc).Pos.x
+            .PFINFO.Target.X = NpcList(.TargetNpc).Pos.Y
+            .PFINFO.Target.Y = NpcList(.TargetNpc).Pos.X
         End If
     End With
     

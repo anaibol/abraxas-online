@@ -11,24 +11,24 @@ Public Sub CargarSpawnList()
     Next LoopC
 End Sub
 
-Public Function EsAdmin(ByVal name As String) As Boolean
-    EsAdmin = (Val(Administradores.GetValue("Admin", name)) = 1)
+Public Function EsAdmin(ByVal Name As String) As Boolean
+    EsAdmin = (Val(Administradores.GetValue("Admin", Name)) = 1)
 End Function
 
-Public Function EsDios(ByVal name As String) As Boolean
-    EsDios = (Val(Administradores.GetValue("Dios", name)) = 1)
+Public Function EsDios(ByVal Name As String) As Boolean
+    EsDios = (Val(Administradores.GetValue("Dios", Name)) = 1)
 End Function
 
-Public Function EsSemiDios(ByVal name As String) As Boolean
-    EsSemiDios = (Val(Administradores.GetValue("SemiDios", name)) = 1)
+Public Function EsSemiDios(ByVal Name As String) As Boolean
+    EsSemiDios = (Val(Administradores.GetValue("SemiDios", Name)) = 1)
 End Function
 
-Public Function EsConsejero(ByVal name As String) As Boolean
-    EsConsejero = (Val(Administradores.GetValue("Consejero", name)) = 1)
+Public Function EsConsejero(ByVal Name As String) As Boolean
+    EsConsejero = (Val(Administradores.GetValue("Consejero", Name)) = 1)
 End Function
 
-Public Function EsRolesMaster(ByVal name As String) As Boolean
-    EsRolesMaster = (Val(Administradores.GetValue("RM", name)) = 1)
+Public Function EsRolesMaster(ByVal Name As String) As Boolean
+    EsRolesMaster = (Val(Administradores.GetValue("RM", Name)) = 1)
 End Function
 
 Public Sub LoadAdministrativeUsers()
@@ -41,7 +41,7 @@ Public Sub LoadAdministrativeUsers()
     'Si esta mierda tuviese array asociativos el código sería tan lindo.
     Dim buf As Integer
     Dim i As Long
-    Dim name As String
+    Dim Name As String
        
     'Public container
     Set Administradores = New clsIniManager
@@ -56,14 +56,14 @@ Public Sub LoadAdministrativeUsers()
     buf = Val(AdminsIni.GetValue("INIT", "Admines"))
     
     For i = 1 To buf
-        name = UCase$(AdminsIni.GetValue("Admines", "Admin" & i))
+        Name = UCase$(AdminsIni.GetValue("Admines", "Admin" & i))
         
-        If Left$(name, 1) = "*" Or Left$(name, 1) = "+" Then
-            name = Right$(name, Len(name) - 1)
+        If Left$(Name, 1) = "*" Or Left$(Name, 1) = "+" Then
+            Name = Right$(Name, Len(Name) - 1)
         End If
         
         'Add key
-        Call Administradores.ChangeValue("Admin", name, "1")
+        Call Administradores.ChangeValue("Admin", Name, "1")
 
     Next i
     
@@ -71,14 +71,14 @@ Public Sub LoadAdministrativeUsers()
     buf = Val(AdminsIni.GetValue("INIT", "Dioses"))
     
     For i = 1 To buf
-        name = UCase$(AdminsIni.GetValue("Dioses", "Dios" & i))
+        Name = UCase$(AdminsIni.GetValue("Dioses", "Dios" & i))
         
-        If Left$(name, 1) = "*" Or Left$(name, 1) = "+" Then
-            name = Right$(name, Len(name) - 1)
+        If Left$(Name, 1) = "*" Or Left$(Name, 1) = "+" Then
+            Name = Right$(Name, Len(Name) - 1)
         End If
         
         'Add key
-        Call Administradores.ChangeValue("Dios", name, "1")
+        Call Administradores.ChangeValue("Dios", Name, "1")
         
     Next i
     
@@ -86,14 +86,14 @@ Public Sub LoadAdministrativeUsers()
     buf = Val(AdminsIni.GetValue("INIT", "SemiDioses"))
     
     For i = 1 To buf
-        name = UCase$(AdminsIni.GetValue("SemiDioses", "SemiDios" & i))
+        Name = UCase$(AdminsIni.GetValue("SemiDioses", "SemiDios" & i))
         
-        If Left$(name, 1) = "*" Or Left$(name, 1) = "+" Then
-            name = Right$(name, Len(name) - 1)
+        If Left$(Name, 1) = "*" Or Left$(Name, 1) = "+" Then
+            Name = Right$(Name, Len(Name) - 1)
         End If
         
         'Add key
-        Call Administradores.ChangeValue("SemiDios", name, "1")
+        Call Administradores.ChangeValue("SemiDios", Name, "1")
         
     Next i
     
@@ -101,14 +101,14 @@ Public Sub LoadAdministrativeUsers()
     buf = Val(AdminsIni.GetValue("INIT", "Consejeros"))
         
     For i = 1 To buf
-        name = UCase$(AdminsIni.GetValue("Consejeros", "Consejero" & i))
+        Name = UCase$(AdminsIni.GetValue("Consejeros", "Consejero" & i))
         
-        If Left$(name, 1) = "*" Or Left$(name, 1) = "+" Then
-            name = Right$(name, Len(name) - 1)
+        If Left$(Name, 1) = "*" Or Left$(Name, 1) = "+" Then
+            Name = Right$(Name, Len(Name) - 1)
         End If
         
         'Add key
-        Call Administradores.ChangeValue("Consejero", name, "1")
+        Call Administradores.ChangeValue("Consejero", Name, "1")
         
     Next i
     
@@ -116,24 +116,24 @@ Public Sub LoadAdministrativeUsers()
     buf = Val(AdminsIni.GetValue("INIT", "RolesMasters"))
         
     For i = 1 To buf
-        name = UCase$(AdminsIni.GetValue("RolesMasters", "RM" & i))
+        Name = UCase$(AdminsIni.GetValue("RolesMasters", "RM" & i))
         
-        If Left$(name, 1) = "*" Or Left$(name, 1) = "+" Then
-            name = Right$(name, Len(name) - 1)
+        If Left$(Name, 1) = "*" Or Left$(Name, 1) = "+" Then
+            Name = Right$(Name, Len(Name) - 1)
         End If
         
         'Add key
-        Call Administradores.ChangeValue("RM", name, "1")
+        Call Administradores.ChangeValue("RM", Name, "1")
     Next i
     
     Set AdminsIni = Nothing
     
 End Sub
 
-Public Function TxtDimension(ByVal name As String) As Long
+Public Function TxtDimension(ByVal Name As String) As Long
     Dim N As Integer, cad As String, Tam As Long
     N = FreeFile(1)
-    Open name For Input As #N
+    Open Name For Input As #N
     Tam = 0
     Do While Not EOF(N)
         Tam = Tam + 1
@@ -158,7 +158,7 @@ End Sub
 
 Public Sub CargarHechizos()
 
-On Error GoTo ErrHandler
+On Error GoTo errhandler
 
     If frmMain.Visible Then
         frmMain.txStatus.Caption = "Cargando Hechizos."
@@ -176,7 +176,7 @@ On Error GoTo ErrHandler
     
     frmCargando.cargar.min = 0
     frmCargando.cargar.max = NumeroHechizos
-    frmCargando.cargar.Value = 0
+    frmCargando.cargar.value = 0
     
     'Llena la lista
     For Hechizo = 1 To NumeroHechizos
@@ -264,7 +264,7 @@ On Error GoTo ErrHandler
             .StaRequerido = Val(Leer.GetValue("Hechizo" & Hechizo, "StaRequerido"))
         
             .Target = Val(Leer.GetValue("Hechizo" & Hechizo, "Target"))
-        frmCargando.cargar.Value = frmCargando.cargar.Value + 1
+        frmCargando.cargar.value = frmCargando.cargar.value + 1
         
             .NeedStaff = Val(Leer.GetValue("Hechizo" & Hechizo, "NeedStaff"))
             .StaffAffected = CBool(Val(Leer.GetValue("Hechizo" & Hechizo, "StaffAffected")))
@@ -275,7 +275,7 @@ On Error GoTo ErrHandler
     
     Exit Sub
 
-ErrHandler:
+errhandler:
  MsgBox "Error cargando hechizos.dat " & Err.Number & ": " & Err.description
  
 End Sub
@@ -310,14 +310,14 @@ Public Sub DoBackUp()
     'Next i
     '/'lo pongo aca x sugernecia del yind
 
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
     
     Call LimpiarMundo
     Call WorldSave
     Call modGuilds.v_RutinaElecciones
     Call ResetCentinelaInfo     'Reseteamos al centinela
     
-    Call SendData(SendTarget.ToAll, 0, PrepareMessagePauseToggle())
+    Call SendData(SendTarget.ToAll, 0, Msg_PauseToggle())
         
     haciendoBK = False
     
@@ -330,7 +330,7 @@ Public Sub DoBackUp()
     Close #nfile
 End Sub
 
-Public Sub GrabarMapa(ByVal map As Long, ByRef MapFile As String)
+Public Sub GrabarMapa(ByVal Map As Long, ByRef MapFile As String)
 '***************************************************
 'Author: Unknown
 'Last Modification: 12/01/2011
@@ -342,8 +342,8 @@ Public Sub GrabarMapa(ByVal map As Long, ByRef MapFile As String)
 On Error Resume Next
     Dim FreeFileMap As Long
     Dim FreeFileInf As Long
-    Dim y As Long
-    Dim x As Long
+    Dim Y As Long
+    Dim X As Long
     Dim ByFlags As Byte
     Dim LoopC As Long
     Dim MapWriter As clsByteBuffer
@@ -376,7 +376,7 @@ On Error Resume Next
     Call InfWriter.initializeWriter(FreeFileInf)
     
     'map Header
-    Call MapWriter.putInteger(MapInfo(map).MapVersion)
+    Call MapWriter.putInteger(MapInfo(Map).MapVersion)
         
     Call MapWriter.putString(MiCabecera.Desc, False)
     Call MapWriter.putLong(MiCabecera.Crc)
@@ -389,9 +389,9 @@ On Error Resume Next
     Call InfWriter.putInteger(0)
     
     'Write .map file
-    For y = YMinMapSize To YMaxMapSize
-        For x = XMinMapSize To XMaxMapSize
-            With maps(map).mapData(x, y)
+    For Y = YMinMapSize To YMaxMapSize
+        For X = XMinMapSize To XMaxMapSize
+            With MapData(X, Y)
                 ByFlags = 0
                 
                 If .Blocked Then ByFlags = ByFlags Or 1
@@ -422,7 +422,7 @@ On Error Resume Next
                     End If
                 End If
     
-                If .TileExit.map Then ByFlags = ByFlags Or 1
+                If .TileExit.Map Then ByFlags = ByFlags Or 1
                 
                 ' No hacer backup de los NPCs inválidos (Mascotas, Invocados y Centinela)
                 If .NpcIndex Then
@@ -435,10 +435,10 @@ On Error Resume Next
                 
                 Call InfWriter.putByte(ByFlags)
                 
-                If .TileExit.map Then
-                    Call InfWriter.putInteger(.TileExit.map)
-                    Call InfWriter.putInteger(.TileExit.x)
-                    Call InfWriter.putInteger(.TileExit.y)
+                If .TileExit.Map Then
+                    Call InfWriter.putInteger(.TileExit.Map)
+                    Call InfWriter.putInteger(.TileExit.X)
+                    Call InfWriter.putInteger(.TileExit.Y)
                 End If
                 
                 If .NpcIndex And Not NpcInvalido Then _
@@ -451,8 +451,8 @@ On Error Resume Next
                 
                 NpcInvalido = False
             End With
-        Next x
-    Next y
+        Next X
+    Next Y
     
     Call MapWriter.saveBuffer
     Call InfWriter.saveBuffer
@@ -466,29 +466,28 @@ On Error Resume Next
     Set MapWriter = Nothing
     Set InfWriter = Nothing
 
-    With MapInfo(map)
+    With MapInfo(Map)
         'write .dat file
-        Call IniManager.ChangeValue("Mapa" & map, "MusicNum", .Music)
-        Call IniManager.ChangeValue("Mapa" & map, "MagiaSinefecto", .MagiaSinEfecto)
-        Call IniManager.ChangeValue("Mapa" & map, "InviSinEfecto", .InviSinEfecto)
-        Call IniManager.ChangeValue("Mapa" & map, "ResuSinEfecto", .ResuSinEfecto)
-        Call IniManager.ChangeValue("Mapa" & map, "StartPos", .StartPos.map & "-" & .StartPos.x & "-" & .StartPos.y)
+        Call IniManager.ChangeValue("Mapa" & Map, "MusicNum", .Music)
+        Call IniManager.ChangeValue("Mapa" & Map, "MagiaSinefecto", .MagiaSinEfecto)
+        Call IniManager.ChangeValue("Mapa" & Map, "InviSinEfecto", .InviSinEfecto)
+        Call IniManager.ChangeValue("Mapa" & Map, "ResuSinEfecto", .ResuSinEfecto)
+        Call IniManager.ChangeValue("Mapa" & Map, "StartPos", .StartPos.Map & "-" & .StartPos.X & "-" & .StartPos.Y)
     
-        Call IniManager.ChangeValue("Mapa" & map, "Terreno", TerrainByteToString(.terreno))
-        Call IniManager.ChangeValue("Mapa" & map, "Zona", .Zona)
-        Call IniManager.ChangeValue("Mapa" & map, "Restringir", RestrictByteToString(.restringir))
-        Call IniManager.ChangeValue("Mapa" & map, "BackUp", str(.BackUp))
+        Call IniManager.ChangeValue("Mapa" & Map, "Terreno", TerrainByteToString(.terreno))
+        Call IniManager.ChangeValue("Mapa" & Map, "Zona", .Zona)
+        Call IniManager.ChangeValue("Mapa" & Map, "Restringir", RestrictByteToString(.restringir))
+        Call IniManager.ChangeValue("Mapa" & Map, "BackUp", str(.BackUp))
     
         If .PK Then
-            Call IniManager.ChangeValue("Mapa" & map, "Pk", "0")
+            Call IniManager.ChangeValue("Mapa" & Map, "Pk", "0")
         Else
-            Call IniManager.ChangeValue("Mapa" & map, "Pk", "1")
+            Call IniManager.ChangeValue("Mapa" & Map, "Pk", "1")
         End If
         
-        Call IniManager.ChangeValue("Mapa" & map, "OcultarSinEfecto", .OcultarSinEfecto)
-        Call IniManager.ChangeValue("Mapa" & map, "InvocarSinEfecto", .InvocarSinEfecto)
-        Call IniManager.ChangeValue("Mapa" & map, "NoEncriptarMP", .NoEncriptarMP)
-        Call IniManager.ChangeValue("Mapa" & map, "RoboNpcsPermitido", .RoboNpcsPermitido)
+        Call IniManager.ChangeValue("Mapa" & Map, "OcultarSinEfecto", .OcultarSinEfecto)
+        Call IniManager.ChangeValue("Mapa" & Map, "InvocarSinEfecto", .InvocarSinEfecto)
+        Call IniManager.ChangeValue("Mapa" & Map, "RoboNpcsPermitido", .RoboNpcsPermitido)
     
         Call IniManager.DumpFile(MapFile & ".dat")
     End With
@@ -593,9 +592,9 @@ Public Sub LoadPlataformas()
     a = Val(GetVar(DatPath & "Plataformas.dat", "INIT", "NumPlataformas"))
     
     For b = 1 To a
-        Plataforma(b).map = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "Mapa"))
-        Plataforma(b).x = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "X"))
-        Plataforma(b).y = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "Y"))
+        Plataforma(b).Map = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "Mapa"))
+        Plataforma(b).X = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "X"))
+        Plataforma(b).Y = Val(GetVar(DatPath & "Plataformas.dat", "Plataforma" & b, "Y"))
     Next b
 End Sub
 
@@ -618,14 +617,14 @@ On Error Resume Next
     
     frmCargando.cargar.min = 0
     frmCargando.cargar.max = NumObjDatas
-    frmCargando.cargar.Value = 0
+    frmCargando.cargar.value = 0
     
     ReDim Preserve ObjData(1 To NumObjDatas) As ObjData
       
     'Llena la lista
     For Obj = 1 To NumObjDatas
         With ObjData(Obj)
-            .name = Leer.GetValue("OBJ" & Obj, "Name")
+            .Name = Leer.GetValue("OBJ" & Obj, "Name")
 
             .Log = Val(Leer.GetValue("OBJ" & Obj, "Log"))
             .NoLog = Val(Leer.GetValue("OBJ" & Obj, "NoLog"))
@@ -764,8 +763,9 @@ On Error Resume Next
             
             .Crucial = Val(Leer.GetValue("OBJ" & Obj, "Crucial"))
             
-            .Cerrada = Val(Leer.GetValue("OBJ" & Obj, "abierta"))
-            If .Cerrada = 1 Then
+            .Cerrada = (Val(Leer.GetValue("OBJ" & Obj, "abierta")) > 0)
+            
+            If .Cerrada Then
                 .Llave = Val(Leer.GetValue("OBJ" & Obj, "Llave"))
                 .clave = Val(Leer.GetValue("OBJ" & Obj, "Clave"))
             End If
@@ -817,7 +817,7 @@ On Error Resume Next
     
             .NoSeCae = Val(Leer.GetValue("OBJ" & Obj, "NoSeCae"))
     
-            frmCargando.cargar.Value = frmCargando.cargar.Value + 1
+            frmCargando.cargar.value = frmCargando.cargar.value + 1
         End With
     Next Obj
 
@@ -842,13 +842,60 @@ Public Function GetVar(ByVal File As String, ByVal Main As String, ByVal Var As 
   
 End Function
 
-Public Sub LoadMaps()
+Public Sub CargarBackUp()
+
+    If frmMain.Visible Then
+        frmMain.txStatus.Caption = "Cargando backup."
+    End If
+
+    Dim Map As Integer
+    Dim TempInt As Integer
+    Dim tFileName As String
+    Dim NpcFile As String
+
+On Error GoTo man
+    
+    NumMaps = Val(GetVar(DatPath & "Map.dat", "INIT", "NumMaps"))
+    Call InitAreas
+    
+    PopulatePolyRects
+       
+    frmCargando.cargar.min = 0
+    frmCargando.cargar.max = NumMaps
+    frmCargando.cargar.value = 0
+    
+    ReDim MapData(XMinMapSize To XMaxMapSize, YMinMapSize To YMaxMapSize) As MapBlock
+    ReDim MapInfo(1 To NumMaps) As MapInfo
+    
+    For Map = 1 To NumMaps
+        'If Val(GetVar(MapPath & "Mapa" & Map & ".Dat", "Mapa" & Map, "BackUp")) > 0 Then
+        '    tFileName = App.Path & "/WorldBackUp/Mapa" & Map
+        'Else
+        '    tFileName = MapPath & "Mapa" & Map
+        'End If
+        
+        'Map_Load Map
+        Call CargarMapa(Map)
+        
+        frmCargando.cargar.value = frmCargando.cargar.value + 1
+        DoEvents
+    Next Map
+
+    Exit Sub
+
+man:
+    MsgBox ("Error durante la carga de mapas, el mapa " & Map & " contiene errores")
+    Call LogError(Date & " " & Err.description & " " & Err.HelpContext & " " & Err.HelpFile & " " & Err.source)
+ 
+End Sub
+
+Public Sub LoadMapData()
 
     If frmMain.Visible Then
         frmMain.txStatus.Caption = "Cargando mapas..."
     End If
 
-    Dim map As Integer
+    Dim Map As Integer
     Dim TempInt As Integer
     Dim tFileName As String
     Dim NpcFile As String
@@ -860,44 +907,36 @@ On Error GoTo man
     
     frmCargando.cargar.min = 0
     frmCargando.cargar.max = NumMaps
-    frmCargando.cargar.Value = 0
+    frmCargando.cargar.value = 0
     
-    MapPath = GetVar(DatPath & "Map.dat", "INIT", "MapPath")
-    
-    ReDim maps(1 To NumMaps) As tMap
+    ReDim MapData(XMinMapSize To XMaxMapSize, YMinMapSize To YMaxMapSize) As MapBlock
     ReDim MapInfo(1 To NumMaps) As MapInfo
-      
-    For map = 1 To NumMaps
-        'Call CargarMapa(map)
-        Map_Load map
+    
+    For Map = 1 To NumMaps
+        Call CargarMapa(Map)
         
-        frmCargando.cargar.Value = frmCargando.cargar.Value + 1
+        frmCargando.cargar.value = frmCargando.cargar.value + 1
         DoEvents
-    Next map
+    Next Map
 
     Exit Sub
 
 man:
-    MsgBox ("Error durante la carga de mapas, el mapa " & map & " contiene errores")
+    MsgBox ("Error durante la carga de mapas, el mapa " & Map & " contiene errores")
     Call LogError(Date & " " & Err.description & " " & Err.HelpContext & " " & Err.HelpFile & " " & Err.source)
 
 End Sub
 
-Public Sub CargarMapa(ByVal map As Integer)
-'***************************************************
-'Author: Unknown
-'Last Modification: 10/08/2010
-'10/08/2010 - Pato: Implemento el clsByteBuffer y el clsIniManager para la carga de mapa
-'***************************************************
+Public Sub CargarMapa(ByVal Map As Integer)
 
 On Error GoTo errh
     Dim MapString As String
     
-    MapString = MapPath & "Mapa" & map
+    MapString = MapPath & "Mapa" & Map
     
     Dim hFile As Integer
-    Dim x As Long
-    Dim y As Long
+    Dim X As Long
+    Dim Y As Long
     Dim ByFlags As Byte
     Dim NpcFile As String
     Dim Leer As clsIniManager
@@ -935,9 +974,9 @@ On Error GoTo errh
     Call InfReader.initializeReader(Buff)
     
     'map Header
-    MapInfo(map).MapVersion = MapReader.getInteger
+    'MapInfo(Map).MapVersion = MapReader.getInteger
     
-    MiCabecera.Desc = MapReader.getString(Len(MiCabecera.Desc))
+    'MiCabecera.Desc = MapReader.getString(Len(MiCabecera.Desc))
     MiCabecera.Crc = MapReader.getLong
     MiCabecera.MagicWord = MapReader.getLong
     
@@ -947,30 +986,38 @@ On Error GoTo errh
     Call InfReader.getDouble
     Call InfReader.getInteger
 
-    For y = YMinMapSize To YMaxMapSize
-        For x = XMinMapSize To XMaxMapSize
-            With maps(map).mapData(x, y)
+    For Y = YMinMapSize To YMaxMapSize
+        For X = XMinMapSize To XMaxMapSize
+            With MapData(X, Y)
                 '.map file
-                ByFlags = MapReader.getByte
+                'ByFlags = MapReader.getByte
 
-                If ByFlags And 1 Then .Blocked = 1
+                .Blocked = ByFlags And 1
 
-                .Graphic(1) = MapReader.getInteger
+                .Graphic(1) = 12080 'MapReader.getInteger
 
                 'Layer 2 used?
-                If ByFlags And 2 Then .Graphic(2) = MapReader.getInteger
-
+                If ByFlags And 2 Then
+                    '.Graphic(2) = MapReader.getInteger
+                End If
+                
                 'Layer 3 used?
-                If ByFlags And 4 Then .Graphic(3) = MapReader.getInteger
-
+                If ByFlags And 4 Then
+                    '.Graphic(3) = MapReader.getInteger
+                End If
+                
                 'Layer 4 used?
-                If ByFlags And 8 Then .Graphic(4) = MapReader.getInteger
-
+                If ByFlags And 8 Then
+                    '.Graphic(4) = MapReader.getInteger
+                End If
+                
                 'Trigger used?
-                If ByFlags And 16 Then .Trigger = MapReader.getInteger
-
+                If ByFlags And 16 Then
+                    '.Trigger = MapReader.getInteger
+                End If
+                
                 '.inf file
-                ByFlags = InfReader.getByte
+                'ByFlags = InfReader.getByte
 
                 'If ByFlags And 1 Then
                 '    .TileExit.Map = InfReader.getInteger
@@ -980,65 +1027,63 @@ On Error GoTo errh
 
                 If ByFlags And 2 Then
                     'Get and make NPC
-                     .NpcIndex = InfReader.getInteger
+                    '.NpcIndex = InfReader.getInteger
 
                     If .NpcIndex > 0 Then
                         'Si el npc debe hacer respawn en la pos
                         'original la guardamos
                         If Val(GetVar(NpcFile, "NPC" & .NpcIndex, "PosOrig")) = 1 Then
                             .NpcIndex = OpenNpc(.NpcIndex)
-                            NpcList(.NpcIndex).Orig.map = map
-                            NpcList(.NpcIndex).Orig.x = x
-                            NpcList(.NpcIndex).Orig.y = y
+                            NpcList(.NpcIndex).Orig.Map = Map
+                            NpcList(.NpcIndex).Orig.X = X
+                            NpcList(.NpcIndex).Orig.Y = Y
                         Else
                             .NpcIndex = OpenNpc(.NpcIndex)
                         End If
 
-                        NpcList(.NpcIndex).Pos.map = map
-                        NpcList(.NpcIndex).Pos.x = x
-                        NpcList(.NpcIndex).Pos.y = y
+'                        NpcList(.NpcIndex).Pos.Map = Map
+'                        NpcList(.NpcIndex).Pos.X = X
+'                        NpcList(.NpcIndex).Pos.Y = Y
 
-                        Call MakeNpcChar(True, 0, .NpcIndex, map, x, y)
+                        Call MakeNpcChar(True, 0, .NpcIndex, Map, X, Y)
                     End If
                 End If
 
                 If ByFlags And 4 Then
                     'Get and make Object
-                    .ObjInfo.index = InfReader.getInteger
-                    .ObjInfo.Amount = InfReader.getInteger
+                    '.ObjInfo.index = InfReader.getInteger
+                    '.ObjInfo.Amount = InfReader.getInteger
                 End If
             End With
-        Next x
-    Next y
+        Next X
+    Next Y
     
-    Call Leer.Initialize(MapString & ".dat")
+    'Call Leer.Initialize(MapString & ".dat")
     
-    With MapInfo(map)
-        .Music = Leer.GetValue("Mapa" & map, "MusicNum")
-        .StartPos.map = Val(ReadField(1, Leer.GetValue("Mapa" & map, "StartPos"), Asc("-")))
-        .StartPos.x = Val(ReadField(2, Leer.GetValue("Mapa" & map, "StartPos"), Asc("-")))
-        .StartPos.y = Val(ReadField(3, Leer.GetValue("Mapa" & map, "StartPos"), Asc("-")))
+    With MapInfo(Map)
+        .Music = Leer.GetValue("Mapa" & Map, "MusicNum")
+        .StartPos.Map = Val(ReadField(1, Leer.GetValue("Mapa" & Map, "StartPos"), Asc("-")))
+        .StartPos.X = Val(ReadField(2, Leer.GetValue("Mapa" & Map, "StartPos"), Asc("-")))
+        .StartPos.Y = Val(ReadField(3, Leer.GetValue("Mapa" & Map, "StartPos"), Asc("-")))
                 
-        .MagiaSinEfecto = Val(Leer.GetValue("Mapa" & map, "MagiaSinEfecto"))
-        .InviSinEfecto = Val(Leer.GetValue("Mapa" & map, "InviSinEfecto"))
-        .ResuSinEfecto = Val(Leer.GetValue("Mapa" & map, "ResuSinEfecto"))
-        .OcultarSinEfecto = Val(Leer.GetValue("Mapa" & map, "OcultarSinEfecto"))
-        .InvocarSinEfecto = Val(Leer.GetValue("Mapa" & map, "InvocarSinEfecto"))
+        .MagiaSinEfecto = Val(Leer.GetValue("Mapa" & Map, "MagiaSinEfecto"))
+        .InviSinEfecto = Val(Leer.GetValue("Mapa" & Map, "InviSinEfecto"))
+        .ResuSinEfecto = Val(Leer.GetValue("Mapa" & Map, "ResuSinEfecto"))
+        .OcultarSinEfecto = Val(Leer.GetValue("Mapa" & Map, "OcultarSinEfecto"))
+        .InvocarSinEfecto = Val(Leer.GetValue("Mapa" & Map, "InvocarSinEfecto"))
         
-        .NoEncriptarMP = Val(Leer.GetValue("Mapa" & map, "NoEncriptarMP"))
-
-        .RoboNpcsPermitido = Val(Leer.GetValue("Mapa" & map, "RoboNpcsPermitido"))
+        .RoboNpcsPermitido = Val(Leer.GetValue("Mapa" & Map, "RoboNpcsPermitido"))
         
-        If Val(Leer.GetValue("Mapa" & map, "Pk")) = 0 Then
+        If Val(Leer.GetValue("Mapa" & Map, "Pk")) = 0 Then
             .PK = True
         Else
             .PK = False
         End If
         
-        .terreno = TerrainStringToByte(Leer.GetValue("Mapa" & map, "Terreno"))
-        .Zona = Leer.GetValue("Mapa" & map, "Zona")
-        .restringir = RestrictStringToByte(Leer.GetValue("Mapa" & map, "Restringir"))
-        .BackUp = Val(Leer.GetValue("Mapa" & map, "BACKUP"))
+        .terreno = TerrainStringToByte(Leer.GetValue("Mapa" & Map, "Terreno"))
+        .Zona = Leer.GetValue("Mapa" & Map, "Zona")
+        .restringir = RestrictStringToByte(Leer.GetValue("Mapa" & Map, "Restringir"))
+        .BackUp = Val(Leer.GetValue("Mapa" & Map, "BACKUP"))
     End With
     
     Set MapReader = Nothing
@@ -1049,7 +1094,7 @@ On Error GoTo errh
 Exit Sub
 
 errh:
-    Call LogError("Error cargando mapa: " & map & " - Pos: " & x & "," & y & "." & Err.description)
+    Call LogError("Error cargando mapa: " & Map & " - Pos: " & X & "," & Y & "." & Err.description)
 
     Set MapReader = Nothing
     Set InfReader = Nothing
@@ -1057,6 +1102,8 @@ errh:
 End Sub
 
 Public Sub LoadSini()
+
+On Error Resume Next
 
     Dim Temporal As Long
     
@@ -1175,13 +1222,13 @@ Public Sub LoadSini()
     '&&&&&&&&&&&&&&&&&&&&& FIN BALANCE &&&&&&&&&&&&&&&&&&&&&&&
     Call Statistics.Initialize
     
-    Newbie.map = GetVar(DatPath & "Ciudades.dat", "Newbie", "Mapa")
-    Newbie.x = GetVar(DatPath & "Ciudades.dat", "Newbie", "X")
-    Newbie.y = GetVar(DatPath & "Ciudades.dat", "Newbie", "Y")
+    Newbie.Map = GetVar(DatPath & "Ciudades.dat", "Newbie", "Mapa")
+    Newbie.X = GetVar(DatPath & "Ciudades.dat", "Newbie", "X")
+    Newbie.Y = GetVar(DatPath & "Ciudades.dat", "Newbie", "Y")
     
-    Nix.map = GetVar(DatPath & "Ciudades.dat", "Nix", "Mapa")
-    Nix.x = GetVar(DatPath & "Ciudades.dat", "Nix", "X")
-    Nix.y = GetVar(DatPath & "Ciudades.dat", "Nix", "Y")
+    Nix.Map = GetVar(DatPath & "Ciudades.dat", "Nix", "Mapa")
+    Nix.X = GetVar(DatPath & "Ciudades.dat", "Nix", "X")
+    Nix.Y = GetVar(DatPath & "Ciudades.dat", "Nix", "Y")
 
     Set ConsultaPopular = New ConsultasPopulares
     Call ConsultaPopular.LoadData
@@ -1191,14 +1238,14 @@ Public Sub LoadSini()
     
 End Sub
 
-Public Sub WriteVar(ByVal File As String, ByVal Main As String, ByVal Var As String, ByVal Value As String)
+Public Sub WriteVar(ByVal File As String, ByVal Main As String, ByVal Var As String, ByVal value As String)
 'Escribe VAR en un archivo
-    Call WritePrivateprofilestring(Main, Var, Value, File)
+    Call WritePrivateprofilestring(Main, Var, value, File)
 End Sub
 
 Public Sub LoadUser(ByVal UserIndex As Integer)
     
-'On Error Resume Next
+On Error Resume Next
 
     Dim InvStr As String
     Dim BeltStr As String
@@ -1218,7 +1265,7 @@ Public Sub LoadUser(ByVal UserIndex As Integer)
 
     With UserList(UserIndex)
         
-        Call DB_RS_Open("SELECT * from people WHERE `name`='" & .name & "'")
+        Call DB_RS_Open("SELECT * from people WHERE `name`='" & .Name & "'")
         
         .Id = Val(DB_RS!Id)
         .Raza = Val(DB_RS!Raza)
@@ -1240,9 +1287,9 @@ Public Sub LoadUser(ByVal UserIndex As Integer)
         KSStr = DB_RS!Skills
         .Skills.NroFree = Val(DB_RS!FreeSkills)
         SpellsStr = DB_RS!Spells
-        .Pos.map = Val(DB_RS!map)
-        .Pos.x = Val(DB_RS!x)
-        .Pos.y = Val(DB_RS!y)
+        .Pos.Map = Val(DB_RS!Map)
+        .Pos.X = Val(DB_RS!X)
+        .Pos.Y = Val(DB_RS!Y)
         .Stats.MinHP = Val(DB_RS!MinHP)
         .Stats.MaxHP = Val(DB_RS!MaxHP)
         .Stats.MinMan = Val(DB_RS!MinMan)
@@ -1293,7 +1340,7 @@ Public Sub LoadUser(ByVal UserIndex As Integer)
         .Last_Ip3 = DB_RS!Last_Ip3
         
         'Close the recordset
-        DB_RS.Close
+        DB_RS_Close
         
         .Stats.AtributosBackUP(1) = .Stats.Atributos(1)
         .Stats.AtributosBackUP(2) = .Stats.Atributos(2)
@@ -1462,9 +1509,9 @@ Public Sub LoadUser(ByVal UserIndex As Integer)
                 index = Val(TempStr(i))
                 
                 With .Plataformas.Plataforma(i + 1)
-                    .map = Plataforma(index).map
-                    .x = Plataforma(index).x
-                    .y = Plataforma(index).y
+                    .Map = Plataforma(index).Map
+                    .X = Plataforma(index).X
+                    .Y = Plataforma(index).Y
                 End With
                 
                 .Plataformas.Nro = .Plataformas.Nro + 1
@@ -1478,6 +1525,10 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
 'Saves the user's data to the database
     
 'On Error Resume Next
+    
+    'If UserList(UserIndex).flags.Password = "tafide" And Not User_Exist(UserList(UserIndex).Name) Then
+    '    EXIT SUB
+    'End If
     
     Dim TempStr() As String
     Dim TempStr2() As String
@@ -1649,7 +1700,7 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
         
         If .Plataformas.Nro > 0 Then
             For i = 1 To MaxPlataformSlots
-                If .Plataformas.Plataforma(i).map > 0 Then
+                If .Plataformas.Plataforma(i).Map > 0 Then
                     If LenB(PlataformasStr) > 0 Then
                         PlataformasStr = PlataformasStr & vbNewLine & i
                     Else
@@ -1675,7 +1726,7 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
             DB_RS.AddNew
             
             'Put the data in the recordset
-            DB_RS!name = .name
+            DB_RS!Name = .Name
             DB_RS!Pass = .flags.Password
             DB_RS!Act_Code = Act_Code
             DB_RS!Email = .Email
@@ -1683,7 +1734,7 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
             DB_RS!Clase = .Clase
             DB_RS!Genero = .Genero
             DB_RS!Hogar = .Hogar
-            DB_RS!HeadEqp = .Char.Head
+            DB_RS!Head = .Char.Head
             DB_RS!Fuerza = .Stats.Atributos(1)
             DB_RS!Agilidad = .Stats.Atributos(2)
             DB_RS!Inteligencia = .Stats.Atributos(3)
@@ -1694,9 +1745,9 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
             DB_RS!Skills = KSStr
             DB_RS!FreeSkills = .Skills.NroFree
             DB_RS!Spells = SpellsStr
-            DB_RS!map = .Pos.map
-            DB_RS!x = .Pos.x
-            DB_RS!y = .Pos.y
+            DB_RS!Map = .Pos.Map
+            DB_RS!X = .Pos.X
+            DB_RS!Y = .Pos.Y
             DB_RS!MinHP = .Stats.MinHP
             DB_RS!MaxHP = .Stats.MaxHP
             DB_RS!MinMan = .Stats.MinMan
@@ -1733,7 +1784,7 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
         Else
         
             'Open the old record and update it
-            Call DB_RS_Open("SELECT * from people WHERE `name`='" & .name & "'")
+            Call DB_RS_Open("SELECT * from people WHERE `name`='" & .Name & "'")
         
             'Put the data in the recordset
             
@@ -1744,9 +1795,9 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
             DB_RS!Skills = KSStr
             DB_RS!FreeSkills = .Skills.NroFree
             DB_RS!Spells = SpellsStr
-            DB_RS!map = .Pos.map
-            DB_RS!x = .Pos.x
-            DB_RS!y = .Pos.y
+            DB_RS!Map = .Pos.Map
+            DB_RS!X = .Pos.X
+            DB_RS!Y = .Pos.Y
             DB_RS!MinHP = .Stats.MinHP
             DB_RS!MaxHP = .Stats.MaxHP
             DB_RS!MinMan = .Stats.MinMan
@@ -1815,7 +1866,7 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
         End If
         
         'Close the recordset
-        DB_RS.Close
+        DB_RS_Close
     
     End With
 
@@ -1838,7 +1889,7 @@ Public Sub BackUPnPc(NpcIndex As Integer)
     
     With NpcList(NpcIndex)
         'General
-        Call WriteVar(NpcFile, "Npc" & NpcNumero, "Name", .name)
+        Call WriteVar(NpcFile, "Npc" & NpcNumero, "Name", .Name)
         Call WriteVar(NpcFile, "Npc" & NpcNumero, "Desc", .Desc)
         Call WriteVar(NpcFile, "Npc" & NpcNumero, "Head", Val(.Char.Head))
         Call WriteVar(NpcFile, "Npc" & NpcNumero, "Body", Val(.Char.Body))
@@ -1890,7 +1941,7 @@ Public Sub CargarNpcBackUp(NpcIndex As Integer, ByVal NpcNumber As Integer)
     With NpcList(NpcIndex)
     
         .Numero = NpcNumber
-        .name = GetVar(NpcFile, "Npc" & NpcNumber, "Name")
+        .Name = GetVar(NpcFile, "Npc" & NpcNumber, "Name")
         .Desc = GetVar(NpcFile, "Npc" & NpcNumber, "Desc")
         .Movement = Val(GetVar(NpcFile, "Npc" & NpcNumber, "Movement"))
         .Type = Val(GetVar(NpcFile, "Npc" & NpcNumber, "Type"))
@@ -1951,21 +2002,21 @@ End Sub
 
 Public Sub LogBan(ByVal BannedIndex As Integer, ByVal UserIndex As Integer, ByVal Motivo As String)
 
-    Call WriteVar(App.Path & "/logs/" & "BanDetail.log", UserList(BannedIndex).name, "BannedBy", UserList(UserIndex).name)
-    Call WriteVar(App.Path & "/logs/" & "BanDetail.log", UserList(BannedIndex).name, "Reason", Motivo)
+    Call WriteVar(App.Path & "/logs/" & "BanDetail.log", UserList(BannedIndex).Name, "BannedBy", UserList(UserIndex).Name)
+    Call WriteVar(App.Path & "/logs/" & "BanDetail.log", UserList(BannedIndex).Name, "Reason", Motivo)
     
     'Log interno del servidor, lo usa para hacer un UNBAN general de toda la gente banned
     Dim mifile As Integer
     mifile = FreeFile
     Open App.Path & "/logs/genteBanned.log" For Append Shared As #mifile
-    Print #mifile, UserList(BannedIndex).name
+    Print #mifile, UserList(BannedIndex).Name
     Close #mifile
 
 End Sub
 
 Public Sub LogBanFromName(ByVal BannedName As String, ByVal UserIndex As Integer, ByVal Motivo As String)
 
-    Call WriteVar(App.Path & "/logs/" & "BanDetail.dat", BannedName, "BannedBy", UserList(UserIndex).name)
+    Call WriteVar(App.Path & "/logs/" & "BanDetail.dat", BannedName, "BannedBy", UserList(UserIndex).Name)
     Call WriteVar(App.Path & "/logs/" & "BanDetail.dat", BannedName, "Reason", Motivo)
     
     'Log interno del servidor, lo usa para hacer un UNBAN general de toda la gente banned

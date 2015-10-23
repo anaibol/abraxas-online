@@ -164,7 +164,7 @@ Public Sub ConectarMiembro(ByVal UserIndex As Integer)
     p_OnlineMembers.Add UserIndex
 
     With UserList(UserIndex)
-        'Call SendData(SendTarget.ToDiosesYGuilda, .Guild_Id, PrepareMessageConsoleMsg(, .Name & " se ha conectado."))
+        'Call SendData(SendTarget.ToDiosesYGuilda, .Guild_Id, Msg_ConsoleMsg(, .Name & " se ha conectado."))
     End With
 End Sub
 
@@ -175,7 +175,7 @@ Public Sub DesConectarMiembro(ByVal UserIndex As Integer)
             p_OnlineMembers.Remove i
             
             With UserList(UserIndex)
-                'Call SendData(SendTarget.ToDiosesYGuilda, .Guild_Id, PrepareMessageConsoleMsg(.Name & " se ha desconectado."))
+                'Call SendData(SendTarget.ToDiosesYGuilda, .Guild_Id, Msg_ConsoleMsg(.Name & " se ha desconectado."))
             End With
 
             Exit Sub
