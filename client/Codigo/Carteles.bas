@@ -58,6 +58,7 @@ Public Sub DibujarCartel()
     Dim x As Integer, y As Integer
     
     x = XPosCartel + 20
+    y = YPosCartel + 60
     
     Call DDrawTransGrhIndextoSurface(textura, XPosCartel, YPosCartel, 0)
     

@@ -65,17 +65,42 @@ Begin VB.Form frmMain
       Type            =   1
       Urgent          =   0   'False
    End
-   Begin VB.PictureBox MainViewPic 
-      BackColor       =   &H80000012&
-      BorderStyle     =   0  'None
-      Height          =   6240
+   Begin SocketWrenchCtrl.Socket DoSSock 
+      Left            =   10920
+      Top             =   8520
+      _Version        =   65536
+      _ExtentX        =   741
+      _ExtentY        =   741
+      _StockProps     =   0
+      AutoResolve     =   0   'False
+      Backlog         =   1
+      Binary          =   -1  'True
+      Blocking        =   0   'False
+      Broadcast       =   0   'False
+      BufferSize      =   10240
+      HostAddress     =   ""
+      HostFile        =   ""
+      HostName        =   ""
+      InLine          =   0   'False
+      Interval        =   0
+      KeepAlive       =   0   'False
+      Library         =   ""
+      Linger          =   0
+      LocalPort       =   0
+      LocalService    =   ""
+      Protocol        =   0
+      RemotePort      =   0
+      RemoteService   =   ""
+      ReuseAddress    =   0   'False
+      Route           =   -1  'True
+      Timeout         =   7000
+      Type            =   1
+      Urgent          =   0   'False
+   End
+   Begin VB.Timer TimeOut 
+      Interval        =   1000
       Left            =   120
-      ScaleHeight     =   416
-      ScaleMode       =   3  'Pixel
-      ScaleWidth      =   544
-      TabIndex        =   42
       Top             =   2280
-      Width           =   8160
    End
    Begin VB.PictureBox picShip 
       AutoRedraw      =   -1  'True
@@ -145,6 +170,11 @@ Begin VB.Form frmMain
       TabIndex        =   36
       Top             =   6120
       Width           =   480
+   End
+   Begin VB.Timer DoSTimer 
+      Interval        =   250
+      Left            =   11520
+      Top             =   8520
    End
    Begin VB.PictureBox PicBelt 
       Appearance      =   0  'Flat
@@ -1206,6 +1236,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+Private Declare Function GetLastInputInfo Lib "user32" (plii As Any) As Long
+Private Type LASTINPUTINFO
+    cbSize As Long
+    dwTime As Long
+End Type
+
 Option Explicit
 
 Public tX As Integer
@@ -1225,6 +1261,21 @@ Private Type POINTAPI
 End Type
 
 Dim DoSReady As Boolean
+
+Private Sub TimeOut_Timer()
+
+ On Error Resume Next
+ 
+    Dim lii As LASTINPUTINFO
+    lii.cbSize = Len(lii)
+    Call GetLastInputInfo(lii)
+
+    TimedOut = FormatNumber((GetTickCount() - lii.dwTime) / 1000, 0)
+
+    If TimedOut >= MaxTimeOut Then
+        MsgBox "Timed out."
+    End If
+End Sub
 
 Public Sub ActivarMacroHechizos()
 
