@@ -102,7 +102,7 @@ Private Sub BuscarUserCerca(ByVal NpcIndex As Integer)
                         Call HeadtoPos(tHeading, nPos)
                         
                         If InMapBounds(nPos.Map, nPos.X, nPos.Y) Then
-                            UserIndex = MapData(nPos.X, nPos.Y).UserIndex
+                            UserIndex = maps(nPos.map).mapData(nPos.x, nPos.y).UserIndex
                             
                             If UserIndex > 0 Then
                                 UserProtected = Not IntervaloPermiteSerAtacado(UserIndex) And UserList(UserIndex).flags.NoPuedeSerAtacado
@@ -182,7 +182,7 @@ Private Sub AiNpcAtacaUser(ByVal NpcIndex As Integer)
             AttackPos = .Pos
             Call HeadtoPos(.Char.Heading, AttackPos)
             
-            If MapData(AttackPos.X, AttackPos.Y).NpcIndex = .TargetUser Then
+            If maps(AttackPos.map).mapData(AttackPos.x, AttackPos.y).NpcIndex = .TargetUser Then
                 Ataca = True
             
             ElseIf .flags.Inmovilizado < 1 Then
@@ -290,7 +290,7 @@ Private Sub AiNpcAtacaNpc(ByVal NpcIndex As Integer)
             AttackPos = .Pos
             Call HeadtoPos(.Char.Heading, AttackPos)
             
-            If MapData(AttackPos.X, AttackPos.Y).NpcIndex = .TargetNpc Then
+            If maps(AttackPos.map).mapData(AttackPos.x, AttackPos.y).NpcIndex = .TargetNpc Then
                 Call NpcAtacaNpc(NpcIndex, .TargetNpc)
             End If
         End If
@@ -329,7 +329,7 @@ Public Sub Resucitar(ByVal NpcIndex As Integer)
                     
                     With UserList(UserIndex)
                         If .Stats.Muerto Then
-                            If MapData(.Pos.X, .Pos.Y).Blocked Then
+                            If maps(.Pos.map).mapData(.Pos.x, .Pos.y).Blocked Then
                                 Exit Sub
                             End If
                             

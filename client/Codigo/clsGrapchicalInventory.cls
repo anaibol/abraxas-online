@@ -76,7 +76,7 @@ Public Property Get SelectedItem() As Long
     End Select
 End Property
 
-Public Function ClickItem(ByVal x As Integer, ByVal y As Integer) As Long
+Public Function ClickItem(ByVal X As Byte, ByVal Y As Byte) As Long
 'Selects the Item clicked if it's valid and return's it's index
 
     Dim Item As Byte

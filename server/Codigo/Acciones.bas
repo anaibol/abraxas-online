@@ -11,24 +11,31 @@ On Error Resume Next
     
     If Distance(UserList(UserIndex).Pos.X, UserList(UserIndex).Pos.Y, X, Y) < 3 Then
     
-        With MapData(X, Y)
+        With maps(map).mapData(x, y)
         
-            If ObjData(.ObjInfo.index).Llave < 1 Then
+            If Not ObjData(.ObjInfo.index).Llave Then
                 If ObjData(.ObjInfo.index).Cerrada Then
-                    .ObjInfo.index = ObjData(.ObjInfo.index).IndexAbierta
-                    
-                    Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y))
-                    
-                    'Desbloquea
-                    .Blocked = False
-                    MapData(X - 1, Y).Blocked = False
-                    
-                    'Bloquea todos los mapas
-                    Call Bloquear(True, Map, X, Y, 0)
-                    Call Bloquear(True, Map, X - 1, Y, 0)
-                      
-                    'Sonido
-                    Call SendData(SendTarget.ToPCArea, UserIndex, Msg_SoundFX(SND_PUERTA, X, Y))
+                    'Abre la puerta
+                    If Not ObjData(.ObjInfo.index).Llave Then
+                        
+                        .ObjInfo.index = ObjData(.ObjInfo.index).IndexAbierta
+                        
+                        Call modSendData.SendToAreaByPos(map, x, y, PrepareMessageObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, x, y))
+                        
+                        'Desbloquea
+                        .Blocked = False
+                        maps(map).mapData(x - 1, y).Blocked = False
+                        
+                        'Bloquea todos los mapas
+                        Call Bloquear(True, map, x, y, 0)
+                        Call Bloquear(True, map, x - 1, y, 0)
+                          
+                        'Sonido
+                        Call SendData(SendTarget.ToPCArea, UserIndex, PrepareMessagePlayWave(SND_PUERTA, x, y))
+                        
+                    Else
+                         Call WriteConsoleMsg(UserIndex, "La puerta esta cerrada con llave.", FontTypeNames.FONTTYPE_INFO)
+                    End If
                 Else
                     'Cierra puerta
                     .ObjInfo.index = ObjData(.ObjInfo.index).IndexCerrada
@@ -36,7 +43,7 @@ On Error Resume Next
                     Call modSendData.SendToAreaByPos(Map, X, Y, Msg_ObjCreate(ObjData(.ObjInfo.index).GrhIndex, ObjData(.ObjInfo.index).Type, X, Y))
                                     
                     .Blocked = True
-                    MapData(X - 1, Y).Blocked = True
+                    maps(map).mapData(x - 1, y).Blocked = True
                     
                     
                     Call Bloquear(True, Map, X - 1, Y, 1)
@@ -76,7 +83,7 @@ On Error Resume Next
             Exit Sub
         End If
         
-        If MapData(X, Y).Trigger = eTrigger.ZONASEGURA Or MapData(X, Y).Trigger = eTrigger.EnPlataforma Or MapInfo(Map).PK = False Then
+        If maps(map).mapData(x, y).Trigger = eTrigger.ZONASEGURA Or maps(map).mapData(x, y).Trigger = eTrigger.EnPlataforma Or MapInfo(map).PK = False Then
             Call WriteConsoleMsg(UserIndex, "No podés hacer fogatas en zona segura.", FontTypeNames.FONTTYPE_INFO)
             Exit Sub
         End If

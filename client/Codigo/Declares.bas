@@ -352,10 +352,10 @@ Public Enum eObjType
 End Enum
 
 'Tamaño del mapa
-Public Const XMaxMapSize As Integer = 500
-Public Const XMinMapSize As Integer = 1
-Public Const YMaxMapSize As Integer = 500
-Public Const YMinMapSize As Integer = 1
+Public Const XMaxMapSize As Byte = 100
+Public Const XMinMapSize As Byte = 1
+Public Const YMaxMapSize As Byte = 100
+Public Const YMinMapSize As Byte = 1
 
 'Mensajes
 Public Const MENSAJE_CRIATURA_FALLA_GOLPE As String = "¡La criatura falló el golpe!"

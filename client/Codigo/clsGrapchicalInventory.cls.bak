@@ -17,6 +17,8 @@ Dim InventoryOffset As Long             'Number of lines we scrolled down from t
 
 Dim PrevTempSlot As Byte
 
+Dim InvSurface As DirectDrawSurface7            'DD Surface used to render everything
+
 Dim WithEvents InventoryWindow As PictureBox    'Placeholder where to render the inventory
 Attribute InventoryWindow.VB_VarHelpID = -1
 
@@ -74,15 +76,15 @@ Public Property Get SelectedItem() As Long
     End Select
 End Property
 
-Public Function ClickItem(ByVal X As Byte, ByVal Y As Byte) As Long
+Public Function ClickItem(ByVal x As Integer, ByVal y As Integer) As Long
 'Selects the Item clicked if it's valid and return's it's index
 
     Dim Item As Byte
     Dim temp_x As Long
     Dim temp_y As Long
     
-    temp_x = X \ 32
-    temp_y = Y \ 32
+    temp_x = x \ 32
+    temp_y = y \ 32
     
     Item = temp_x + (temp_y + InventoryOffset) * (InventoryWindow.ScaleWidth / 32) + 1
     
@@ -130,9 +132,14 @@ On Error GoTo Error
 
     End Select
     
-    Dim dX As Long
-    Dim dY As Long
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
    
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
    
     Dim upperLeftSlot As Integer
     upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
@@ -142,15 +149,25 @@ On Error GoTo Error
         Exit Sub
     End If
    
-    dY = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-    dX = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
     
+    With SrcRect
+        .Right = 32
+        .Bottom = 32
+    End With
+        
+    With InvSurface
+        .BltFast 0, 0, SurfaceDB.Surface(2), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
     
-    modDX8_Draw.Device_Render_Init
-    
-        modDX8_Draw.Draw_Quad 2, dX, dY, 32, 32, 0, 0, sDefaultColor
-
         If GrhIndex > 0 Then
+            'Render the Item grh
+            .BltFast 0, 0, SurfaceDB.Surface(GrhData(GrhIndex).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
+            
             If AlphaBActivated Then
                 If Not PuedeUsar Then
                     Call EfectoInventario(0, 0, Slot, GrhIndex)
@@ -164,7 +181,9 @@ On Error GoTo Error
                         Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
                     End If
                     
-                    Box_Draw dX, dY, 32, 32, D3DColorXRGB(200, 150, 70)
+                    .SetForeColor RGB(200, 150, 70)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
                     
                 ElseIf (InventoryWindow.Tag = frmMain.PicInv.Tag And Slot = TempSlot) Or _
                 (InventoryWindow.Tag = frmComerciar.PicComercianteInv.Tag And Slot = NpcTempSlot) Or _
@@ -174,16 +193,28 @@ On Error GoTo Error
                         Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
                     End If
                     
-                    Box_Draw dX, dY, 32, 32, D3DColorXRGB(100, 70, 50)
+                    .SetForeColor RGB(100, 70, 50)
                     
-
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
                 End If
         
                 If Amount > 1 Then
+                
+                    Call .SetFont(frmCantidad.font)
+                    
+                    .SetForeColor vbBlack
+                    .DrawText -1, 0, Amount, False
+                    .DrawText 1, 0, Amount, False
+                    .DrawText 0, 1, Amount, False
+                    .DrawText 0, -1, Amount, False
+        
                     If PuedeUsar Then
-                        RenderText dX, dY, PonerPuntos(Amount), &HFFC0FFFF
+                        .SetForeColor &HC0FFFF
+                        .DrawText 0, 0, PonerPuntos(Amount), False
                     Else
-                        RenderText dX, dY, PonerPuntos(Amount), &HFFFF
+                        .SetForeColor vbRed
+                        .DrawText 0, 0, PonerPuntos(Amount), False
                     End If
                 End If
             Else
@@ -191,576 +222,595 @@ On Error GoTo Error
                 (InventoryWindow.Tag = frmComerciar.PicComercianteInv.Tag And Slot = NpcInvSelSlot) Or _
                 (InventoryWindow.Tag = frmBanco.PicBancoInv.Tag And Slot = NpcInvSelSlot) Then
                     
-                    Box_Draw dX, dY, 32, 32, D3DColorXRGB(200, 150, 0)
-
+                    .SetForeColor RGB(200, 150, 0)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
                 ElseIf Slot = TempSlot Then
-                    Box_Draw dX, dY, 32, 32, D3DColorXRGB(255, 190, 70)
+                    .SetForeColor RGB(255, 190, 70)
+                    
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
                 End If
                 
                 'NO PUEDE USAR
                 If Not PuedeUsar Then
-                    RenderText dX + 20, dY + 20, "x", D3DColorXRGB(200, 0, 0)
+                    .SetForeColor RGB(200, 0, 0)
+                    .DrawText 20, 20, "x", False
                 End If
                 
                 If Amount > 1 Then
+                    Call .SetFont(frmCantidad.font)
+                    .SetForeColor vbBlack
+                    .DrawText -1, 0, Amount, False
+                    .DrawText 1, 0, Amount, False
+                    .DrawText 0, 1, Amount, False
+                    .DrawText 0, -1, Amount, False
+        
                     If PuedeUsar Then
-                        RenderText dX, dY, PonerPuntos(Amount), &HFFC0FFFF
+                        .SetForeColor &HC0FFFF
+                        .DrawText 0, 0, PonerPuntos(Amount), False
                     Else
-                        RenderText dX, dY, PonerPuntos(Amount), &HFFFF
+                        .SetForeColor vbRed
+                        .DrawText 0, 0, PonerPuntos(Amount), False
                     End If
                 End If
             End If
         End If
         
-    InventoryWindow.ScaleMode = 3
-    modDX8_Draw.Device_Render_End InventoryWindow.hwnd, InventoryWindow.ScaleWidth, InventoryWindow.ScaleHeight
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+        
+    End With
+   
+    Call InventoryWindow.Refresh
     
 Error:
 End Sub
 
 Public Sub DrawBeltSlot(ByVal Slot As Integer)
 
-'On Error GoTo Error
-'
-'    If Slot < 1 Then
-'        Exit Sub
-'    End If
-'
-'    Dim GrhIndex As Integer
-'    Dim Amount As Integer
-'
-'    GrhIndex = Belt(Slot).GrhIndex
-'    Amount = Belt(Slot).Amount
-'
-'    Dim SrcRect As RECT
-'    Dim TempRect As RECT
-'    Dim DestRect As RECT
-'
-'    With TempRect
-'        .bottom = 32
-'        .Right = 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    'If not in renderable area we exit
-'    If Slot < upperLeftSlot Then
-'        Exit Sub
-'    End If
-'
-'    With DestRect
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    With SrcRect
-'        .Right = 32
-'        .bottom = 32
-'    End With
-'
-'    With InvSurface
-'        .BltFast 0, 0, SurfaceDB.Surface(2), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
-'
-'        If GrhIndex > 0 Then
-'            'Render the Item grh
-'            .BltFast 0, 0, SurfaceDB.Surface(GrhData(GrhIndex).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
-'
-'            If AlphaBActivated Then
-'
-'                If Not Belt(Slot).PuedeUsar Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
-'
-'                    If Slot = BeltTempSlot Then
-'                        .SetForeColor RGB(255, 190, 70)
-'
-'                        .setDrawStyle DrawStyleConstants.vbSolid
-'                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                    End If
-'
-'                ElseIf Slot = BeltSelSlot Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
-'
-'                    .SetForeColor RGB(200, 150, 70)
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'                ElseIf Slot = BeltTempSlot Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
-'
-'                    .SetForeColor RGB(100, 70, 50)
-'
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                End If
-'
-'            Else
-'                If Not Belt(Slot).PuedeUsar Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
-'
-'                    'If Slot = BeltTempSlot Then
-'                        .SetForeColor RGB(90, 90, 50)
-'
-'                        .setDrawStyle DrawStyleConstants.vbSolid
-'                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                    'End If
-'
-'                ElseIf Slot = BeltSelSlot Then
-'                    .SetForeColor RGB(200, 150, 0)
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'                ElseIf Slot = BeltTempSlot Then
-'                    .SetForeColor RGB(255, 190, 70)
-'
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                End If
-'
-'            End If
-'
-'            If Amount > 1 Then
-'
-'                Call .SetFont(frmCantidad.font)
-'
-'                .SetForeColor vbBlack
-'                .DrawText -1, 0, Amount, False
-'                .DrawText 1, 0, Amount, False
-'                .DrawText 0, 1, Amount, False
-'                .DrawText 0, -1, Amount, False
-'
-'                If Belt(Slot).PuedeUsar Then
-'                    .SetForeColor &HC0FFFF
-'                    .DrawText 0, 0, Amount, False
-'                Else
-'                    .SetForeColor vbRed
-'                    .DrawText 0, 0, Amount, False
-'                End If
-'            End If
-'
-'            Call .SetFont(frmCantidad.font)
-'
-'            .SetForeColor vbBlack
-'            .DrawText 25, 21, Slot, False
-'            .DrawText 27, 21, Slot, False
-'            .DrawText 26, 22, Slot, False
-'            .DrawText 26, 20, Slot, False
-'
-'            If Belt(Slot).PuedeUsar Then
-'                .SetForeColor &H808080
-'                .DrawText 26, 21, Slot, False
-'            Else
-'                .SetForeColor &H80&
-'                .DrawText 26, 21, Slot, False
-'            End If
-'        End If
-'
-'        'Render the Item to the Inventory Window
-'        .BltToDC InventoryWindow.hdc, TempRect, DestRect
-'
-'    End With
-'
-'    Call InventoryWindow.Refresh
-'
-'Error:
+On Error GoTo Error
+
+    If Slot < 1 Then
+        Exit Sub
+    End If
+
+    Dim GrhIndex As Integer
+    Dim Amount As Integer
+    
+    GrhIndex = Belt(Slot).GrhIndex
+    Amount = Belt(Slot).Amount
+    
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
+   
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
+   
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+   
+    'If not in renderable area we exit
+    If Slot < upperLeftSlot Then
+        Exit Sub
+    End If
+   
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+
+    With SrcRect
+        .Right = 32
+        .Bottom = 32
+    End With
+    
+    With InvSurface
+        .BltFast 0, 0, SurfaceDB.Surface(2), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
+    
+        If GrhIndex > 0 Then
+            'Render the Item grh
+            .BltFast 0, 0, SurfaceDB.Surface(GrhData(GrhIndex).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
+            
+            If AlphaBActivated Then
+            
+                If Not Belt(Slot).PuedeUsar Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
+                    
+                    If Slot = BeltTempSlot Then
+                        .SetForeColor RGB(255, 190, 70)
+                        
+                        .setDrawStyle DrawStyleConstants.vbSolid
+                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    End If
+                
+                ElseIf Slot = BeltSelSlot Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
+                    
+                    .SetForeColor RGB(200, 150, 70)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    
+                ElseIf Slot = BeltTempSlot Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
+    
+                    .SetForeColor RGB(100, 70, 50)
+                    
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                End If
+            
+            Else
+                If Not Belt(Slot).PuedeUsar Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
+                    
+                    'If Slot = BeltTempSlot Then
+                        .SetForeColor RGB(90, 90, 50)
+                    
+                        .setDrawStyle DrawStyleConstants.vbSolid
+                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    'End If
+            
+                ElseIf Slot = BeltSelSlot Then
+                    .SetForeColor RGB(200, 150, 0)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
+                ElseIf Slot = BeltTempSlot Then
+                    .SetForeColor RGB(255, 190, 70)
+                    
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                End If
+    
+            End If
+            
+            If Amount > 1 Then
+            
+                Call .SetFont(frmCantidad.font)
+                
+                .SetForeColor vbBlack
+                .DrawText -1, 0, Amount, False
+                .DrawText 1, 0, Amount, False
+                .DrawText 0, 1, Amount, False
+                .DrawText 0, -1, Amount, False
+    
+                If Belt(Slot).PuedeUsar Then
+                    .SetForeColor &HC0FFFF
+                    .DrawText 0, 0, Amount, False
+                Else
+                    .SetForeColor vbRed
+                    .DrawText 0, 0, Amount, False
+                End If
+            End If
+            
+            Call .SetFont(frmCantidad.font)
+            
+            .SetForeColor vbBlack
+            .DrawText 25, 21, Slot, False
+            .DrawText 27, 21, Slot, False
+            .DrawText 26, 22, Slot, False
+            .DrawText 26, 20, Slot, False
+    
+            If Belt(Slot).PuedeUsar Then
+                .SetForeColor &H808080
+                .DrawText 26, 21, Slot, False
+            Else
+                .SetForeColor &H80&
+                .DrawText 26, 21, Slot, False
+            End If
+        End If
+        
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+        
+    End With
+   
+    Call InventoryWindow.Refresh
+    
+Error:
 End Sub
 
 Public Sub DrawSpellSlot(ByVal Slot As Integer)
-'
-'On Error GoTo Error
-'
-'    If Slot < 1 Then
-'        Exit Sub
-'    End If
-'
-'    Dim GrhIndex As Integer
-'
-'    GrhIndex = Spell(Slot).Grh
-'
-'    Dim SrcRect As RECT
-'    Dim TempRect As RECT
-'    Dim DestRect As RECT
-'
-'    With TempRect
-'        .bottom = 32
-'        .Right = 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    'If not in renderable area we exit
-'    If Slot < upperLeftSlot Then
-'        Exit Sub
-'    End If
-'
-'    With DestRect
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    With SrcRect
-'        .Right = 32
-'        .bottom = 32
-'    End With
-'
-'    With InvSurface
-'        If GrhIndex < 1 Then
-'            .BltFast 0, 0, SurfaceDB.Surface(2), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
-'
-'        Else
-'            'Render the Item grh
-'            .BltFast 0, 0, SurfaceDB.Surface(GrhData(GrhIndex).FileNum), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
-'
-'            If AlphaBActivated Then
-'
-'                If Not Spell(Slot).PuedeLanzar Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
-'
-'                    'If Slot = TempSlot Then
-'                        .SetForeColor RGB(90, 90, 50)
-'
-'                        .setDrawStyle DrawStyleConstants.vbSolid
-'                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                    'End If
-'
-'                ElseIf Slot = SpellSelSlot Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
-'
-'                    .SetForeColor RGB(200, 150, 70)
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'                ElseIf Slot = TempSlot Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
-'
-'                    .SetForeColor RGB(90, 90, 50)
-'
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                End If
-'
-'            Else
-'                If Not Spell(Slot).PuedeLanzar Then
-'
-'                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
-'
-'                    'If Slot = TempSlot Then
-'                        .SetForeColor RGB(90, 90, 50)
-'
-'                        .setDrawStyle DrawStyleConstants.vbSolid
-'                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                    'End If
-'
-'                ElseIf Slot = SpellSelSlot Then
-'                    .SetForeColor RGB(200, 150, 0)
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'                ElseIf Slot = TempSlot Then
-'                    .SetForeColor RGB(255, 190, 70)
-'
-'                    .setDrawStyle DrawStyleConstants.vbSolid
-'                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'                End If
-'
-'            End If
-'         End If
-'
-'        'Render the Item to the Inventory Window
-'        .BltToDC InventoryWindow.hdc, TempRect, DestRect
-'
-'    End With
-'
-'    Call InventoryWindow.Refresh
-'
-'Error:
+
+On Error GoTo Error
+    
+    If Slot < 1 Then
+        Exit Sub
+    End If
+    
+    Dim GrhIndex As Integer
+    
+    GrhIndex = Spell(Slot).Grh
+    
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
+   
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
+   
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+   
+    'If not in renderable area we exit
+    If Slot < upperLeftSlot Then
+        Exit Sub
+    End If
+   
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+    
+    With SrcRect
+        .Right = 32
+        .Bottom = 32
+    End With
+    
+    With InvSurface
+        If GrhIndex < 1 Then
+            .BltFast 0, 0, SurfaceDB.Surface(2), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
+        
+        Else
+            'Render the Item grh
+            .BltFast 0, 0, SurfaceDB.Surface(GrhData(GrhIndex).FileNum), SrcRect, DDBLTFAST_WAIT Or DDBLTFAST_NOCOLORKEY
+            
+            If AlphaBActivated Then
+            
+                If Not Spell(Slot).PuedeLanzar Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
+                    
+                    'If Slot = TempSlot Then
+                        .SetForeColor RGB(90, 90, 50)
+                    
+                        .setDrawStyle DrawStyleConstants.vbSolid
+                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    'End If
+                
+                ElseIf Slot = SpellSelSlot Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
+                    
+                    .SetForeColor RGB(200, 150, 70)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    
+                ElseIf Slot = TempSlot Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
+                        
+                    .SetForeColor RGB(90, 90, 50)
+                    
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                End If
+            
+            Else
+                If Not Spell(Slot).PuedeLanzar Then
+                
+                    Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 0, 0, 0)
+                    
+                    'If Slot = TempSlot Then
+                        .SetForeColor RGB(90, 90, 50)
+                    
+                        .setDrawStyle DrawStyleConstants.vbSolid
+                        .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                    'End If
+            
+                ElseIf Slot = SpellSelSlot Then
+                    .SetForeColor RGB(200, 150, 0)
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
+                ElseIf Slot = TempSlot Then
+                    .SetForeColor RGB(255, 190, 70)
+                    
+                    .setDrawStyle DrawStyleConstants.vbSolid
+                    .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                End If
+            
+            End If
+         End If
+         
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+        
+    End With
+   
+    Call InventoryWindow.Refresh
+    
+Error:
 End Sub
 
 Public Sub DrawCompaSlotBody(ByVal Slot As Integer, ByVal GrhIndex As Integer)
 'Renders a inventory Slot to the given PictureBox
-'
-'On Error GoTo Error
-'
-'    Dim SrcRect As RECT
-'    Dim TempRect As RECT
-'    Dim DestRect As RECT
-'
-'    With TempRect
-'        .bottom = 32
-'        .Right = 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    'If not in renderable area we exit
-'    If Slot < upperLeftSlot Then
-'        Exit Sub
-'    End If
-'
-'    With DestRect
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    With InvSurface
-'        'Error ACA - IMAGEN FONDO Slot
-'        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
-'
-'        'TONCES PONGO ESTO
-'        'Clear the Slot area
-'        Call .BltColorFill(TempRect, InventoryWindow.BackColor)
-'
-'        'BODY
-'        'Get source rect
-'        With GrhData(GrhData(BodyData(Compa(Slot).Body).Walk(3).GrhIndex).Frames(1))
-'            SrcRect.Left = .sX
-'            SrcRect.Top = .sY
-'            SrcRect.Right = SrcRect.Left + 32 - 10
-'            SrcRect.bottom = SrcRect.Top + 32 - 9
-'        End With
-'
-'        'Render the Item grh
-'        .BltFast 3, 9, SurfaceDB.Surface(GrhData(GrhData(BodyData(Compa(Slot).Body).Walk(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
-'
-'        If AlphaBActivated Then
-'            If Slot = CompaSelSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
-'
-'                .SetForeColor RGB(200, 150, 70)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'            ElseIf Slot = CompaTempSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
-'
-'                .SetForeColor RGB(90, 90, 50)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'        Else
-'            If Slot = CompaSelSlot Then
-'                .SetForeColor RGB(200, 150, 0)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            ElseIf Slot = CompaTempSlot Then
-'                .SetForeColor RGB(255, 190, 70)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'
-'        End If
-'
-'        'Render the Item to the Inventory Window
-'        .BltToDC InventoryWindow.hdc, TempRect, DestRect
-'    End With
-'
-'    'Call InventoryWindow.Refresh
-'
-'    Call DrawCompaSlotHead(Slot, GrhIndex)
-'
-'Error:
+    
+On Error GoTo Error
+    
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
+   
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
+   
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+   
+    'If not in renderable area we exit
+    If Slot < upperLeftSlot Then
+        Exit Sub
+    End If
+   
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+    
+    With InvSurface
+        'Error ACA - IMAGEN FONDO Slot
+        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
+            
+        'TONCES PONGO ESTO
+        'Clear the Slot area
+        Call .BltColorFill(TempRect, InventoryWindow.BackColor)
+    
+        'BODY
+        'Get source rect
+        With GrhData(GrhData(BodyData(Compa(Slot).Body).Walk(3).GrhIndex).Frames(1))
+            SrcRect.Left = .sX
+            SrcRect.Top = .sY
+            SrcRect.Right = SrcRect.Left + 32 - 10
+            SrcRect.Bottom = SrcRect.Top + 32 - 9
+        End With
+                      
+        'Render the Item grh
+        .BltFast 3, 9, SurfaceDB.Surface(GrhData(GrhData(BodyData(Compa(Slot).Body).Walk(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
+        
+        If AlphaBActivated Then
+            If Slot = CompaSelSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
+                
+                .SetForeColor RGB(200, 150, 70)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
+            ElseIf Slot = CompaTempSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
+                    
+                .SetForeColor RGB(90, 90, 50)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+        Else
+            If Slot = CompaSelSlot Then
+                .SetForeColor RGB(200, 150, 0)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            ElseIf Slot = CompaTempSlot Then
+                .SetForeColor RGB(255, 190, 70)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+
+        End If
+        
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+    End With
+   
+    'Call InventoryWindow.Refresh
+    
+    Call DrawCompaSlotHead(Slot, GrhIndex)
+    
+Error:
 End Sub
 
 Public Sub DrawCompaSlotHead(ByVal Slot As Integer, ByVal GrhIndex As Integer)
 'Renders a inventory Slot to the given PictureBox
-'
-'On Error GoTo Error
-'
-'    Dim SrcRect As RECT
-'    Dim TempRect As RECT
-'    Dim DestRect As RECT
-'
-'    With TempRect
-'        .bottom = 32
-'        .Right = 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    'If not in renderable area we exit
-'    If Slot < upperLeftSlot Then
-'        Exit Sub
-'    End If
-'
-'    With DestRect
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    With InvSurface
-'        'Error ACA - IMAGEN FONDO Slot
-'        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
-'
-'        'TONCES PONGO ESTO
-'        'Clear the Slot area
-'        'Call .BltColorFill(TempRect, InventoryWindow.BackColor)
-'
-'        'HEAD
-'        'Get source rect
-'        With GrhData(HeadData(Compa(Slot).Head).Head(3).GrhIndex)
-'            SrcRect.Left = .sX
-'            SrcRect.Top = .sY
-'            SrcRect.Right = SrcRect.Left + 32 - 16
-'            SrcRect.bottom = SrcRect.Top + 32 + BodyData(Compa(Slot).Body).HeadOffset.Y
-'        End With
-'
-'        'Render the Item grh
-'        .BltFast 7, 3, SurfaceDB.Surface(GrhData(GrhData(HeadData(Compa(Slot).Head).Head(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
-'
-'        If AlphaBActivated Then
-'            If Slot = CompaSelSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
-'
-'                .SetForeColor RGB(200, 150, 70)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'            ElseIf Slot = CompaTempSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
-'
-'                .SetForeColor RGB(90, 90, 50)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'        Else
-'            If Slot = CompaSelSlot Then
-'                .SetForeColor RGB(200, 150, 0)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            ElseIf Slot = CompaTempSlot Then
-'                .SetForeColor RGB(255, 190, 70)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'
-'        End If
-'
-'        'Render the Item to the Inventory Window
-'        .BltToDC InventoryWindow.hdc, TempRect, DestRect
-'    End With
-'
-'    Call DrawCompaSlotCasco(Slot, GrhIndex)
-'
-'Error:
+
+On Error GoTo Error
+
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
+   
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
+   
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+   
+    'If not in renderable area we exit
+    If Slot < upperLeftSlot Then
+        Exit Sub
+    End If
+   
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+    
+    With InvSurface
+        'Error ACA - IMAGEN FONDO Slot
+        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
+            
+        'TONCES PONGO ESTO
+        'Clear the Slot area
+        'Call .BltColorFill(TempRect, InventoryWindow.BackColor)
+                    
+        'HEAD
+        'Get source rect
+        With GrhData(HeadData(Compa(Slot).Head).Head(3).GrhIndex)
+            SrcRect.Left = .sX
+            SrcRect.Top = .sY
+            SrcRect.Right = SrcRect.Left + 32 - 16
+            SrcRect.Bottom = SrcRect.Top + 32 + BodyData(Compa(Slot).Body).HeadOffset.y
+        End With
+        
+        'Render the Item grh
+        .BltFast 7, 3, SurfaceDB.Surface(GrhData(GrhData(HeadData(Compa(Slot).Head).Head(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
+
+        If AlphaBActivated Then
+            If Slot = CompaSelSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
+                
+                .SetForeColor RGB(200, 150, 70)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
+            ElseIf Slot = CompaTempSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
+                    
+                .SetForeColor RGB(90, 90, 50)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+        Else
+            If Slot = CompaSelSlot Then
+                .SetForeColor RGB(200, 150, 0)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            ElseIf Slot = CompaTempSlot Then
+                .SetForeColor RGB(255, 190, 70)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+
+        End If
+        
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+    End With
+   
+    Call DrawCompaSlotCasco(Slot, GrhIndex)
+
+Error:
 End Sub
 
 Public Sub DrawCompaSlotCasco(ByVal Slot As Integer, ByVal GrhIndex As Integer)
-''Renders a inventory Slot to the given PictureBox
-'
-'    If Compa(Slot).CascoAnim < 3 Then
-'        Exit Sub
-'    End If
-'
-'    Dim SrcRect As RECT
-'    Dim TempRect As RECT
-'    Dim DestRect As RECT
-'
-'    With TempRect
-'        .bottom = 32
-'        .Right = 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    'If not in renderable area we exit
-'    If Slot < upperLeftSlot Then
-'        Exit Sub
-'    End If
-'
-'    With DestRect
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    With InvSurface
-'        'Error ACA - IMAGEN FONDO Slot
-'        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
-'
-'        'TONCES PONGO ESTO
-'        'Clear the Slot area
-'        'Call .BltColorFill(TempRect, InventoryWindow.BackColor)
-'
-'        'HEAD
-'        'Get source rect
-'        With GrhData(CascoAnimData(Compa(Slot).CascoAnim).Head(3).GrhIndex)
-'            SrcRect.Left = .sX
-'            SrcRect.Top = .sY
-'            SrcRect.Right = SrcRect.Left + 32 - 16
-'            SrcRect.bottom = SrcRect.Top + 32 + BodyData(Compa(Slot).Body).HeadOffset.Y
-'        End With
-'
-'        'Render the Item grh
-'        .BltFast 7, 3, SurfaceDB.Surface(GrhData(GrhData(CascoAnimData(Compa(Slot).CascoAnim).Head(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
-'
-'        If AlphaBActivated Then
-'            If Slot = CompaSelSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
-'
-'                .SetForeColor RGB(200, 150, 70)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'
-'            ElseIf Slot = CompaTempSlot Then
-'
-'                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
-'
-'                .SetForeColor RGB(90, 90, 50)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'        Else
-'            If Slot = CompaSelSlot Then
-'                .SetForeColor RGB(200, 150, 0)
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            ElseIf Slot = CompaTempSlot Then
-'                .SetForeColor RGB(255, 190, 70)
-'
-'                .setDrawStyle DrawStyleConstants.vbSolid
-'                .DrawRoundedBox 0, 0, 32, 32, 5, 5
-'            End If
-'
-'        End If
-'
-'        'Render the Item to the Inventory Window
-'        .BltToDC InventoryWindow.hdc, TempRect, DestRect
-'    End With
-'
-'    Call InventoryWindow.Refresh
+'Renders a inventory Slot to the given PictureBox
+    
+    If Compa(Slot).CascoAnim < 3 Then
+        Exit Sub
+    End If
+    
+    Dim SrcRect As RECT
+    Dim TempRect As RECT
+    Dim DestRect As RECT
+   
+    With TempRect
+        .Bottom = 32
+        .Right = 32
+    End With
+   
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+   
+    'If not in renderable area we exit
+    If Slot < upperLeftSlot Then
+        Exit Sub
+    End If
+   
+    With DestRect
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+    
+    With InvSurface
+        'Error ACA - IMAGEN FONDO Slot
+        '.BltFast 0, 0, SurfaceDB.Surface(123456789), destRect, DDBLTFAST_SRCCOLORKEY + DDBLTFAST_WAIT
+            
+        'TONCES PONGO ESTO
+        'Clear the Slot area
+        'Call .BltColorFill(TempRect, InventoryWindow.BackColor)
+                    
+        'HEAD
+        'Get source rect
+        With GrhData(CascoAnimData(Compa(Slot).CascoAnim).Head(3).GrhIndex)
+            SrcRect.Left = .sX
+            SrcRect.Top = .sY
+            SrcRect.Right = SrcRect.Left + 32 - 16
+            SrcRect.Bottom = SrcRect.Top + 32 + BodyData(Compa(Slot).Body).HeadOffset.y
+        End With
+        
+        'Render the Item grh
+        .BltFast 7, 3, SurfaceDB.Surface(GrhData(GrhData(CascoAnimData(Compa(Slot).CascoAnim).Head(3).GrhIndex).Frames(1)).FileNum), SrcRect, DDBLTFAST_SRCCOLORKEY Or DDBLTFAST_WAIT
+
+        If AlphaBActivated Then
+            If Slot = CompaSelSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 200, 200, 60)
+                
+                .SetForeColor RGB(200, 150, 70)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+                
+            ElseIf Slot = CompaTempSlot Then
+            
+                Call DrawTonalityEffect(Slot, GrhIndex, 0, 0, 150, 150, 40)
+                    
+                .SetForeColor RGB(90, 90, 50)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+        Else
+            If Slot = CompaSelSlot Then
+                .SetForeColor RGB(200, 150, 0)
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            ElseIf Slot = CompaTempSlot Then
+                .SetForeColor RGB(255, 190, 70)
+                
+                .setDrawStyle DrawStyleConstants.vbSolid
+                .DrawRoundedBox 0, 0, 32, 32, 5, 5
+            End If
+
+        End If
+        
+        'Render the Item to the Inventory Window
+        .BltToDC InventoryWindow.hdc, TempRect, DestRect
+    End With
+   
+    Call InventoryWindow.Refresh
 End Sub
 
-Public Sub Initialize(ByRef InvPic As PictureBox, ByVal MaxObjs As Byte, _
+Public Sub Initialize(ByRef DirectDraw As DirectDraw7, ByRef InvPic As PictureBox, ByVal MaxObjs As Byte, _
                         Optional ByVal FontSize As Integer = 7, Optional ByVal TileWidth As Integer = 32, _
                         Optional ByVal TileHeight As Integer = 32, Optional ByVal startX As Integer = 0, _
                         Optional ByVal startY As Integer = 0, Optional ByVal bImgContainer As Boolean = True, _
@@ -773,14 +823,33 @@ Public Sub Initialize(ByRef InvPic As PictureBox, ByVal MaxObjs As Byte, _
     
     'Set apropiate scale (pixel)
     InventoryWindow.ScaleMode = 3
+        
+    'initialize DX stuff
+    Dim SurfaceDesc As DDSURFACEDESC2
+    
+    'Make sure DirectDraw was correctly initialized
+    If DirectDraw Is Nothing Then
+        Exit Sub
+    End If
+    
+    'Set surface's description
+    With SurfaceDesc
+        .lFlags = DDSD_CAPS Or DDSD_HEIGHT Or DDSD_WIDTH
+        .ddsCaps.lCaps = DDSCAPS_OFFSCREENPLAIN Or DDSCAPS_SYSTEMMEMORY
+        .lHeight = 32
+        .lWidth = 32
+    End With
+
+    'Create inventory surface
+    Set InvSurface = DirectDraw.CreateSurface(SurfaceDesc)
     
 End Sub
 
-Private Sub InventoryWindow_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub InventoryWindow_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     
 On Error Resume Next
 
-    If X < 0 Or Y < 0 Or X > InventoryWindow.Width Or Y > InventoryWindow.Height Then
+    If x < 0 Or y < 0 Or x > InventoryWindow.Width Or y > InventoryWindow.Height Then
         Exit Sub
     End If
 
@@ -808,14 +877,10 @@ On Error Resume Next
                 End If
             End If
             
-            TempSlot = ClickItem(CInt(X), CInt(Y))
+            TempSlot = ClickItem(CInt(x), CInt(y))
     
             If TempSlot < 1 Or TempSlot > MaxInvSlots Then
                 Exit Sub
-            End If
-            
-            If Inv(TempSlot).ObjIndex > 0 Then
-                Call DrawSlot(TempSlot)
             End If
             
             If TempSlot <> PrevTempSlot Then
@@ -824,28 +889,32 @@ On Error Resume Next
                 End If
             End If
             
-            If Not Comerciando Then
-                If Inv(TempSlot).ObjIndex > 0 Then
-                
-                    frmMain.Label.Caption = Inv(TempSlot).Name
-                    
-                    Select Case Inv(TempSlot).ObjType
-                        Case 2, 32
-                            InventoryWindow.ToolTipText = "Daño: " & Inv(TempSlot).MinHit & " - " & Inv(TempSlot).MaxHit
-                        Case 3, 16, 17
-                            InventoryWindow.ToolTipText = "Defensa: " & Inv(TempSlot).MinDef & " - " & Inv(TempSlot).MaxDef
-                        Case Else
-                            InventoryWindow.ToolTipText = vbNullString
-                    End Select
+            If Inv(TempSlot).ObjIndex < 1 Then
+                TempSlot = 0
 
-                Else
-                    frmMain.Label.Caption = vbNullString
-                    InventoryWindow.ToolTipText = vbNullString
-                                    
-                    If PrevTempSlot > 0 Then
-                        Call DrawSlot(PrevTempSlot)
-                    End If
+                frmMain.Label.Caption = vbNullString
+                InventoryWindow.ToolTipText = vbNullString
+                                
+                If PrevTempSlot > 0 Then
+                    Call DrawSlot(PrevTempSlot)
                 End If
+                
+                Exit Sub
+            End If
+            
+            Call DrawSlot(TempSlot)
+            
+            If Not Comerciando Then
+                frmMain.Label.Caption = Inv(TempSlot).Name
+                
+                Select Case Inv(TempSlot).ObjType
+                    Case 2, 32
+                        InventoryWindow.ToolTipText = "Daño: " & Inv(TempSlot).MinHit & " - " & Inv(TempSlot).MaxHit
+                    Case 3, 16, 17
+                        InventoryWindow.ToolTipText = "Defensa: " & Inv(TempSlot).MinDef & " - " & Inv(TempSlot).MaxDef
+                    Case Else
+                        InventoryWindow.ToolTipText = vbNullString
+                End Select
                 
             ElseIf frmComerciar.Visible Then
             
@@ -853,7 +922,7 @@ On Error Resume Next
                     Exit Sub
                     If Inv(TempSlot).ObjIndex > 0 Then
                         .lblItemName.Caption = Inv(TempSlot).Name
-                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Inv(TempSlot).Valor, Val(Replace(frmComerciar.Cantidad.text, ".", vbNullString))))
+                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Inv(TempSlot).Valor, Val(Replace(frmComerciar.Cantidad.Text, ".", vbNullString))))
                         .lblItemName.Visible = True
                         .lblItemPrice.Visible = True
                         .lblValor.Visible = True
@@ -936,7 +1005,7 @@ On Error Resume Next
                     
                     If Inv(TempSlot).ObjIndex > 0 Then
                         .lblItemName.Caption = Inv(TempSlot).Name
-                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Inv(TempSlot).Valor, Val(Replace(frmComerciar.Cantidad.text, ".", vbNullString))))
+                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Inv(TempSlot).Valor, Val(Replace(frmComerciar.Cantidad.Text, ".", vbNullString))))
                         .lblItemName.Visible = True
                         .lblItemPrice.Visible = True
                         .lblValor.Visible = True
@@ -1025,14 +1094,10 @@ On Error Resume Next
                 End If
             End If
             
-            BeltTempSlot = ClickItem(CInt(X), CInt(Y))
+            BeltTempSlot = ClickItem(CInt(x), CInt(y))
     
             If BeltTempSlot < 1 Or BeltTempSlot > MaxBeltSlots Then
                 Exit Sub
-            End If
-                        
-            If Belt(BeltTempSlot).ObjIndex > 0 Then
-                Call DrawBeltSlot(BeltTempSlot)
             End If
                         
             If BeltTempSlot <> PrevTempSlot Then
@@ -1040,29 +1105,30 @@ On Error Resume Next
                     Call DrawBeltSlot(PrevTempSlot)
                 End If
             End If
-            
-            If Not Comerciando Then
-                If Belt(BeltTempSlot).ObjIndex > 0 Then
-                
-                    frmMain.Label.Caption = Belt(BeltTempSlot).Name
-                    
-                    'Select Case Belt(BeltTempSlot).ObjType
-                    '    Case 2, 32
-                    '        InventoryWindow.ToolTipText = "Daño: " & Belt(BeltTempSlot).MinHit & " - " & Belt(BeltTempSlot).MaxHit
-                    '    Case 3, 16, 17
-                    '        InventoryWindow.ToolTipText = "Defensa: " & Belt(BeltTempSlot).MinDef & " - " & Belt(BeltTempSlot).MaxDef
-                    '    Case Else
-                    '        InventoryWindow.ToolTipText = vbNullString
-                    'End Select
-
-                Else
-                    frmMain.Label.Caption = vbNullString
-                    InventoryWindow.ToolTipText = vbNullString
-                                    
-                    If PrevTempSlot > 0 Then
-                        Call DrawBeltSlot(PrevTempSlot)
-                    End If
+                 
+            If Belt(BeltTempSlot).ObjIndex < 1 Then
+                BeltTempSlot = 0
+                frmMain.Label.Caption = vbNullString
+                InventoryWindow.ToolTipText = vbNullString
+                                
+                If PrevTempSlot > 0 Then
+                    Call DrawBeltSlot(PrevTempSlot)
                 End If
+            End If
+
+            Call DrawBeltSlot(BeltTempSlot)
+
+            If Not Comerciando Then
+                frmMain.Label.Caption = Belt(BeltTempSlot).Name
+                
+                'Select Case Belt(BeltTempSlot).ObjType
+                '    Case 2, 32
+                '        InventoryWindow.ToolTipText = "Daño: " & Belt(BeltTempSlot).MinHit & " - " & Belt(BeltTempSlot).MaxHit
+                '    Case 3, 16, 17
+                '        InventoryWindow.ToolTipText = "Defensa: " & Belt(BeltTempSlot).MinDef & " - " & Belt(BeltTempSlot).MaxDef
+                '    Case Else
+                '        InventoryWindow.ToolTipText = vbNullString
+                'End Select
                 
             ElseIf frmComerciar.Visible Then
             
@@ -1070,7 +1136,7 @@ On Error Resume Next
 
                     If Belt(BeltTempSlot).ObjIndex > 0 Then
                         .lblItemName.Caption = Belt(BeltTempSlot).Name
-                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Belt(BeltTempSlot).Valor, Val(Replace(frmComerciar.Cantidad.text, ".", vbNullString))))
+                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Belt(BeltTempSlot).Valor, Val(Replace(frmComerciar.Cantidad.Text, ".", vbNullString))))
                         .lblItemName.Visible = True
                         .lblItemPrice.Visible = True
                         .lblValor.Visible = True
@@ -1149,7 +1215,7 @@ On Error Resume Next
                     
                     If Belt(BeltTempSlot).ObjIndex > 0 Then
                         .lblItemName.Caption = Belt(BeltTempSlot).Name
-                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Belt(BeltTempSlot).Valor, Val(Replace(frmComerciar.Cantidad.text, ".", vbNullString))))
+                        .lblItemPrice.Caption = PonerPuntos(CalculateSellPrice(Belt(BeltTempSlot).Valor, Val(Replace(frmComerciar.Cantidad.Text, ".", vbNullString))))
                         .lblItemName.Visible = True
                         .lblItemPrice.Visible = True
                         .lblValor.Visible = True
@@ -1234,18 +1300,10 @@ On Error Resume Next
                 End If
             End If
             
-            TempSlot = ClickItem(CInt(X), CInt(Y))
+            TempSlot = ClickItem(CInt(x), CInt(y))
         
             If TempSlot < 1 Or TempSlot > MaxSpellSlots Then
                 Exit Sub
-            End If
-            
-            If Spell(TempSlot).Grh > 0 Then
-                Call DrawSpellSlot(TempSlot)
-                frmMain.Label.Caption = Spell(TempSlot).Nombre
-            
-            Else
-                frmMain.Label.Caption = vbNullString
             End If
             
             If TempSlot <> PrevTempSlot Then
@@ -1253,6 +1311,15 @@ On Error Resume Next
                     Call DrawSpellSlot(PrevTempSlot)
                 End If
             End If
+            
+            If Spell(TempSlot).Grh > 0 Then
+                Call DrawSpellSlot(TempSlot)
+                frmMain.Label.Caption = Spell(TempSlot).Nombre
+            Else
+                frmMain.Label.Caption = vbNullString
+                TempSlot = 0
+            End If
+
             
         Case frmMain.PicCompaInv.Tag
             
@@ -1264,20 +1331,23 @@ On Error Resume Next
                 End If
             End If
             
-            CompaTempSlot = ClickItem(CInt(X), CInt(Y))
+            CompaTempSlot = ClickItem(CInt(x), CInt(y))
             
             If CompaTempSlot < 1 Or CompaTempSlot > MaxCompaSlots Then
                 Exit Sub
             End If
             
-            If Compa(CompaTempSlot).Body > 0 Then
-                Call DrawCompaSlotBody(CompaTempSlot, GrhData(BodyData(Compa(CompaTempSlot).Body).Walk(3).GrhIndex).Frames(1))
-            End If
-            
-            If CompaTempSlot <> PrevTempSlot Then
+           If CompaTempSlot <> PrevTempSlot Then
                 If PrevTempSlot > 0 Then
                     Call DrawCompaSlotBody(PrevTempSlot, GrhData(BodyData(Compa(PrevTempSlot).Body).Walk(3).GrhIndex).Frames(1))
                 End If
+            End If
+            
+            Call DrawCompaSlotBody(CompaTempSlot, GrhData(BodyData(Compa(CompaTempSlot).Body).Walk(3).GrhIndex).Frames(1))
+            
+            If Compa(CompaTempSlot).Body < 1 Then
+                CompaTempSlot = 0
+                Exit Sub
             End If
                         
             If Button = vbRightButton Then
@@ -1304,14 +1374,10 @@ On Error Resume Next
                 End If
             End If
             
-            NpcTempSlot = ClickItem(CInt(X), CInt(Y))
+            NpcTempSlot = ClickItem(CInt(x), CInt(y))
         
             If NpcTempSlot < 1 Or NpcTempSlot > MaxNpcInvSlots Then
                 Exit Sub
-            End If
-            
-            If NpcInv(NpcTempSlot).ObjIndex > 0 Then
-                Call DrawSlot(NpcTempSlot)
             End If
             
             If NpcTempSlot <> PrevTempSlot Then
@@ -1320,10 +1386,17 @@ On Error Resume Next
                 End If
             End If
             
+            If NpcInv(NpcTempSlot).ObjIndex < 1 Then
+                NpcTempSlot = 0
+                Exit Sub
+            End If
+            
+            Call DrawSlot(NpcTempSlot)
+            
             With frmComerciar
                 If NpcInv(NpcTempSlot).ObjIndex > 0 Then
                     .lblItemName.Caption = NpcInv(NpcTempSlot).Name
-                    .lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcTempSlot).Valor, Val(frmComerciar.Cantidad.text)))
+                    .lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcTempSlot).Valor, Val(frmComerciar.Cantidad.Text)))
                     .lblItemName.Visible = True
                     .lblItemPrice.Visible = True
                     .lblValor.Visible = True
@@ -1414,7 +1487,7 @@ On Error Resume Next
                 End If
             End If
             
-            NpcTempSlot = ClickItem(CInt(X), CInt(Y))
+            NpcTempSlot = ClickItem(CInt(x), CInt(y))
         
             If NpcTempSlot < 1 Or NpcTempSlot > MaxNpcInvSlots Then
                 Exit Sub
@@ -1442,7 +1515,7 @@ On Error Resume Next
             With frmBanco
                 If NpcInv(NpcTempSlot).ObjIndex > 0 Then
                     .lblItemName.Caption = NpcInv(NpcTempSlot).Name
-                    .lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcTempSlot).Valor, Val(frmBanco.Cantidad.text)))
+                    .lblItemPrice.Caption = PonerPuntos(CalculateBuyPrice(NpcInv(NpcTempSlot).Valor, Val(frmBanco.Cantidad.Text)))
                     .lblItemName.Visible = True
                     .lblItemPrice.Visible = True
                     .lblValor.Visible = True
@@ -1521,9 +1594,9 @@ On Error Resume Next
     End Select
 End Sub
 
-Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     
-    If X > 0 And Y > 0 And X < InventoryWindow.Width And Y < InventoryWindow.Height Then
+    If x > 0 And y > 0 And x < InventoryWindow.Width And y < InventoryWindow.Height Then
             
         Dim PrevSlot As Byte
         Dim posList As Integer
@@ -1536,7 +1609,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     PrevSlot = InvSelSlot
                 End If
                 
-                InvSelSlot = ClickItem(CInt(X), CInt(Y))
+                InvSelSlot = ClickItem(CInt(x), CInt(y))
                 
                 If InvSelSlot < 1 Or InvSelSlot > MaxInvSlots Then
                     Exit Sub
@@ -1593,7 +1666,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     PrevSlot = BeltSelSlot
                 End If
             
-                BeltSelSlot = ClickItem(CInt(X), CInt(Y))
+                BeltSelSlot = ClickItem(CInt(x), CInt(y))
             
                 If BeltSelSlot < 1 Or BeltSelSlot > MaxBeltSlots Then
                     Exit Sub
@@ -1647,7 +1720,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     PrevSlot = SpellSelSlot
                 End If
                 
-                SpellSelSlot = ClickItem(CInt(X), CInt(Y))
+                SpellSelSlot = ClickItem(CInt(x), CInt(y))
                     
                 If SpellSelSlot < 1 Or SpellSelSlot > MaxSpellSlots Then
                     Exit Sub
@@ -1701,7 +1774,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     PrevSlot = CompaSelSlot
                 End If
                 
-                CompaSelSlot = ClickItem(CInt(X), CInt(Y))
+                CompaSelSlot = ClickItem(CInt(x), CInt(y))
                 
                 If CompaSelSlot < 1 Or CompaSelSlot > MaxCompaSlots Then
                     Exit Sub
@@ -1727,7 +1800,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     End If
                 End If
                 
-                NpcInvSelSlot = ClickItem(CInt(X), CInt(Y))
+                NpcInvSelSlot = ClickItem(CInt(x), CInt(y))
                 
                 If NpcInvSelSlot < 1 Or NpcInvSelSlot > MaxNpcInvSlots Then
                     Exit Sub
@@ -1755,7 +1828,7 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
                     End If
                 End If
                 
-                NpcInvSelSlot = ClickItem(CInt(X), CInt(Y))
+                NpcInvSelSlot = ClickItem(CInt(x), CInt(y))
                 
                 If NpcInvSelSlot < 1 Or NpcInvSelSlot > MaxNpcInvSlots Then
                     Exit Sub
@@ -1778,9 +1851,9 @@ Private Sub InventoryWindow_MouseDown(Button As Integer, Shift As Integer, X As 
     End If
 End Sub
 
-Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
-    If X < 0 Or Y < 0 Or X > InventoryWindow.Width Or Y > InventoryWindow.Height Then
+    If x < 0 Or y < 0 Or x > InventoryWindow.Width Or y > InventoryWindow.Height Then
         If PicInvDragging Then
             PicInvDragging = False
             frmMain.PicInv.MousePointer = vbDefault
@@ -1796,12 +1869,12 @@ Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Si
         
            If PicInvDragging Then
                If Button = vbRightButton Then
-                   TempSlot = ClickItem(CInt(X), CInt(Y))
+                   TempSlot = ClickItem(CInt(x), CInt(y))
         
                    If InvSelSlot <> TempSlot Then
                        If InvSelSlot > 0 And TempSlot > 0 And TempSlot <= MaxInvSlots Then
                            Call MoveInvSlot(InvSelSlot, TempSlot)
-                           Call Audio.mSound_PlayWav(SND_CLICK)
+                           Call Audio.Play(SND_CLICK)
                        End If
                    End If
                End If
@@ -1814,12 +1887,12 @@ Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Si
         
            If PicInvDragging Then
                If Button = vbRightButton Then
-                   TempSlot = ClickItem(CInt(X), CInt(Y))
+                   TempSlot = ClickItem(CInt(x), CInt(y))
         
                    If BeltSelSlot <> TempSlot Then
                        If BeltSelSlot > 0 And TempSlot > 0 And TempSlot <= MaxBeltSlots Then
                            Call MoveBeltSlot(BeltSelSlot, TempSlot)
-                           Call Audio.mSound_PlayWav(SND_CLICK)
+                           Call Audio.Play(SND_CLICK)
                        End If
                    End If
                End If
@@ -1832,13 +1905,13 @@ Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Si
         
            If PicInvDragging Then
                If Button = vbRightButton Then
-                   TempSlot = ClickItem(CInt(X), CInt(Y))
+                   TempSlot = ClickItem(CInt(x), CInt(y))
         
                    If SpellSelSlot <> TempSlot Then
                        If SpellSelSlot > 0 And TempSlot > 0 And TempSlot <= MaxSpellSlots Then
                             If Spell(SpellSelSlot).Grh > 0 Then
                                 Call MoveSpellSlotSlot(SpellSelSlot, TempSlot)
-                                Call Audio.mSound_PlayWav(SND_CLICK)
+                                Call Audio.Play(SND_CLICK)
                             End If
                        End If
                    End If
@@ -1854,12 +1927,12 @@ Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Si
             
             If PicInvDragging Then
                 If Button = vbRightButton Then
-                    TempSlot = ClickItem(CInt(X), CInt(Y))
+                    TempSlot = ClickItem(CInt(x), CInt(y))
             
                     If CompaSelSlot <> TempSlot Then
                         If CompaSelSlot > 0 And TempSlot > 0 And TempSlot <= MaxCompaSlots Then
                             'Call MoveSlot(CompaSelSlot, TempSlot)
-                            Call Audio.mSound_PlayWav(SND_CLICK)
+                            Call Audio.Play(SND_CLICK)
                         End If
                     End If
                 End If
@@ -1869,10 +1942,10 @@ Private Sub InventoryWindow_MouseUp(Button As Integer, Shift As Integer, X As Si
             End If
     
         Case frmComerciar.PicComercianteInv.Tag
-            Call Auto_Drag(frmComerciar.hwnd)
+            Call Auto_Drag(frmComerciar.hWnd)
             
         Case frmBanco.PicBancoInv.Tag
-            Call Auto_Drag(frmBanco.hwnd)
+            Call Auto_Drag(frmBanco.hWnd)
             
     End Select
     
@@ -2041,142 +2114,194 @@ Private Sub MoveSpellSlotSlot(ByVal Slot As Byte, ByVal Slot2 As Byte)
 
 End Sub
 
-Private Sub EfectoInventario(ByVal X As Integer, ByVal Y As Integer, ByVal Slot As Integer, ByVal GrhIndex As Integer)
+Private Sub EfectoInventario(ByVal x As Integer, ByVal y As Integer, ByVal Slot As Integer, ByVal GrhIndex As Integer)
 'Draw the GRH with a tonality, in the position X and Y of the Inventory
-'
-'    Dim CurrentGrhIndex As Integer
-'    Dim SourceRect As RECT
-'
-'    With SourceRect
-'        .Left = GrhData(GrhIndex).sX
-'        .Top = GrhData(GrhIndex).sY
-'        .Right = .Left + 32
-'        .bottom = .Top + 32
-'    End With
-'
-'    Dim upperLeftSlot As Integer
-'
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    Dim Src As DirectDrawSurface7
-'    Dim rDest As RECT
-'    Dim dArray() As Byte, sArray() As Byte
-'    Dim ddsdSrc As DDSURFACEDESC2, ddsdDest As DDSURFACEDESC2
-'    Dim Modo As Long
-'
-'    Set Src = SurfaceDB.Surface(GrhData(GrhIndex).FileNum)
-'
-'    Src.GetSurfaceDesc ddsdSrc
-'    InvSurface.GetSurfaceDesc ddsdDest
-'
-'    With rDest
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'    Dim SrcLock As Boolean
-'    Dim DstLock As Boolean
-'
-'    SrcLock = False
-'    DstLock = False
-'
-'On Error GoTo HayErrorAlpha
-'
-'    Call Src.Lock(SourceRect, ddsdSrc, DDLOCK_WAIT, 0)
-'    SrcLock = True
-'    Call InvSurface.Lock(rDest, ddsdDest, DDLOCK_WAIT, 0)
-'    DstLock = True
-'
-'    Call InvSurface.GetLockedArray(dArray())
-'    Call Src.GetLockedArray(sArray())
-'
-''Alpha
-'    Call vbDABLcolorblend16565ck(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(X + X, Y)), 100, rDest.Right - rDest.Left, rDest.bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 150, 0, 0)
-'
-'    InvSurface.Unlock rDest
-'    Src.Unlock SourceRect
-'Exit Sub
-'
-'HayErrorAlpha:
-'    If SrcLock Then
-'        Src.Unlock SourceRect
-'    End If
-'
-'    If DstLock Then
-'        InvSurface.Unlock rDest
-'    End If
+
+    Dim CurrentGrhIndex As Integer
+    Dim SourceRect As RECT
+ 
+    With SourceRect
+        .Left = GrhData(GrhIndex).sX
+        .Top = GrhData(GrhIndex).sY
+        .Right = .Left + 32
+        .Bottom = .Top + 32
+    End With
+
+    Dim upperLeftSlot As Integer
+    
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+ 
+    Dim Src As DirectDrawSurface7
+    Dim rDest As RECT
+    Dim dArray() As Byte, sArray() As Byte
+    Dim ddsdSrc As DDSURFACEDESC2, ddsdDest As DDSURFACEDESC2
+    Dim Modo As Long
+   
+    Set Src = SurfaceDB.Surface(GrhData(GrhIndex).FileNum)
+   
+    Src.GetSurfaceDesc ddsdSrc
+    InvSurface.GetSurfaceDesc ddsdDest
+   
+    With rDest
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+    Dim SrcLock As Boolean
+    Dim DstLock As Boolean
+   
+    SrcLock = False
+    DstLock = False
+   
+On Error GoTo HayErrorAlpha
+   
+    Call Src.Lock(SourceRect, ddsdSrc, DDLOCK_WAIT, 0)
+    SrcLock = True
+    Call InvSurface.Lock(rDest, ddsdDest, DDLOCK_WAIT, 0)
+    DstLock = True
+   
+    Call InvSurface.GetLockedArray(dArray())
+    Call Src.GetLockedArray(sArray())
+ 
+'Alpha
+    Call vbDABLcolorblend16565ck(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(x + x, y)), 100, rDest.Right - rDest.Left, rDest.Bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 150, 0, 0)
+    
+    InvSurface.Unlock rDest
+    Src.Unlock SourceRect
+Exit Sub
+ 
+HayErrorAlpha:
+    If SrcLock Then
+        Src.Unlock SourceRect
+    End If
+    
+    If DstLock Then
+        InvSurface.Unlock rDest
+    End If
 End Sub
 
-Private Sub EfectoInventario2(ByVal X As Integer, ByVal Y As Integer, ByVal Slot As Integer, ByVal GrhIndex As Integer)
+Private Sub EfectoInventario2(ByVal x As Integer, ByVal y As Integer, ByVal Slot As Integer, ByVal GrhIndex As Integer)
     
-'    Dim CurrentGrhIndex As Integer
-'    Dim SourceRect As RECT
-'
-'        With SourceRect
-'            .Left = GrhData(GrhIndex).sX
-'            .Top = GrhData(GrhIndex).sY
-'            .Right = .Left + 32
-'            .bottom = .Top + 32
-'        End With
-'
-'    Dim upperLeftSlot As Integer
-'    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
-'
-'    Dim Src As DirectDrawSurface7
-'    Dim rDest As RECT
-'    Dim dArray() As Byte, sArray() As Byte
-'    Dim ddsdSrc As DDSURFACEDESC2, ddsdDest As DDSURFACEDESC2
-'    Dim Modo As Long
-'
-'    Set Src = SurfaceDB.Surface(GrhData(GrhIndex).FileNum)
-'
-'    Src.GetSurfaceDesc ddsdSrc
-'    InvSurface.GetSurfaceDesc ddsdDest
-'
-'    With rDest
-'        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
-'        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
-'        .bottom = .Top + 32
-'        .Right = .Left + 32
-'    End With
-'
-'    Call Src.Lock(SourceRect, ddsdSrc, DDLOCK_WAIT, 0)
-'    Call InvSurface.Lock(rDest, ddsdDest, DDLOCK_WAIT, 0)
-'
-'    Call InvSurface.GetLockedArray(dArray())
-'    Call Src.GetLockedArray(sArray())
-'
-'    Call vbDABLcolorblend16565(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(X + X, Y)), 50, rDest.Right - rDest.Left, rDest.bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 0, 255, 0)
-'    Call vbDABLcolorblend16565ck(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(X + X, Y)), 50, rDest.Right - rDest.Left, rDest.bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 0, 0, 0)
-'
-'    InvSurface.Unlock rDest
-'    Src.Unlock SourceRect
+    Dim CurrentGrhIndex As Integer
+    Dim SourceRect As RECT
+ 
+        With SourceRect
+            .Left = GrhData(GrhIndex).sX
+            .Top = GrhData(GrhIndex).sY
+            .Right = .Left + 32
+            .Bottom = .Top + 32
+        End With
+ 
+    Dim upperLeftSlot As Integer
+    upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
+ 
+    Dim Src As DirectDrawSurface7
+    Dim rDest As RECT
+    Dim dArray() As Byte, sArray() As Byte
+    Dim ddsdSrc As DDSURFACEDESC2, ddsdDest As DDSURFACEDESC2
+    Dim Modo As Long
+   
+    Set Src = SurfaceDB.Surface(GrhData(GrhIndex).FileNum)
+   
+    Src.GetSurfaceDesc ddsdSrc
+    InvSurface.GetSurfaceDesc ddsdDest
+   
+    With rDest
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+      
+    Call Src.Lock(SourceRect, ddsdSrc, DDLOCK_WAIT, 0)
+    Call InvSurface.Lock(rDest, ddsdDest, DDLOCK_WAIT, 0)
+   
+    Call InvSurface.GetLockedArray(dArray())
+    Call Src.GetLockedArray(sArray())
+ 
+    Call vbDABLcolorblend16565(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(x + x, y)), 50, rDest.Right - rDest.Left, rDest.Bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 0, 255, 0)
+    Call vbDABLcolorblend16565ck(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(x + x, y)), 50, rDest.Right - rDest.Left, rDest.Bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, 0, 0, 0)
+    
+    InvSurface.Unlock rDest
+    Src.Unlock SourceRect
 End Sub
 
-Private Sub DrawTonalityEffect(ByVal Slot As Integer, ByVal GrhIndex As Integer, ByVal X As Integer, ByVal Y As Integer, ByVal r As Byte, ByVal g As Byte, ByVal B As Byte)
+Private Sub DrawTonalityEffect(ByVal Slot As Integer, ByVal GrhIndex As Integer, ByVal x As Integer, ByVal y As Integer, ByVal r As Byte, ByVal g As Byte, ByVal B As Byte)
 'Draw the GRH with a tonality, in the position X and Y of the Inventory
-    Dim sColor(3) As Long
     
-    sColor(0) = D3DColorXRGB(r, g, B)
-    sColor(1) = D3DColorXRGB(r, g, B)
-    sColor(2) = D3DColorXRGB(r, g, B)
-    sColor(3) = D3DColorXRGB(r, g, B)
-    
+    Dim SourceRect As RECT
+ 
     If GrhIndex < 1 Then
         Exit Sub
     End If
     
+    With SourceRect
+        .Left = GrhData(GrhIndex).sX
+        .Top = GrhData(GrhIndex).sY
+        .Right = .Left + 32
+        .Bottom = .Top + 32
+    End With
+
     Dim upperLeftSlot As Integer
     upperLeftSlot = InventoryOffset * (InventoryWindow.ScaleWidth / 32) + 1
  
-    modDX8_Draw.Draw_Quad GrhData(GrhIndex).FileNum, _
-            X + ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32, _
-            Y + ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32, _
-            32, 32, _
-            GrhData(GrhIndex).sX, GrhData(GrhIndex).sY, _
-            sColor
+    Dim Src As DirectDrawSurface7
+    Dim rDest As RECT
+    Dim dArray() As Byte, sArray() As Byte
+    Dim ddsdSrc As DDSURFACEDESC2, ddsdDest As DDSURFACEDESC2
+    Dim Modo As Long
+   
+    Set Src = SurfaceDB.Surface(GrhData(GrhIndex).FileNum)
+   
+    Src.GetSurfaceDesc ddsdSrc
+    InvSurface.GetSurfaceDesc ddsdDest
+   
+    With rDest
+        .Top = ((Slot - upperLeftSlot) \ (InventoryWindow.ScaleWidth / 32)) * 32
+        .Left = ((Slot - 1) Mod (InventoryWindow.ScaleWidth / 32)) * 32
+        .Bottom = .Top + 32
+        .Right = .Left + 32
+    End With
+ 
+   
+    Dim SrcLock As Boolean
+    Dim DstLock As Boolean
+     
+On Error GoTo HayErrorAlpha
+    
+    If x < 0 Then
+        x = 0
+    End If
+    
+    If y < 0 Then
+        y = 0
+    End If
+    
+    Call Src.Lock(SourceRect, ddsdSrc, DDLOCK_WAIT, 0)
+    SrcLock = True
+    Call InvSurface.Lock(rDest, ddsdDest, DDLOCK_WAIT, 0)
+    DstLock = True
+    Call InvSurface.GetLockedArray(dArray())
+    Call Src.GetLockedArray(sArray())
+    
+'Alpha
+    Call vbDABLcolorblend16565ck(ByVal VarPtr(sArray(SourceRect.Left + SourceRect.Left, SourceRect.Top)), ByVal VarPtr(dArray(x + x, y)), 70, rDest.Right - rDest.Left, rDest.Bottom - rDest.Top, ddsdSrc.lPitch, ddsdDest.lPitch, r, g, B)
 
+    InvSurface.Unlock rDest
+    DstLock = False
+    Src.Unlock SourceRect
+    SrcLock = False
+Exit Sub
+ 
+HayErrorAlpha:
+    If SrcLock Then
+        Src.Unlock SourceRect
+    End If
+    
+    If DstLock Then
+        InvSurface.Unlock rDest
+    End If
 End Sub
 
 Public Sub SetSlot(ByVal Slot As Byte, ByVal ObjIndex As Integer, ByVal Amount As Integer, ByVal GrhIndex As Integer, _

@@ -347,9 +347,9 @@ Public Const AumentoSTLadron As Byte = AumentoSTDef + 3
 Public Const AumentoSTMago As Byte = AumentoSTDef - 1
 
 'Tamaño del mapa
-Public Const XMaxMapSize As Integer = 500
+Public Const XMaxMapSize As Byte = 100
 Public Const XMinMapSize As Byte = 1
-Public Const YMaxMapSize As Integer = 500
+Public Const YMaxMapSize As Byte = 100
 Public Const YMinMapSize As Byte = 1
 
 'Tamaño en Tiles de la pantalla de visualizacion
@@ -717,8 +717,7 @@ Public Type Char
     
     FX As Integer
     Loops As Integer
-    NpcIndex As Integer
-    UserIndex As Integer
+    
 End Type
 
 'Tipos de objetos
@@ -843,8 +842,8 @@ Public Type ObjData
     
     DesdeMap As Integer
     HastaMap As Integer
-    HastaY As Integer
-    HastaX As Integer
+    HastaY As Byte
+    HastaX As Byte
     NecesitasSkill As Byte
     CantidadSkill As Byte
     
@@ -1251,38 +1250,6 @@ End Type
 
 '******************** Tipos del mapa **********************
 
-'Tile
-Public Type MapBlock
-    Blocked As Boolean
-    Graphic(1 To 4) As Integer
-    UserIndex As Integer
-    NpcIndex As Integer
-    ObjInfo As Obj
-    TileExit As WorldPos
-    Trigger As eTrigger
-End Type
-
-'Info del mapa
-Type MapInfo
-    Music As String
-    'Name As String
-    StartPos As WorldPos
-    MapVersion As Integer
-    PK As Boolean
-    MagiaSinEfecto As Byte
-    InviSinEfecto As Byte
-    ResuSinEfecto As Byte
-    OcultarSinEfecto As Byte
-    InvocarSinEfecto As Byte
-    
-    RoboNpcsPermitido As Byte
-    
-    terreno As String
-    Zona As String
-    restringir As String
-    BackUp As Byte
-End Type
-
 Public ListaRazas(1 To NUMRAZAS) As String
 Public SkillName(1 To NumSkills) As String
 Public ListaClases(1 To NUMCLASES) As String
@@ -1291,10 +1258,10 @@ Public ListaAtributos(1 To NUMATRIBUTOS) As String
 Public RecordPoblacion As Integer
 
 'Bordes del mapa
-Public MinXBorder As Integer
-Public MaxXBorder As Integer
-Public MinYBorder As Integer
-Public MaxYBorder As Integer
+Public MinXBorder As Byte
+Public MaxXBorder As Byte
+Public MinYBorder As Byte
+Public MaxYBorder As Byte
 
 'Numero de usuarios actual
 Public Poblacion As Integer
@@ -1322,10 +1289,9 @@ Public EnPausa As Boolean
 '*****************ARRAYS PUBLICOS*************************
 Public UserList() As User 'USUARIOS
 Public NpcList(1 To MaxNpcs) As Npc 'Npcs
-Public MapData() As MapBlock
 Public MapInfo() As MapInfo
 Public Hechizos() As tHechizo
-Public CharList(1 To MaxChars) As Char
+Public CharList(1 To MaxCHARS) As Integer
 Public ObjData() As ObjData
 Public FX() As FXdata
 Public Spawn_List() As tCriaturasEntrenador
@@ -1422,4 +1388,48 @@ Public DataSent As Long
 Public DataReceived As Long
 
 Public Administradores As clsIniManager
+
+
+'Tile
+Public Type MapBlock
+    Blocked As Boolean
+    Graphic(1 To 4) As Integer
+    UserIndex As Integer
+    NpcIndex As Integer
+    ObjInfo As Obj
+    TileExit As WorldPos
+    Trigger As eTrigger
+End Type
+
+Public Type tMap
+    mapData() As MapBlock
+    dX As Long
+    dY As Long
+End Type
+
+Public maps() As tMap
+
+'Info del mapa
+Type MapInfo
+    Poblacion As Integer
+    Music As String
+    'Name As String
+    StartPos As WorldPos
+    MapVersion As Integer
+    PK As Boolean
+    MagiaSinEfecto As Byte
+    NoEncriptarMP As Byte
+    InviSinEfecto As Byte
+    ResuSinEfecto As Byte
+    OcultarSinEfecto As Byte
+    InvocarSinEfecto As Byte
+    
+    RoboNpcsPermitido As Byte
+    
+    terreno As String
+    Zona As String
+    restringir As String
+    BackUp As Byte
+End Type
+
 

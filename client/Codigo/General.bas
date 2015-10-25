@@ -691,8 +691,6 @@ On Error Resume Next
     Shell "regsvr32 /s dx7vb.dll"
     Shell "regsvr32 /s %WinDir%\system32\dx7vb.dll"
     
-    Dim PacketKeys() As String
-
     'Inicialización de variables globales
     prgRun = True
     Pausa = False
@@ -1032,8 +1030,6 @@ Public Sub CloseClient()
 'Frees all used resources, cleans up and leaves
 
     'Allow new instances of the client to be opened
-    Call ReleaseInstance
-    
     EngineRun = False
 
     Call ResetResolution

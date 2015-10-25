@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
 Object = "{33101C00-75C3-11CF-A8A0-444553540000}#1.0#0"; "CSWSK32.ocx"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form frmMain 
@@ -245,6 +245,7 @@ Begin VB.Form frmMain
       _Version        =   393217
       BackColor       =   128
       BorderStyle     =   0
+      Enabled         =   -1  'True
       MultiLine       =   0   'False
       DisableNoScroll =   -1  'True
       MaxLength       =   100
@@ -420,6 +421,7 @@ Begin VB.Form frmMain
       _Version        =   393217
       BackColor       =   128
       BorderStyle     =   0
+      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       DisableNoScroll =   -1  'True
       Appearance      =   0
@@ -448,6 +450,7 @@ Begin VB.Form frmMain
       _Version        =   393217
       BackColor       =   128
       BorderStyle     =   0
+      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       DisableNoScroll =   -1  'True
       Appearance      =   0
@@ -1202,8 +1205,8 @@ End Type
 
 Option Explicit
 
-Public tX As Integer
-Public tY As Integer
+Public tX As Byte
+Public tY As Byte
 Public MouseX As Long
 Public MouseY As Long
 Private clicX As Long

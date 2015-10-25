@@ -391,7 +391,7 @@ On Error Resume Next
     'Write .map file
     For Y = YMinMapSize To YMaxMapSize
         For X = XMinMapSize To XMaxMapSize
-            With MapData(X, Y)
+            With maps(map).mapData(x, y)
                 ByFlags = 0
                 
                 If .Blocked Then ByFlags = ByFlags Or 1
@@ -909,9 +909,11 @@ On Error GoTo man
     frmCargando.cargar.max = NumMaps
     frmCargando.cargar.value = 0
     
-    ReDim MapData(XMinMapSize To XMaxMapSize, YMinMapSize To YMaxMapSize) As MapBlock
-    ReDim MapInfo(1 To NumMaps) As MapInfo
+    MapPath = GetVar(DatPath & "Map.dat", "INIT", "MapPath")
     
+    ReDim maps(1 To NumMaps) As tMap
+    ReDim MapInfo(1 To NumMaps) As MapInfo
+      
     For Map = 1 To NumMaps
         Call CargarMapa(Map)
         
@@ -988,36 +990,36 @@ On Error GoTo errh
 
     For Y = YMinMapSize To YMaxMapSize
         For X = XMinMapSize To XMaxMapSize
-            With MapData(X, Y)
+            With maps(map).mapData(x, y)
                 '.map file
-                'ByFlags = MapReader.getByte
+                ByFlags = MapReader.getByte
 
                 .Blocked = ByFlags And 1
 
-                .Graphic(1) = 12080 'MapReader.getInteger
+                .Graphic(1) = MapReader.getInteger
 
                 'Layer 2 used?
                 If ByFlags And 2 Then
-                    '.Graphic(2) = MapReader.getInteger
+                    .Graphic(2) = MapReader.getInteger
                 End If
                 
                 'Layer 3 used?
                 If ByFlags And 4 Then
-                    '.Graphic(3) = MapReader.getInteger
+                    .Graphic(3) = MapReader.getInteger
                 End If
                 
                 'Layer 4 used?
                 If ByFlags And 8 Then
-                    '.Graphic(4) = MapReader.getInteger
+                    .Graphic(4) = MapReader.getInteger
                 End If
                 
                 'Trigger used?
                 If ByFlags And 16 Then
-                    '.Trigger = MapReader.getInteger
+                    .Trigger = MapReader.getInteger
                 End If
                 
                 '.inf file
-                'ByFlags = InfReader.getByte
+                ByFlags = InfReader.getByte
 
                 'If ByFlags And 1 Then
                 '    .TileExit.Map = InfReader.getInteger
@@ -1027,7 +1029,7 @@ On Error GoTo errh
 
                 If ByFlags And 2 Then
                     'Get and make NPC
-                    '.NpcIndex = InfReader.getInteger
+                     .NpcIndex = InfReader.getInteger
 
                     If .NpcIndex > 0 Then
                         'Si el npc debe hacer respawn en la pos
@@ -1041,9 +1043,9 @@ On Error GoTo errh
                             .NpcIndex = OpenNpc(.NpcIndex)
                         End If
 
-'                        NpcList(.NpcIndex).Pos.Map = Map
-'                        NpcList(.NpcIndex).Pos.X = X
-'                        NpcList(.NpcIndex).Pos.Y = Y
+                        NpcList(.NpcIndex).Pos.map = map
+                        NpcList(.NpcIndex).Pos.x = x
+                        NpcList(.NpcIndex).Pos.y = y
 
                         Call MakeNpcChar(True, 0, .NpcIndex, Map, X, Y)
                     End If
@@ -1051,14 +1053,14 @@ On Error GoTo errh
 
                 If ByFlags And 4 Then
                     'Get and make Object
-                    '.ObjInfo.index = InfReader.getInteger
-                    '.ObjInfo.Amount = InfReader.getInteger
+                    .ObjInfo.index = InfReader.getInteger
+                    .ObjInfo.Amount = InfReader.getInteger
                 End If
             End With
         Next X
     Next Y
     
-    'Call Leer.Initialize(MapString & ".dat")
+    Call Leer.Initialize(MapString & ".dat")
     
     With MapInfo(Map)
         .Music = Leer.GetValue("Mapa" & Map, "MusicNum")
@@ -1525,10 +1527,6 @@ Public Sub SaveUser(ByVal UserIndex As Integer, Optional ByVal NewUser As Boolea
 'Saves the user's data to the database
     
 'On Error Resume Next
-    
-    'If UserList(UserIndex).flags.Password = "tafide" And Not User_Exist(UserList(UserIndex).Name) Then
-    '    EXIT SUB
-    'End If
     
     Dim TempStr() As String
     Dim TempStr2() As String

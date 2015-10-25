@@ -98,25 +98,27 @@ End Sub
 Public Sub ReproducirSonidosDeMapas()
     Dim i As Long
     Dim SonidoMapa As Byte
-    Dim posX As Integer
-    Dim posY As Integer
+    Dim posX As Byte
+    Dim posY As Byte
     
     'Sounds are played at a random position
     posX = RandomNumber(XMinMapSize, XMaxMapSize)
     posY = RandomNumber(YMinMapSize, YMaxMapSize)
     
     For i = 1 To UBound(p_Mapas)
-        If p_Mapas(i).Cantidad > 0 Then
-            SonidoMapa = RandomNumber(1, p_Mapas(i).Cantidad)
-            If RandomNumber(1, 100) <= p_Mapas(i).Probabilidad(SonidoMapa) Then
-                'tocarlo
-                If Lloviendo Then
-                    If p_Mapas(i).flags(SonidoMapa) Xor p_eSoundFlags.Lluvia Then
-                        Call SendData(SendTarget.toMap, i, Msg_SoundFX(p_Mapas(i).SoundIndex(SonidoMapa), posX, posY))
-                    End If
-                Else
-                    If p_Mapas(i).flags(SonidoMapa) Xor p_eSoundFlags.ninguna Then
-                        Call SendData(SendTarget.toMap, i, Msg_SoundFX(p_Mapas(i).SoundIndex(SonidoMapa), posX, posY))
+        If MapInfo(i).Poblacion > 0 Then
+            If p_Mapas(i).Cantidad > 0 Then
+                SonidoMapa = RandomNumber(1, p_Mapas(i).Cantidad)
+                If RandomNumber(1, 100) <= p_Mapas(i).Probabilidad(SonidoMapa) Then
+                    'tocarlo
+                    If Lloviendo Then
+                        If p_Mapas(i).flags(SonidoMapa) Xor p_eSoundFlags.Lluvia Then
+                            Call SendData(SendTarget.toMap, i, PrepareMessagePlayWave(p_Mapas(i).SoundIndex(SonidoMapa), posX, posY))
+                        End If
+                    Else
+                        If p_Mapas(i).flags(SonidoMapa) Xor p_eSoundFlags.ninguna Then
+                            Call SendData(SendTarget.toMap, i, PrepareMessagePlayWave(p_Mapas(i).SoundIndex(SonidoMapa), posX, posY))
+                        End If
                     End If
                 End If
             End If

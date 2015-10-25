@@ -7,8 +7,8 @@ Public MaxLimiteX As Integer
 Public MinLimiteY As Integer
 Public MaxLimiteY As Integer
 
-Public Sub CambioDeArea(ByVal x As Integer, ByVal y As Integer)
-    Dim loopX As Integer, loopY As Integer
+Public Sub CambioDeArea(ByVal X As Byte, ByVal Y As Byte)
+    Dim loopX As Byte, loopY As Byte
     
     MinLimiteX = (X \ 9 - 1) * 9
     MaxLimiteX = MinLimiteX + 26

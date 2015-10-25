@@ -18,6 +18,7 @@ Public Sub CambioDeArea(ByVal x As Integer, ByVal y As Integer)
     
     For loopX = MinXBorder To MaxXBorder
         For loopY = MinYBorder To MaxYBorder
+    
             If loopY < MinLimiteY Or loopY > MaxLimiteY Or loopX < MinLimiteX Or loopX > MaxLimiteX Then
                 'Erase NPCs
                 If MapData(loopX, loopY).CharIndex > 0 Then

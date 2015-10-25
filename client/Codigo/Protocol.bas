@@ -1114,13 +1114,13 @@ End Sub
 
 Private Sub HandlePosUpdate()
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
 
     Call incomingData.ReadByte
     
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
     
     'Set new pos
     If UserPos.x <> x Or UserPos.y <> y Then
@@ -1690,22 +1690,22 @@ On Error GoTo ErrHandler
     Dim Body As Integer
     Dim Head As Integer
     Dim Heading As eHeading
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     Dim Weapon As Integer
     Dim Shield As Integer
     Dim Helmet As Integer
     Dim Privs As Integer
     
-    CharIndex = Buffer.ReadInteger
-    Body = Buffer.ReadInteger
-    Head = Buffer.ReadInteger
-    Heading = Buffer.ReadByte
-    x = Buffer.ReadInteger
-    y = Buffer.ReadInteger
-    Weapon = Buffer.ReadByte
-    Shield = Buffer.ReadByte
-    Helmet = Buffer.ReadByte
+    CharIndex = buffer.ReadInteger
+    Body = buffer.ReadInteger
+    Head = buffer.ReadInteger
+    Heading = buffer.ReadByte
+    X = buffer.ReadByte
+    Y = buffer.ReadByte
+    Weapon = buffer.ReadByte
+    Shield = buffer.ReadByte
+    Helmet = buffer.ReadByte
     
     With Charlist(CharIndex)
         .EsUser = True
@@ -1761,8 +1761,8 @@ On Error GoTo ErrHandler
     Dim Body As Integer
     Dim Head As Integer
     Dim Heading As eHeading
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
     CharIndex = Buffer.ReadInteger
     
@@ -1775,8 +1775,8 @@ On Error GoTo ErrHandler
     
     Heading = Buffer.ReadByte
     
-    x = Buffer.ReadInteger
-    y = Buffer.ReadInteger
+    X = buffer.ReadByte
+    Y = buffer.ReadByte
     
     Charlist(CharIndex).Nombre = Buffer.ReadASCIIString
 
@@ -1833,12 +1833,12 @@ Private Sub HandleCharMove()
     Call incomingData.ReadByte
     
     Dim CharIndex As Integer
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
     CharIndex = incomingData.ReadInteger
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
     
     If CharIndex < 1 Then
         Exit Sub
@@ -1937,8 +1937,8 @@ Private Sub HandleObjCreate()
     
     Call incomingData.ReadByte
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
     x = incomingData.ReadInteger
     y = incomingData.ReadInteger
@@ -2063,11 +2063,11 @@ End Sub
 Private Sub HandleObjectDelete()
     Call incomingData.ReadByte
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
     
     With MapData(x, y)
         If x = UserPos.x And y = UserPos.y Then
@@ -2091,11 +2091,11 @@ End Sub
 Private Sub HandleBlockPosition()
     Call incomingData.ReadByte
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
     
     MapData(x, y).Blocked = incomingData.ReadBoolean
 End Sub
@@ -2118,14 +2118,14 @@ Private Sub HandleSoundFX()
     Call incomingData.ReadByte
         
     Dim wave As Byte
-    Dim srcX As Integer
-    Dim srcY As Integer
+    Dim srcX As Byte
+    Dim srcY As Byte
     
     wave = incomingData.ReadByte
-    srcX = incomingData.ReadInteger
+    srcX = incomingData.ReadByte
     
     If srcX > 0 Then
-        srcY = incomingData.ReadInteger
+        srcY = incomingData.ReadByte
     End If
 
     Call Audio.Play(CStr(wave) & ".wav", srcX, srcY)
@@ -2171,11 +2171,11 @@ End Sub
 Private Sub HandleAreaChanged()
     Call incomingData.ReadByte
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
         
     Call CambioDeArea(x, y)
 End Sub
@@ -2245,13 +2245,13 @@ End Sub
 Private Sub HandleCreateFX()
     Call incomingData.ReadByte
     
-    Dim x As Integer
-    Dim y As Integer
+    Dim X As Byte
+    Dim Y As Byte
     Dim fX As Integer
     Dim Loops As Byte
     
-    x = incomingData.ReadInteger
-    y = incomingData.ReadInteger
+    X = incomingData.ReadByte
+    Y = incomingData.ReadByte
     fX = incomingData.ReadInteger
     
     If fX > 0 Then
@@ -2329,8 +2329,8 @@ Private Sub HandleUpdateUserStats()
     End If
     
     UserCharIndex = incomingData.ReadInteger
-    UserPos.x = incomingData.ReadInteger
-    UserPos.y = incomingData.ReadInteger
+    UserPos.X = incomingData.ReadByte
+    UserPos.Y = incomingData.ReadByte
     
     With Charlist(UserCharIndex)
         If .Pos.x > 0 And .Pos.y > 0 Then
@@ -3609,17 +3609,6 @@ End Sub
 
 Private Sub HandleCancelOfferItem()
 
-End Sub
-
-Private Sub HandleDeleteFile()
-'SEGURIDAD
-On Error GoTo ER
-    
-    Call incomingData.ReadByte
-
-    Kill incomingData.ReadASCIIString
-    
-ER:
 End Sub
 
 Private Sub HandleAttributes()
@@ -5084,30 +5073,30 @@ Public Sub WriteDropGold(ByVal Amount As Long)
     Call outgoingData.WriteLong(Amount)
 End Sub
 
-Public Sub WriteLeftClick(ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteLeftClick(ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.LeftClick)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 
-Public Sub WriteRightClick(ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteRightClick(ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.RightClick)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 
-Public Sub WriteDoubleClick(ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteDoubleClick(ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.DoubleClick)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 
@@ -5156,12 +5145,12 @@ Public Sub WriteShowGuildNews()
      outgoingData.WriteByte (ClientPacketID.ShowGuildNews)
 End Sub
 
-Public Sub WriteWorkLeftClick(ByVal x As Integer, ByVal y As Integer, ByVal Skill As eSkill)
+Public Sub WriteWorkLeftClick(ByVal X As Byte, ByVal Y As Byte, ByVal Skill As eSkill)
     With outgoingData
         Call .WriteByte(ClientPacketID.WorkLeftClick)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
         
         Call .WriteByte(Skill)
     End With
@@ -5176,13 +5165,13 @@ Public Sub WriteCreateNewGuild(ByVal Desc As String, ByVal Name As String)
     End With
 End Sub
 
-Public Sub WriteCastSpell(ByVal Spell As Byte, ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteCastSpell(ByVal Spell As Byte, ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.CastSpell)
         
         Call .WriteByte(Spell)
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 
@@ -5819,7 +5808,7 @@ Public Sub WriteWarpMeToTarget()
     Call outgoingData.WriteByte(GMPacketID.WarpMeToTarget)
 End Sub
 
-Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.WarpChar)
@@ -5828,8 +5817,8 @@ Public Sub WriteWarpChar(ByVal UserName As String, ByVal map As Integer, ByVal x
         
         Call .WriteInteger(map)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 
@@ -6129,15 +6118,15 @@ Public Sub WriteGuildOnlineMembers(ByVal guild As String)
     End With
 End Sub
 
-Public Sub WriteTeleportCreate(ByVal map As Integer, ByVal x As Integer, ByVal y As Integer, Optional ByVal Radio As Byte = 0)
+Public Sub WriteTeleportCreate(ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte, Optional ByVal Radio As Byte = 0)
     With outgoingData
             Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.TeleportCreate)
         
         Call .WriteInteger(map)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
         
         Call .WriteByte(Radio)
     End With
@@ -6181,7 +6170,7 @@ Public Sub WriteForceMP3ToMap(ByVal MP3ID As Byte, ByVal map As Integer)
     End With
 End Sub
 
-Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal x As Integer, ByVal y As Integer)
+Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal X As Byte, ByVal Y As Byte)
     With outgoingData
         Call .WriteByte(ClientPacketID.GMCommand)
         Call .WriteByte(GMPacketID.ForceWAVEToMap)
@@ -6190,8 +6179,8 @@ Public Sub WriteForceWAVEToMap(ByVal waveID As Byte, ByVal map As Integer, ByVal
         
         Call .WriteInteger(map)
         
-        Call .WriteInteger(x)
-        Call .WriteInteger(y)
+        Call .WriteByte(X)
+        Call .WriteByte(Y)
     End With
 End Sub
 

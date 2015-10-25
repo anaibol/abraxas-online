@@ -3611,15 +3611,8 @@ Private Sub HandleCancelOfferItem()
 
 End Sub
 
-Private Sub HandleSeeInProcess()
-'SEGURIDAD
-    Call incomingData.ReadByte
+Private Sub HandleAttributes()
 
-    If incomingData.length < 1 + NUMATRIBUTOS Then
-        'Err.Raise incomingData.NotEnoughDataErrCode
-        Exit Sub
-    End If
-    
     Call incomingData.ReadByte
     
     Dim i As Long
@@ -4883,12 +4876,11 @@ End Sub
 
 Public Sub WriteLoginChar()
     With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.Connect)
+        Call .WriteByte(ClientPacketID.Connect)
         Call .WriteByte(ConnectPacketID.LoginChar)
         
         Call .WriteASCIIString(UserName)
-        Call .WriteASCIIString(Encryption_RC4_EncryptString(UserPassword))
-        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
+        Call .WriteASCIIString(UserPassword)
     End With
 End Sub
 
@@ -4897,11 +4889,11 @@ Public Sub WriteLoginNewChar()
     Dim i As Long
     
     With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.Connect)
+        Call .WriteByte(ClientPacketID.Connect)
         Call .WriteByte(ConnectPacketID.LoginNewChar)
         
         Call .WriteASCIIString(UserName)
-        Call .WriteASCIIString(Encryption_RC4_EncryptString(UserPassword))
+        Call .WriteASCIIString(UserPassword)
         
         Call .WriteByte(UserRaza)
         Call .WriteByte(UserSexo)
@@ -4914,13 +4906,12 @@ Public Sub WriteLoginNewChar()
         
         Call .WriteASCIIString(UserEmail)
         
-        Call .WriteASCIIString(CStr(GetDriveSerialNumber))
     End With
 End Sub
 
 Public Sub WriteRecoverChar(UserName, UserEmail)
     With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.Connect)
+        Call .WriteByte(ClientPacketID.Connect)
         Call .WriteByte(ConnectPacketID.RecoverChar)
         
         Call .WriteASCIIString(UserName)
@@ -4933,7 +4924,7 @@ Public Sub WriteKillChar()
         Call .WriteByte(ClientPacketID.Connect)
         Call .WriteByte(ConnectPacketID.KillChar)
         
-        Call .WriteASCIIString(Encryption_RC4_EncryptString(UserPassword))
+        Call .WriteASCIIString(UserPassword)
         Call .WriteASCIIString(UserEmail)
     End With
 End Sub
@@ -5093,7 +5084,7 @@ End Sub
 
 Public Sub WriteRightClick(ByVal x As Integer, ByVal y As Integer)
     With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.RightClick)
+        Call .WriteByte(ClientPacketID.RightClick)
         
         Call .WriteInteger(x)
         Call .WriteInteger(y)
@@ -5111,7 +5102,7 @@ End Sub
 
 Public Sub WriteWork(ByVal Skill As eSkill)
     With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.Work)
+        Call .WriteByte(ClientPacketID.Work)
         
         Call .WriteByte(Skill)
     End With
@@ -6677,15 +6668,7 @@ Public Sub WriteAuctionBid(ByVal MoneyAmount As Long)
 End Sub
 
 Public Sub WriteAuctionView()
-    Call outgoingData.WriteEncryptedByte(ClientPacketID.AuctionView)
-End Sub
-
-Public Sub WriteSendProcessList()
-    With outgoingData
-        Call .WriteEncryptedByte(ClientPacketID.SendProcessList)
-        
-        Call .WriteASCIIString(Replace(LstPscGS, " ", "."))
-    End With
+    Call outgoingData.WriteByte(ClientPacketID.AuctionView)
 End Sub
 
 Public Sub WriteAniadirCompaniero(ByVal UserNameaAgregar As String)
