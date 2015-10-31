@@ -1,6 +1,6 @@
 ##  Abraxas Online
 
-Abraxas is an MMORPG. This repo has a VB6 (yes, Visual Basic VI) version based on Argentum Online, an argentinian free (from freedom) MMORPG.
+Abraxas is an MMORPG. This repo has a VB6 (yes, Visual Basic VI) version based on Argentum Online, an argentinian free (as in Freedom) MMORPG.
 
 
 ###  Requirements:
