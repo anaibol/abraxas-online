@@ -18,6 +18,6 @@ You may want to set the server's listening port on Servidor.ini and set it with 
 
 ###  What does it look like?
 
-![](http://i.imm.io/8w4c.png)
+![](http://img834.imageshack.us/img834/7774/8w4c.png)
 
 
